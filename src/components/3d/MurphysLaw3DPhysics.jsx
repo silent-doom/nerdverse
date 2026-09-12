@@ -170,6 +170,7 @@ export default function MurphysLaw3DPhysics() {
   const [initialOverhang, setInitialOverhang] = useState(0.04); // meters overhang
   const [gravity, setGravity] = useState(9.81); // m/s^2 (Earth standard)
   const [slowMotion, setSlowMotion] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   // Telemetry State
   const [simState, setSimState] = useState('idle'); // 'idle', 'sliding', 'pivoting', 'falling', 'impact'
@@ -397,7 +398,7 @@ export default function MurphysLaw3DPhysics() {
     tableEdgeTrim.castShadow = true;
     tableGroup.add(tableEdgeTrim);
 
-    // 4 Turned Walnut Legs with Brass Ferrules
+    // 4 Turned Walnut Legs with Brass Ferrules (Normalized Unit Height = 1.0)
     const legRadius = 0.028;
     const legOffsets = [
       [-tableWidth + 0.11, -tableDepth / 2 + 0.11],
@@ -407,15 +408,18 @@ export default function MurphysLaw3DPhysics() {
     ];
     const legMeshes = [];
 
+    // Normalized unit-height cylinder ensures leg scaling NEVER penetrates the tabletop
+    const legGeom = new THREE.CylinderGeometry(legRadius, legRadius * 0.75, 1.0, 16);
+
     legOffsets.forEach(([lx, lz]) => {
-      const legGeom = new THREE.CylinderGeometry(legRadius, legRadius * 0.75, tableHeight - tableThick, 16);
       const leg = new THREE.Mesh(legGeom, woodMat);
+      leg.scale.set(1, tableHeight - tableThick, 1);
       leg.position.set(lx, (tableHeight - tableThick) / 2, lz);
       leg.castShadow = true;
       tableGroup.add(leg);
       legMeshes.push(leg);
 
-      // Brass foot ferrule
+      // Brass foot ferrule (Fixed at floor level)
       const ferrule = new THREE.Mesh(
         new THREE.CylinderGeometry(legRadius * 0.8, legRadius * 0.8, 0.06, 16),
         brassTrimMat
@@ -469,18 +473,19 @@ export default function MurphysLaw3DPhysics() {
 
     tableGroup.add(mugGroup);
 
-    // 7. Scientific Height Caliper Gauge
+    // 7. Scientific Height Caliper Gauge (Unit height = 1.0)
     const rulerGroup = new THREE.Group();
     rulerGroup.position.set(0.04, 0, -0.58);
     scene.add(rulerGroup);
 
-    const rulerPoleGeo = new THREE.BoxGeometry(0.025, tableHeight, 0.08);
+    const rulerPoleGeo = new THREE.BoxGeometry(0.025, 1.0, 0.08);
     const rulerPoleMat = new THREE.MeshStandardMaterial({
       map: createHeightRulerTexture(tableHeight),
       roughness: 0.3,
       metalness: 0.5,
     });
     const rulerPole = new THREE.Mesh(rulerPoleGeo, rulerPoleMat);
+    rulerPole.scale.set(1, tableHeight, 1);
     rulerPole.position.y = tableHeight / 2;
     rulerPole.castShadow = true;
     rulerGroup.add(rulerPole);
@@ -488,6 +493,22 @@ export default function MurphysLaw3DPhysics() {
     const rulerBase = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.015, 24), brassTrimMat);
     rulerBase.position.y = 0.0075;
     rulerGroup.add(rulerBase);
+
+    // 7b. 3D Overhang Indicator Bracket at Table Edge (Visually marks overhang offset d)
+    const overhangBracketMat = new THREE.MeshStandardMaterial({
+      color: 0xe5a93c,
+      roughness: 0.2,
+      metalness: 0.85,
+      emissive: 0xe5a93c,
+      emissiveIntensity: 0.45,
+    });
+    const overhangBracket = new THREE.Mesh(
+      new THREE.BoxGeometry(1.0, 0.002, 0.22),
+      overhangBracketMat
+    );
+    overhangBracket.scale.x = Math.max(0.002, initialOverhang);
+    overhangBracket.position.set(initialOverhang / 2, tableHeight + 0.001, 0);
+    tableGroup.add(overhangBracket);
 
     // 8. Artisan Buttered Toast Object (Substantial, Highly Visible Dimensions)
     const toastGroup = new THREE.Group();
@@ -554,7 +575,7 @@ export default function MurphysLaw3DPhysics() {
     scene.add(toastGroup);
 
     // 9. Rigid-Body Physics Engine State
-    let posX = -L / 2 - initialOverhang;
+    let posX = initialOverhang - L / 2;
     let posY = tableHeight + H / 2;
     let posZ = 0;
     let rotZ = 0;
@@ -571,14 +592,14 @@ export default function MurphysLaw3DPhysics() {
       plateGroup.position.y = h;
       mugGroup.position.y = h;
 
-      // Scale table legs smoothly
+      // Scale table legs smoothly without any clipping through the tabletop
       legMeshes.forEach((leg) => {
-        leg.scale.y = (h - tableThick) / (0.75 - tableThick);
+        leg.scale.set(1, h - tableThick, 1);
         leg.position.y = (h - tableThick) / 2;
       });
 
       // Update height caliper ruler
-      rulerPole.scale.y = h / 0.75;
+      rulerPole.scale.set(1, h, 1);
       rulerPole.position.y = h / 2;
       if (rulerPole.material.map) {
         rulerPole.material.map.dispose();
@@ -586,8 +607,13 @@ export default function MurphysLaw3DPhysics() {
       rulerPole.material.map = createHeightRulerTexture(h);
       rulerPole.material.needsUpdate = true;
 
-      // Reposition toast sitting right at the pivot edge
-      posX = -L / 2 - 0.025;
+      // Update 3D overhang indicator bracket
+      overhangBracket.scale.x = Math.max(0.002, oh);
+      overhangBracket.position.set(oh / 2, h + 0.001, 0);
+
+      // Reposition toast sitting precisely at overhang offset:
+      // Right edge of toast (posX + L/2) is at x = oh
+      posX = oh - L / 2;
       posY = h + H / 2;
       posZ = 0;
       rotZ = 0;
@@ -618,7 +644,8 @@ export default function MurphysLaw3DPhysics() {
       launch: () => {
         resetToast(tableHeight, initialOverhang);
         state = 'sliding';
-        velX = 0.22; // Gentle edge nudge velocity
+        // Nudge velocity is dynamically calibrated: greater overhang means center of mass is already closer to edge
+        velX = 0.12 + initialOverhang * 1.5;
         setSimState('sliding');
       },
       batchMonteCarlo: () => {
@@ -631,7 +658,9 @@ export default function MurphysLaw3DPhysics() {
           const h = tableHeight;
           const tFall = Math.sqrt((2 * h) / g);
           const thetaSlip = 0.52 + Math.random() * 0.1; // ~30-36 deg
-          const w = Math.sqrt((3 * g / L) * Math.sin(thetaSlip)) * 0.55;
+          // Overhang directly influences initial torque and angular momentum
+          const torqueFactor = 0.85 + (initialOverhang / (L / 2)) * 0.55;
+          const w = Math.sqrt((3 * g / L) * Math.sin(thetaSlip)) * 0.52 * torqueFactor;
           const totalAngleRad = thetaSlip + w * tFall;
           const finalDeg = ((totalAngleRad * 180 / Math.PI) % 360 + 360) % 360;
 
@@ -670,23 +699,23 @@ export default function MurphysLaw3DPhysics() {
           setSimState('pivoting');
         }
       } else if (state === 'pivoting') {
-        // Torque = m * g * (L/2) * cos(theta)
-        // Moment of Inertia I = (1/3) * m * L^2
-        // Alpha = (3g / 2L) * cos(theta)
-        const alpha = (3 * gravity) / (2 * L) * Math.cos(rotZ);
-        omega -= alpha * dt * 0.88;
+        // Torque = m * g * (L/2) * cos(theta) * overhangTorqueFactor
+        const torqueBoost = 0.85 + (initialOverhang / (L / 2)) * 0.55;
+        const alpha = ((3 * gravity) / (2 * L)) * Math.cos(rotZ) * torqueBoost;
+        omega -= alpha * dt;
         rotZ += omega * dt;
 
         // Geometric pivot around table edge (x = 0, y = tableHeight)
         posX = (L / 2) * (1 - Math.cos(rotZ));
         posY = tableHeight + H / 2 - (L / 2) * Math.sin(-rotZ);
 
-        // Edge slip condition: normal force vanishes when rotZ reaches ~32 degrees
-        if (rotZ < -Math.PI * 0.18) {
+        // Edge slip condition: normal force vanishes when rotZ reaches slip threshold
+        const slipThreshold = -Math.PI * (0.16 + (initialOverhang / L) * 0.08);
+        if (rotZ < slipThreshold) {
           state = 'free_fall';
           setSimState('falling');
-          velX = 0.28;
-          velY = -0.16;
+          velX = 0.22 + Math.abs(omega) * 0.04;
+          velY = -0.14 - Math.abs(omega) * 0.02;
         }
       } else if (state === 'free_fall') {
         timeInAir += dt;
@@ -753,14 +782,26 @@ export default function MurphysLaw3DPhysics() {
 
     const onWheel = (e) => {
       e.preventDefault();
-      cameraAngleRef.current.radius = Math.max(1.4, Math.min(5.5, cameraAngleRef.current.radius + e.deltaY * 0.005));
+      cameraAngleRef.current.radius = Math.max(0.7, Math.min(3.5, cameraAngleRef.current.radius + e.deltaY * 0.004));
       updateCameraPos();
+    };
+
+    const onKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        simContextRef.current?.launch();
+      } else if (e.code === 'KeyR') {
+        e.preventDefault();
+        simContextRef.current?.reset();
+      }
     };
 
     dom.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     dom.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('keydown', onKeyDown);
 
     const handleResize = () => {
       if (!container) return;
@@ -777,6 +818,7 @@ export default function MurphysLaw3DPhysics() {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       dom.removeEventListener('wheel', onWheel);
+      window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('resize', handleResize);
       if (container && renderer.domElement) {
         container.removeChild(renderer.domElement);
@@ -803,13 +845,48 @@ export default function MurphysLaw3DPhysics() {
         </p>
       </div>
 
-      {/* 3D WebGL Canvas */}
-      <div className={styles.canvasWrapper} ref={mountRef}>
+      {/* 3D WebGL Canvas with Interactive Instructions Overlay */}
+      <div className={styles.canvasWrapper}>
+        <div className={styles.canvasMount} ref={mountRef} />
         <div className={styles.canvasOverlay}>
-          <span className={styles.orbitHint}>
-            <Icon name="rotate-ccw" size={11} />
-            <span>Drag to rotate • Scroll to zoom</span>
-          </span>
+          <div className={styles.orbitHint}>
+            <Icon name="rotate-ccw" size={12} />
+            <span>🖱️ Drag to rotate • 🔍 Scroll to zoom</span>
+          </div>
+
+          <div className={styles.instructionCard}>
+            <div className={styles.instructionHeader}>
+              <span>⚡ Experiment Guide</span>
+              <button
+                className={styles.instructionToggle}
+                onClick={() => setShowInstructions(!showInstructions)}
+                title={showInstructions ? 'Minimize guide' : 'Expand guide'}
+              >
+                {showInstructions ? 'Hide' : 'Show'}
+              </button>
+            </div>
+
+            {showInstructions && (
+              <ul className={styles.instructionList}>
+                <li>
+                  <span>1.</span>
+                  <span><strong>Murphy's Test:</strong> At <span className={styles.keyBadge}>0.75m</span>, click Drop Toast or press <span className={styles.keyBadge}>Space</span>. Toast flips 180° and lands <strong>Butter-Down</strong>.</span>
+                </li>
+                <li>
+                  <span>2.</span>
+                  <span><strong>Inversion Test:</strong> Increase Table Elevation to <span className={styles.keyBadge}>2.6m</span>. Longer flight time completes a full 360° rotation to land <strong>Butter-Up</strong>!</span>
+                </li>
+                <li>
+                  <span>3.</span>
+                  <span><strong>Overhang:</strong> Slide <span className={styles.keyBadge}>1cm - 8cm</span> to see initial edge torque & tipping speed change.</span>
+                </li>
+                <li>
+                  <span>4.</span>
+                  <span><strong>Keys:</strong> <span className={styles.keyBadge}>Space</span> to drop, <span className={styles.keyBadge}>R</span> to reset table.</span>
+                </li>
+              </ul>
+            )}
+          </div>
         </div>
 
         <div className={styles.canvasTools}>
@@ -861,7 +938,7 @@ export default function MurphysLaw3DPhysics() {
             onChange={(e) => setInitialOverhang(Number(e.target.value))}
             className={styles.rangeInput}
           />
-          <span className={styles.hint}>Overhang determines initial gravitational torque</span>
+          <span className={styles.hint}>Overhang determines initial gravitational torque & tipping speed</span>
         </div>
 
         <div className={styles.controlGroup}>
@@ -904,7 +981,7 @@ export default function MurphysLaw3DPhysics() {
             {!outcome && 'Awaiting Drop...'}
           </div>
           <div className={styles.statFormula}>
-            {flightTime > 0 ? `Time of flight: ${flightTime}s (t = √(2h/g))` : 'Click Drop Toast to run'}
+            {flightTime > 0 ? `Time of flight: ${flightTime}s (t = √(2h/g))` : 'Click Drop Toast or press [Space]'}
           </div>
         </div>
       </div>
