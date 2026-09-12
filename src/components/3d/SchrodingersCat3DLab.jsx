@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import styles from './SchrodingersCat3DLab.module.css';
 import Button from '@/components/ui/Button/Button';
 import Icon from '@/components/common/Icon';
@@ -1276,6 +1277,46 @@ export default function SchrodingersCat3DLab() {
     catDeadMeshRef.current = deadMesh;
     catGroupRef.current = catGroup;
     scene.add(catGroup);
+
+    // Asynchronously load the fine-grained Blender-modeled assets (with seamless fallback)
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.load(
+      '/models/schrodinger_cat.glb',
+      (gltf) => {
+        const model = gltf.scene;
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        aliveMesh.clear();
+        aliveMesh.add(model);
+      },
+      undefined,
+      () => {
+        // Keeps procedural model intact
+      }
+    );
+
+    gltfLoader.load(
+      '/models/schrodinger_cat_dead.glb',
+      (gltf) => {
+        const model = gltf.scene;
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        deadMesh.clear();
+        deadMesh.add(model);
+      },
+      undefined,
+      () => {
+        // Keeps procedural model intact
+      }
+    );
 
     // 12. Animation Render Loop
     let clock = new THREE.Clock();
