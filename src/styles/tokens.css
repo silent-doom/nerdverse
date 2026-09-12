@@ -1,54 +1,30 @@
 /* =====================================================
-   NerdVerse Design Tokens — Deep Obsidian & Electric Sci-Fi
+   NerdVerse Design Tokens — Strict 3-4 Color Minimalist Palette
    =====================================================
-   Predominantly black background, high readability,
-   curated Color Hunt tech palette with refined accents.
+   Palette:
+   1. Canvas Void: #08090C / #0E1117
+   2. Surface Graphite: #141721 / Border: #202636
+   3. Crisp White: #FFFFFF / Muted Slate: #94A3B8
+   4. Signature Accent: #00D2FF (Electric Cyan)
    ===================================================== */
 
 :root {
-  /* ── Canvas & Surface Baseline (Predominantly Black) ── */
+  /* ── Color 1: Canvas & Backgrounds (Void Black) ── */
   --color-bg-primary: #08090C;
   --color-bg-secondary: #0E1117;
-  --color-bg-tertiary: #151922;
-  --color-bg-elevated: #1B202D;
-  --color-bg-surface: #10131B;
+  --color-bg-tertiary: #141721;
+  --color-bg-elevated: #181C28;
+  --color-bg-surface: #0E1117;
 
-  /* ── Crisp Dark Surfaces & Borders ── */
+  /* ── Color 2: Surfaces & Structural Borders (Dark Graphite) ── */
   --color-card-bg: #12151E;
-  --color-card-hover-bg: #181C28;
-  --color-border-default: #222736;
-  --color-border-subtle: #191D28;
-  --color-border-strong: #333A4F;
+  --color-card-hover-bg: #161A26;
+  --color-border-default: #202636;
+  --color-border-subtle: #171A24;
+  --color-border-strong: #2B3347;
   --color-border-focus: #00D2FF;
 
-  /* ── Brand Accents (Color Hunt: Electric Cyan & Solar Coral) ── */
-  --color-brand-primary: #00D2FF;
-  --color-brand-hover: #33DCFF;
-  --color-brand-active: #00B4DB;
-  --color-brand-contrast: #08090C;
-
-  /* ── Specialized Scientific Accents ── */
-  --color-accent-quantum: #00D2FF;   /* Electric Cyan */
-  --color-accent-gold: #FFB800;      /* Solar Gold */
-  --color-accent-emerald: #00E599;   /* Quantum Mint */
-  --color-accent-crimson: #FF3366;   /* Paradox Rose */
-  --color-accent-purple: #8A2BE2;    /* Theoretical Purple */
-
-  /* ── Discipline Accents ── */
-  --color-category-physics: #00D2FF;
-  --color-category-math: #FFB800;
-  --color-category-philosophy: #FF3366;
-  --color-category-psychology: #A855F7;
-  --color-category-cs: #38BDF8;
-  --color-category-biology: #00E599;
-  --color-category-economics: #FB923C;
-
-  /* ── Difficulty Levels ── */
-  --color-difficulty-beginner: #00E599;
-  --color-difficulty-intermediate: #FFB800;
-  --color-difficulty-advanced: #FF3366;
-
-  /* ── High-Contrast Legible Typography ── */
+  /* ── Color 3: Typography & Text Hierarchy ── */
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #94A3B8;
   --color-text-tertiary: #64748B;
@@ -57,10 +33,37 @@
   --color-text-link: #00D2FF;
   --color-text-link-hover: #FFFFFF;
 
+  /* ── Color 4: Single Signature Accent (#00D2FF) ── */
+  --color-brand-primary: #00D2FF;
+  --color-brand-hover: #33DCFF;
+  --color-brand-active: #00B4DB;
+  --color-brand-contrast: #08090C;
+
+  /* ── Unified Accents (Strictly restricted to Signature Accent & Neutrals) ── */
+  --color-accent-quantum: #00D2FF;
+  --color-accent-gold: #00D2FF;
+  --color-accent-emerald: #00D2FF;
+  --color-accent-crimson: #00D2FF;
+  --color-accent-purple: #00D2FF;
+
+  /* ── Discipline Accents (All mapped to Signature Accent) ── */
+  --color-category-physics: #00D2FF;
+  --color-category-math: #00D2FF;
+  --color-category-philosophy: #00D2FF;
+  --color-category-psychology: #00D2FF;
+  --color-category-cs: #00D2FF;
+  --color-category-biology: #00D2FF;
+  --color-category-economics: #00D2FF;
+
+  /* ── Difficulty Levels (Mapped to Signature Accent / Subtle Slate) ── */
+  --color-difficulty-beginner: #94A3B8;
+  --color-difficulty-intermediate: #00D2FF;
+  --color-difficulty-advanced: #00D2FF;
+
   /* ── Status & Telemetry ── */
-  --color-status-success: #00E599;
-  --color-status-warning: #FFB800;
-  --color-status-danger: #FF3366;
+  --color-status-success: #00D2FF;
+  --color-status-warning: #94A3B8;
+  --color-status-danger: #00D2FF;
   --color-status-info: #00D2FF;
 
   /* ── Typography ── */
@@ -131,7 +134,7 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.65);
-  --shadow-accent: 0 0 20px rgba(0, 210, 255, 0.2);
+  --shadow-accent: 0 0 20px rgba(0, 210, 255, 0.15);
 
   /* ── Transitions ── */
   --duration-fast: 120ms;

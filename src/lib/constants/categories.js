@@ -1,5 +1,5 @@
 /**
- * Category definitions with Solar Obsidian discipline colors and SVG icon identifiers.
+ * Category definitions with unified scientific electric cyan accent.
  */
 export const CATEGORIES = [
   {
@@ -8,7 +8,7 @@ export const CATEGORIES = [
     slug: 'physics',
     icon: 'atom',
     iconName: 'atom',
-    color: '#00e5ff',
+    color: '#00D2FF',
     description: 'Quantum mechanics, relativity, astrophysics, and spacetime.',
   },
   {
@@ -17,7 +17,7 @@ export const CATEGORIES = [
     slug: 'math',
     icon: 'math',
     iconName: 'math',
-    color: '#ffb300',
+    color: '#00D2FF',
     description: 'Probability paradoxes, game theory, number theory, and topology.',
   },
   {
@@ -26,7 +26,7 @@ export const CATEGORIES = [
     slug: 'philosophy',
     icon: 'compass',
     iconName: 'compass',
-    color: '#ff5722',
+    color: '#00D2FF',
     description: 'Thought experiments, metaphysics, epistemology, and moral dilemmas.',
   },
   {
@@ -35,7 +35,7 @@ export const CATEGORIES = [
     slug: 'psychology',
     icon: 'brain',
     iconName: 'brain',
-    color: '#ff1744',
+    color: '#00D2FF',
     description: 'Cognitive biases, perception, consciousness, and behavioral economics.',
   },
   {
@@ -44,7 +44,7 @@ export const CATEGORIES = [
     slug: 'cs',
     icon: 'code',
     iconName: 'code',
-    color: '#00e676',
+    color: '#00D2FF',
     description: 'Algorithms, complexity theory, cryptography, and computation.',
   },
   {
@@ -53,7 +53,7 @@ export const CATEGORIES = [
     slug: 'biology',
     icon: 'dna',
     iconName: 'dna',
-    color: '#00b0ff',
+    color: '#00D2FF',
     description: 'Evolutionary theory, genetics, neuroscience, and ecology.',
   },
   {
@@ -62,7 +62,7 @@ export const CATEGORIES = [
     slug: 'economics',
     icon: 'chart',
     iconName: 'chart',
-    color: '#d500f9',
+    color: '#00D2FF',
     description: 'Market dynamics, incentive structures, and complex systems.',
   },
 ];

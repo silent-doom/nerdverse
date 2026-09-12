@@ -137,11 +137,8 @@ export default function HomePage() {
               >
                 <Card variant="interactive" padding="md" className={styles.catCard}>
                   <div className={styles.categoryCardInner}>
-                    <div
-                      className={styles.categoryIconBadge}
-                      style={{ backgroundColor: cat.color }}
-                    >
-                      <Icon name={cat.iconName} size={24} color="#1A1A1A" />
+                    <div className={styles.categoryIconBadge}>
+                      <Icon name={cat.iconName} size={22} color="var(--color-brand-primary)" />
                     </div>
                     <h3 className={styles.categoryName}>{cat.name}</h3>
                     <p className={styles.categoryDesc}>{cat.description}</p>
