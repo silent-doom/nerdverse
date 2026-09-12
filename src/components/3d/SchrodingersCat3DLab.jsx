@@ -2,7 +2,6 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import styles from './SchrodingersCat3DLab.module.css';
 import Button from '@/components/ui/Button/Button';
 import Icon from '@/components/common/Icon';
@@ -1034,173 +1033,212 @@ export default function SchrodingersCat3DLab() {
     const createAnatomicalCat = (isDeadPose = false) => {
       const catSubGroup = new THREE.Group();
 
-      // Natural domestic feline fur (Sleek Russian Blue / Slate-Charcoal with warm satin finish)
-      const furColor = isDeadPose ? 0x2e3342 : 0x383e50;
+      // Rich warm scholarly amber ginger coat (expressive, charismatic, authentic feline)
+      const furColor = isDeadPose ? 0x383e50 : 0xd97706;
       const furMat = new THREE.MeshStandardMaterial({
         color: furColor,
-        roughness: 0.76,
-        metalness: 0.05,
+        roughness: 0.74,
+        metalness: 0.04,
       });
 
       const chestBibMat = new THREE.MeshStandardMaterial({
-        color: isDeadPose ? 0x94a3b8 : 0xd8d3cb,
-        roughness: 0.78,
+        color: isDeadPose ? 0x64748b : 0xfef3c7,
+        roughness: 0.76,
       });
 
       const innerEarMat = new THREE.MeshStandardMaterial({
-        color: isDeadPose ? 0x475569 : 0xcc8b86,
+        color: isDeadPose ? 0x475569 : 0xfbbf24,
         roughness: 0.65,
       });
 
       const noseMat = new THREE.MeshStandardMaterial({
-        color: 0x27272a,
+        color: 0x181a24,
         roughness: 0.35,
       });
 
       const catEyeTex = createCatEyeTexture();
 
       if (!isDeadPose) {
-        // ================= ALIVE POSE (Natural, alert, seated domestic feline) =================
+        // ================= ALIVE POSE (Expressive, alert, charismatic domestic feline) =================
 
-        // 1. Ribcage & Chest (Leaned naturally, realistic proportions)
-        const ribcage = new THREE.Mesh(new THREE.SphereGeometry(0.32, 20, 16), furMat);
-        ribcage.scale.set(0.92, 1.22, 1.18);
-        ribcage.position.set(0, 0.58, -0.04);
+        // 1. Ribcage & Chest (Leaned forward with subtle breathing animation)
+        const ribcage = new THREE.Mesh(new THREE.SphereGeometry(0.34, 22, 18), furMat);
+        ribcage.scale.set(0.95, 1.25, 1.22);
+        ribcage.position.set(0, 0.60, -0.04);
         ribcage.rotation.x = -0.18;
         ribcage.castShadow = true;
         ribcage.name = 'chest';
         catSubGroup.add(ribcage);
 
-        // Soft cream bib on front chest
-        const bib = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 12), chestBibMat);
-        bib.scale.set(0.65, 1.1, 0.5);
-        bib.position.set(0, 0.54, 0.22);
+        // Warm Cream Bib on front chest
+        const bib = new THREE.Mesh(new THREE.SphereGeometry(0.25, 18, 14), chestBibMat);
+        bib.scale.set(0.68, 1.12, 0.52);
+        bib.position.set(0, 0.56, 0.24);
         bib.rotation.x = -0.22;
         catSubGroup.add(bib);
 
-        // 2. Flanks & Pelvis
-        const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.34, 20, 16), furMat);
-        pelvis.scale.set(1.05, 0.95, 1.12);
-        pelvis.position.set(0, 0.32, -0.18);
+        // 2. Muscular Flanks & Pelvis
+        const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.36, 22, 18), furMat);
+        pelvis.scale.set(1.08, 0.95, 1.15);
+        pelvis.position.set(0, 0.34, -0.18);
         pelvis.castShadow = true;
         catSubGroup.add(pelvis);
 
         // 3. Folded Rear Thighs (Left and Right haunches)
-        const thighL = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 12), furMat);
-        thighL.scale.set(0.68, 1.15, 1.25);
-        thighL.position.set(-0.28, 0.26, -0.14);
+        const thighL = new THREE.Mesh(new THREE.SphereGeometry(0.26, 18, 14), furMat);
+        thighL.scale.set(0.68, 1.18, 1.28);
+        thighL.position.set(-0.30, 0.28, -0.14);
         thighL.castShadow = true;
         catSubGroup.add(thighL);
 
-        const thighR = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 12), furMat);
-        thighR.scale.set(0.68, 1.15, 1.25);
-        thighR.position.set(0.28, 0.26, -0.14);
+        const thighR = new THREE.Mesh(new THREE.SphereGeometry(0.26, 18, 14), furMat);
+        thighR.scale.set(0.68, 1.18, 1.28);
+        thighR.position.set(0.30, 0.28, -0.14);
         thighR.castShadow = true;
         catSubGroup.add(thighR);
 
-        // 4. Slender Front Forelegs & Paws (Resting squarely on the steel floor)
-        const legGeom = new THREE.CylinderGeometry(0.065, 0.055, 0.48, 14);
+        // 4. Slender Front Forelegs & Sculpted Paws with Toe Pads
+        const legGeom = new THREE.CylinderGeometry(0.068, 0.058, 0.50, 16);
         const legL = new THREE.Mesh(legGeom, furMat);
-        legL.position.set(-0.14, 0.24, 0.24);
+        legL.position.set(-0.15, 0.25, 0.25);
         legL.castShadow = true;
         catSubGroup.add(legL);
 
         const legR = new THREE.Mesh(legGeom, furMat);
-        legR.position.set(0.14, 0.24, 0.24);
+        legR.position.set(0.15, 0.25, 0.25);
         legR.castShadow = true;
         catSubGroup.add(legR);
 
-        const pawGeom = new THREE.SphereGeometry(0.08, 14, 10);
+        // Paws
+        const pawGeom = new THREE.SphereGeometry(0.088, 16, 12);
         pawGeom.scale(1.05, 0.65, 1.35);
         const pawL = new THREE.Mesh(pawGeom, furMat);
-        pawL.position.set(-0.14, 0.04, 0.32);
+        pawL.position.set(-0.15, 0.04, 0.33);
         catSubGroup.add(pawL);
 
         const pawR = new THREE.Mesh(pawGeom, furMat);
-        pawR.position.set(0.14, 0.04, 0.32);
+        pawR.position.set(0.15, 0.04, 0.33);
         catSubGroup.add(pawR);
 
-        // 5. Cranium & Facial Anatomy
+        // Individual Toe Pads
+        const toeMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.5 });
+        for (let t = -1; t <= 1; t++) {
+          const toeL = new THREE.Mesh(new THREE.SphereGeometry(0.024, 8, 8), toeMat);
+          toeL.position.set(-0.15 + t * 0.032, 0.032, 0.41);
+          catSubGroup.add(toeL);
+
+          const toeR = new THREE.Mesh(new THREE.SphereGeometry(0.024, 8, 8), toeMat);
+          toeR.position.set(0.15 + t * 0.032, 0.032, 0.41);
+          catSubGroup.add(toeR);
+        }
+
+        // 5. Cranium & Expressive Feline Facial Anatomy
         const headGroup = new THREE.Group();
-        headGroup.position.set(0, 1.02, 0.08); // Ear tips reach y ~ -0.98, head at y ~ -1.13
+        headGroup.position.set(0, 1.06, 0.08); // Ear tips reach y ~ -0.96, head at y ~ -1.10
         headGroup.name = 'head';
 
-        // Sculpted wedge-shaped cranium (Natural feline skull)
-        const cranium = new THREE.Mesh(new THREE.SphereGeometry(0.26, 20, 16), furMat);
-        cranium.scale.set(1.04, 0.94, 1.0);
+        // Sculpted wedge-shaped cranium
+        const cranium = new THREE.Mesh(new THREE.SphereGeometry(0.28, 22, 18), furMat);
+        cranium.scale.set(1.05, 0.94, 1.0);
         cranium.castShadow = true;
         headGroup.add(cranium);
 
-        // Subtle Muzzle Pad
-        const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 10), furMat);
-        muzzle.scale.set(1.3, 0.8, 1.0);
-        muzzle.position.set(0, -0.06, 0.22);
-        headGroup.add(muzzle);
+        // Distinct Left and Right Whisker Cushions (Bilateral Muzzle Pads)
+        const muzzleGeom = new THREE.SphereGeometry(0.095, 16, 14);
+        muzzleGeom.scale(1.15, 0.9, 1.1);
 
-        // Rhinarium Nose Leather
-        const nose = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.04, 3), noseMat);
+        const muzzleL = new THREE.Mesh(muzzleGeom, furMat);
+        muzzleL.position.set(-0.075, -0.07, 0.25);
+        headGroup.add(muzzleL);
+
+        const muzzleR = new THREE.Mesh(muzzleGeom, furMat);
+        muzzleR.position.set(0.075, -0.07, 0.25);
+        headGroup.add(muzzleR);
+
+        // Rhinarium Nose Leather (Inverted triangle resting between whisker pads)
+        const nose = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.048, 3), noseMat);
         nose.rotation.x = Math.PI;
-        nose.position.set(0, -0.04, 0.31);
+        nose.position.set(0, -0.035, 0.32);
         headGroup.add(nose);
 
-        // Triangular Feline Ears with Acoustic Cavities
-        const earGeom = new THREE.ConeGeometry(0.11, 0.22, 4);
+        // Realistic Fine Whisker Filaments (3 on each side protruding gracefully)
+        const whiskerMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb, transparent: true, opacity: 0.8 });
+        for (let w = -1; w <= 1; w++) {
+          const wL = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-0.08, -0.07 + w * 0.025, 0.27),
+            new THREE.Vector3(-0.24, -0.08 + w * 0.035, 0.24),
+            new THREE.Vector3(-0.38, -0.10 + w * 0.045, 0.18),
+          ]);
+          headGroup.add(new THREE.Mesh(new THREE.TubeGeometry(wL, 8, 0.0035, 4, false), whiskerMat));
+
+          const wR = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0.08, -0.07 + w * 0.025, 0.27),
+            new THREE.Vector3(0.24, -0.08 + w * 0.035, 0.24),
+            new THREE.Vector3(0.38, -0.10 + w * 0.045, 0.18),
+          ]);
+          headGroup.add(new THREE.Mesh(new THREE.TubeGeometry(wR, 8, 0.0035, 4, false), whiskerMat));
+        }
+
+        // Alert Feline Ears with Acoustic Inner Cavities
+        const earGeom = new THREE.ConeGeometry(0.125, 0.25, 4);
         earGeom.scale(1.0, 1.0, 0.55);
 
         const earL = new THREE.Mesh(earGeom, furMat);
-        earL.position.set(-0.15, 0.25, 0.02);
+        earL.position.set(-0.16, 0.27, 0.02);
         earL.rotation.z = 0.22;
         earL.rotation.y = -0.18;
         headGroup.add(earL);
 
         const earR = new THREE.Mesh(earGeom, furMat);
-        earR.position.set(0.15, 0.25, 0.02);
+        earR.position.set(0.16, 0.27, 0.02);
         earR.rotation.z = -0.22;
         earR.rotation.y = 0.18;
         headGroup.add(earR);
 
-        const innerEarGeom = new THREE.ConeGeometry(0.07, 0.16, 4);
+        const innerEarGeom = new THREE.ConeGeometry(0.085, 0.19, 4);
         innerEarGeom.scale(0.8, 1.0, 0.35);
         const innerEarL = new THREE.Mesh(innerEarGeom, innerEarMat);
-        innerEarL.position.set(-0.14, 0.23, 0.05);
+        innerEarL.position.set(-0.15, 0.25, 0.05);
         innerEarL.rotation.z = 0.22;
         headGroup.add(innerEarL);
 
         const innerEarR = new THREE.Mesh(innerEarGeom, innerEarMat);
-        innerEarR.position.set(0.14, 0.23, 0.05);
+        innerEarR.position.set(0.15, 0.25, 0.05);
         innerEarR.rotation.z = -0.22;
         headGroup.add(innerEarR);
 
-        // Realistic Almond Feline Eyes (Embedded naturally into skull)
-        const eyeGeom = new THREE.SphereGeometry(0.058, 16, 16);
+        // Expressive Almond Feline Eyes with Procedural Amber Iris & Slit Pupil Texture
+        const eyeGeom = new THREE.SphereGeometry(0.075, 18, 18);
         const eyeMat = new THREE.MeshStandardMaterial({
           map: catEyeTex,
-          roughness: 0.1,
-          metalness: 0.25,
+          roughness: 0.08,
+          metalness: 0.15,
         });
 
         const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
-        eyeL.position.set(-0.1, 0.03, 0.22);
-        eyeL.rotation.y = -0.15;
+        eyeL.position.set(-0.12, 0.035, 0.24);
+        eyeL.rotation.y = -0.14;
+        eyeL.rotation.z = 0.06;
         headGroup.add(eyeL);
 
         const eyeR = new THREE.Mesh(eyeGeom, eyeMat);
-        eyeR.position.set(0.1, 0.03, 0.22);
-        eyeR.rotation.y = 0.15;
+        eyeR.position.set(0.12, 0.035, 0.24);
+        eyeR.rotation.y = 0.14;
+        eyeR.rotation.z = -0.06;
         headGroup.add(eyeR);
 
         catSubGroup.add(headGroup);
 
-        // 6. Graceful Tail Curled Around Paws
+        // 6. Graceful Tail Curled Around Forepaws
         const tailCurve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, 0.15, -0.28),
-          new THREE.Vector3(0.28, 0.09, -0.32),
-          new THREE.Vector3(0.48, 0.05, -0.05),
-          new THREE.Vector3(0.38, 0.05, 0.32),
-          new THREE.Vector3(0.18, 0.07, 0.44),
+          new THREE.Vector3(0, 0.18, -0.28),
+          new THREE.Vector3(0.26, 0.11, -0.32),
+          new THREE.Vector3(0.48, 0.06, -0.06),
+          new THREE.Vector3(0.40, 0.05, 0.34),
+          new THREE.Vector3(0.19, 0.07, 0.46),
         ]);
         const tailMesh = new THREE.Mesh(
-          new THREE.TubeGeometry(tailCurve, 24, 0.055, 10, false),
+          new THREE.TubeGeometry(tailCurve, 28, 0.058, 10, false),
           furMat
         );
         tailMesh.name = 'tail';
@@ -1208,44 +1246,44 @@ export default function SchrodingersCat3DLab() {
       } else {
         // ================= DEAD / COLLAPSED POSE (Resting peacefully on the chamber floor) =================
 
-        const body = new THREE.Mesh(new THREE.SphereGeometry(0.34, 16, 14), furMat);
+        const body = new THREE.Mesh(new THREE.SphereGeometry(0.36, 18, 16), furMat);
         body.scale.set(1.35, 0.75, 0.95);
         body.position.set(-0.12, 0.2, 0);
         body.rotation.z = 0.06;
         body.castShadow = true;
         catSubGroup.add(body);
 
-        const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.32, 16, 14), furMat);
+        const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.34, 18, 16), furMat);
         pelvis.scale.set(1.1, 0.7, 0.9);
         pelvis.position.set(0.38, 0.18, -0.04);
         catSubGroup.add(pelvis);
 
         // Reclined Head resting on the floor
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 14), furMat);
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.26, 18, 16), furMat);
         head.scale.set(1.05, 0.85, 0.95);
         head.position.set(-0.62, 0.15, 0.08);
         head.rotation.z = -0.2;
         catSubGroup.add(head);
 
-        const earL = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.18, 4), furMat);
+        const earL = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.20, 4), furMat);
         earL.position.set(-0.76, 0.28, 0.12);
         earL.rotation.z = -0.35;
         catSubGroup.add(earL);
 
         // Limp relaxed paws
-        const paw1 = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.32, 6, 10), furMat);
+        const paw1 = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.34, 6, 10), furMat);
         paw1.rotation.z = Math.PI / 2.5;
         paw1.position.set(-0.25, 0.07, 0.28);
         catSubGroup.add(paw1);
 
-        const paw2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.32, 6, 10), furMat);
+        const paw2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.34, 6, 10), furMat);
         paw2.rotation.z = Math.PI / 2.8;
         paw2.position.set(0.24, 0.07, 0.28);
         catSubGroup.add(paw2);
 
         // Closed eyelid slits (peaceful repose)
         const closedEye = new THREE.Mesh(
-          new THREE.BoxGeometry(0.08, 0.015, 0.015),
+          new THREE.BoxGeometry(0.09, 0.016, 0.016),
           new THREE.MeshBasicMaterial({ color: 0x1e2230 })
         );
         closedEye.position.set(-0.6, 0.16, 0.3);
@@ -1259,7 +1297,7 @@ export default function SchrodingersCat3DLab() {
           new THREE.Vector3(0.96, 0.04, 0.28),
         ]);
         const tailDead = new THREE.Mesh(
-          new THREE.TubeGeometry(tailCurveDead, 16, 0.05, 8, false),
+          new THREE.TubeGeometry(tailCurveDead, 18, 0.052, 8, false),
           furMat
         );
         catSubGroup.add(tailDead);
@@ -1277,46 +1315,6 @@ export default function SchrodingersCat3DLab() {
     catDeadMeshRef.current = deadMesh;
     catGroupRef.current = catGroup;
     scene.add(catGroup);
-
-    // Asynchronously load the fine-grained Blender-modeled assets (with seamless fallback)
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.load(
-      '/models/schrodinger_cat.glb',
-      (gltf) => {
-        const model = gltf.scene;
-        model.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-          }
-        });
-        aliveMesh.clear();
-        aliveMesh.add(model);
-      },
-      undefined,
-      () => {
-        // Keeps procedural model intact
-      }
-    );
-
-    gltfLoader.load(
-      '/models/schrodinger_cat_dead.glb',
-      (gltf) => {
-        const model = gltf.scene;
-        model.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-          }
-        });
-        deadMesh.clear();
-        deadMesh.add(model);
-      },
-      undefined,
-      () => {
-        // Keeps procedural model intact
-      }
-    );
 
     // 12. Animation Render Loop
     let clock = new THREE.Clock();
