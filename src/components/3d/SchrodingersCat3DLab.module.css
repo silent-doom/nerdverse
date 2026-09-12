@@ -1,0 +1,526 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  color: var(--color-text-primary, #F9FAFB);
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+/* Header */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tagline {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent-amber, #E5A93C);
+  font-weight: 600;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #F9FAFB);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary, #9CA3AF);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 54rem;
+}
+
+/* Main 3D Viewport Area */
+.viewportWrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: #07080B;
+  border-radius: var(--radius-lg, 10px);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+  user-select: none;
+}
+
+.canvasContainer {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.canvasContainer:active {
+  cursor: grabbing;
+}
+
+/* Camera Hint */
+.cameraHint {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(14, 15, 20, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #9CA3AF);
+  pointer-events: auto;
+}
+
+.resetCamBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(229, 169, 60, 0.1);
+  border: 1px solid rgba(229, 169, 60, 0.25);
+  color: var(--color-accent-amber, #E5A93C);
+  border-radius: var(--radius-full, 9999px);
+  padding: 0.2rem 0.55rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.resetCamBtn:hover {
+  background: rgba(229, 169, 60, 0.22);
+  border-color: var(--color-accent-amber, #E5A93C);
+  color: #FCD34D;
+}
+
+/* Live Quantum State Badge HUD */
+.statusHud {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: rgba(14, 15, 20, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  pointer-events: none;
+}
+
+.statusLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted, #6B7280);
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.statusValue {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.statusValue.sealed {
+  color: var(--color-accent-amber, #E5A93C);
+}
+
+.statusValue.measuring {
+  color: #FCD34D;
+  animation: pulseDecoherence 0.8s infinite alternate ease-in-out;
+}
+
+.statusValue.alive {
+  color: #34D399;
+}
+
+.statusValue.dead {
+  color: #F87171;
+}
+
+@keyframes pulseDecoherence {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Quick Viewport Controls (Top Right) */
+.viewportControls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.viewBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.75rem;
+  background: rgba(14, 15, 20, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-radius: var(--radius-md, 6px);
+  color: var(--color-text-secondary, #9CA3AF);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.viewBtn:hover {
+  background: rgba(25, 27, 36, 0.95);
+  border-color: var(--color-border-default, #323644);
+  color: var(--color-text-primary, #F9FAFB);
+}
+
+.activeViewBtn {
+  background: rgba(229, 169, 60, 0.15);
+  border-color: var(--color-accent-amber, #E5A93C);
+  color: var(--color-accent-amber, #E5A93C);
+}
+
+/* Everett Many-Worlds Multiverse Branch Banner */
+.manyWorldsBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--color-surface-card, #13151C);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-left: 3px solid var(--color-accent-amber, #E5A93C);
+  border-radius: var(--radius-md, 8px);
+  padding: 1rem 1.25rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.branchHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-accent-amber, #E5A93C);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.branchesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.875rem;
+}
+
+.branchCard {
+  background: var(--color-surface-input, #0E0F14);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.branchCard.activeBranch {
+  border-color: var(--color-accent-amber, #E5A93C);
+  background: rgba(229, 169, 60, 0.05);
+}
+
+.branchTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted, #6B7280);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+}
+
+.branchOutcome {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #F9FAFB);
+  margin-bottom: 0.35rem;
+}
+
+.branchDesc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #9CA3AF);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Interactive Dashboard Grid */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 860px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+.controlPanel,
+.telemetryPanel {
+  background: var(--color-surface-card, #13151C);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-radius: var(--radius-lg, 10px);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.panelTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary, #9CA3AF);
+  margin: 0;
+  border-bottom: 1px solid var(--color-border-subtle, #21232C);
+  padding-bottom: 0.5rem;
+}
+
+/* Primary Action Button */
+.primaryActionRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.actionBtn {
+  width: 100%;
+  justify-content: center;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Slider */
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sliderLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--color-text-primary, #F9FAFB);
+}
+
+.halfLifeNotice {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-accent-amber, #E5A93C);
+}
+
+.timeSlider {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-full, 9999px);
+  background: #21232C;
+  accent-color: var(--color-accent-amber, #E5A93C);
+  cursor: pointer;
+}
+
+.timeSlider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sliderScale {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted, #6B7280);
+}
+
+/* Interpretation Switcher */
+.interpretationRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.controlLabel {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #9CA3AF);
+}
+
+.toggleGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--color-surface-input, #0E0F14);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-radius: var(--radius-md, 6px);
+  padding: 3px;
+  gap: 3px;
+}
+
+.toggleBtn {
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.75rem;
+  font-family: var(--font-sans, sans-serif);
+  font-weight: 500;
+  color: var(--color-text-secondary, #9CA3AF);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.toggleBtn:hover {
+  color: var(--color-text-primary, #F9FAFB);
+}
+
+.toggleActive {
+  background: var(--color-surface-card, #13151C);
+  color: var(--color-accent-amber, #E5A93C);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Telemetry Probability Gauge */
+.probGauge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gaugeHeader {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #9CA3AF);
+}
+
+.gaugeTrack {
+  display: flex;
+  height: 8px;
+  width: 100%;
+  border-radius: var(--radius-full, 9999px);
+  overflow: hidden;
+  background: #21232C;
+}
+
+.gaugeAlive {
+  background: #10B981;
+  transition: width 0.3s ease;
+}
+
+.gaugeDead {
+  background: var(--color-accent-amber, #E5A93C);
+  transition: width 0.3s ease;
+}
+
+/* Telemetry Grid */
+.telemetryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.telemetryCard {
+  background: var(--color-surface-input, #0E0F14);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-radius: var(--radius-md, 6px);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.telemetryNum {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #F9FAFB);
+}
+
+.telemetryLabel {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted, #6B7280);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.empiricalStat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #9CA3AF);
+  background: var(--color-surface-input, #0E0F14);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-radius: var(--radius-md, 6px);
+  padding: 0.625rem 0.875rem;
+}
+
+.empiricalStat strong {
+  color: var(--color-accent-amber, #E5A93C);
+}
+
+.lawNotice {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted, #6B7280);
+  font-style: italic;
+}
+
+/* Educational Pedagogical Takeaway */
+.pedagogyCard {
+  background: var(--color-surface-card, #13151C);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  border-radius: var(--radius-md, 8px);
+  padding: 1.125rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pedagogyHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent-amber, #E5A93C);
+}
+
+.pedagogyCard p {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary, #9CA3AF);
+  margin: 0;
+}
+
+.pedagogyCard strong {
+  color: var(--color-text-primary, #F9FAFB);
+}
