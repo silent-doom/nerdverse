@@ -2,27 +2,171 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import Icon from '@/components/common/Icon';
 import styles from './PhysicsSimulation3D.module.css';
+
+/**
+ * High-Clarity Canvas Textures for Toast
+ */
+function createButterTopTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Rich melted golden butter gradient
+  const grad = ctx.createRadialGradient(256, 256, 40, 256, 256, 250);
+  grad.addColorStop(0, '#fef08a'); // Warm molten yellow center
+  grad.addColorStop(0.4, '#f59e0b'); // Golden butter
+  grad.addColorStop(0.85, '#d97706'); // Deep amber melted edge
+  grad.addColorStop(1.0, '#b45309'); // Caramelized butter rim
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Melted butter gloss swirls
+  ctx.strokeStyle = 'rgba(254, 240, 138, 0.45)';
+  ctx.lineWidth = 14;
+  ctx.beginPath();
+  ctx.arc(230, 220, 140, 0.2, 1.8);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.arc(270, 270, 90, 2.2, 3.8);
+  ctx.stroke();
+
+  // Fine butter droplets
+  ctx.fillStyle = 'rgba(254, 240, 138, 0.6)';
+  for (let i = 0; i < 28; i++) {
+    const rx = 60 + Math.random() * 392;
+    const ry = 60 + Math.random() * 392;
+    const rr = 4 + Math.random() * 10;
+    ctx.beginPath();
+    ctx.arc(rx, ry, rr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Clear pedagogical insignia stamp
+  ctx.fillStyle = '#78350f';
+  ctx.font = 'bold 30px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🧈 BUTTERED SURFACE', 256, 230);
+
+  ctx.fillStyle = '#92400e';
+  ctx.font = 'bold 20px monospace';
+  ctx.fillText('• TOP LAYER (+Y) •', 256, 275);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function createBreadCrumbTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Toasted bread grain
+  ctx.fillStyle = '#dfaa75';
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Porous bread crumb speckles
+  for (let i = 0; i < 400; i++) {
+    const bx = Math.random() * 512;
+    const by = Math.random() * 512;
+    const br = 2 + Math.random() * 6;
+    ctx.fillStyle = Math.random() > 0.5 ? '#cb8e56' : '#ebd1b0';
+    ctx.beginPath();
+    ctx.arc(bx, by, br, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Toasted diagonal grill stripes
+  ctx.strokeStyle = 'rgba(120, 53, 15, 0.22)';
+  ctx.lineWidth = 22;
+  for (let d = -200; d < 800; d += 80) {
+    ctx.beginPath();
+    ctx.moveTo(d, 0);
+    ctx.lineTo(d + 300, 512);
+    ctx.stroke();
+  }
+
+  // Pedagogical label on dry bottom
+  ctx.fillStyle = '#5c2c16';
+  ctx.font = 'bold 30px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🍞 DRY TOAST CRUMB', 256, 230);
+
+  ctx.fillStyle = '#78350f';
+  ctx.font = 'bold 20px monospace';
+  ctx.fillText('• BOTTOM BASE (-Y) •', 256, 275);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function createHeightRulerTexture(heightVal) {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#141722';
+  ctx.fillRect(0, 0, 128, 512);
+
+  // Brass border
+  ctx.strokeStyle = '#e5a93c';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(3, 3, 122, 506);
+
+  // Ruler tick marks
+  ctx.strokeStyle = '#fef08a';
+  ctx.fillStyle = '#fef08a';
+  ctx.font = 'bold 18px monospace';
+  ctx.textAlign = 'left';
+
+  for (let y = 30; y < 490; y += 45) {
+    ctx.lineWidth = y % 90 === 30 ? 4 : 2;
+    ctx.beginPath();
+    ctx.moveTo(10, y);
+    ctx.lineTo(y % 90 === 30 ? 40 : 25, y);
+    ctx.stroke();
+  }
+
+  // Digital height readout
+  ctx.save();
+  ctx.translate(85, 256);
+  ctx.rotate(Math.PI / 2);
+  ctx.font = 'bold 24px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#e5a93c';
+  ctx.fillText(`H = ${heightVal.toFixed(2)}m`, 0, 0);
+  ctx.restore();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  return texture;
+}
 
 /**
  * High-Fidelity 3D Physics Laboratory for Murphy's Law: The Tumbling Buttered Toast.
  * Based on Robert Matthews' 1995 Royal Astronomical Society paper:
  * "Tumbling toast, Murphy's Law and the fundamental constants".
- * 
- * Demonstrates:
- * 1. Gravitational torque τ = mg(L/2)cos(θ)
- * 2. Conservation of angular momentum in free-fall
- * 3. Why typical table heights (~0.75m) guarantee a half-rotation (180° = Butter Down)
- * 4. Why elevating tables to 2.5m-3.0m produces a full 360° rotation (Butter Up!)
  */
 export default function MurphysLaw3DPhysics() {
   const mountRef = useRef(null);
   const audioCtxRef = useRef(null);
 
   // Simulation Parameters
-  const [tableHeight, setTableHeight] = useState(0.75); // meters (standard kitchen table)
+  const [tableHeight, setTableHeight] = useState(0.75); // meters
   const [initialOverhang, setInitialOverhang] = useState(0.04); // meters overhang
   const [gravity, setGravity] = useState(9.81); // m/s^2 (Earth standard)
   const [slowMotion, setSlowMotion] = useState(false);
@@ -44,12 +188,13 @@ export default function MurphysLaw3DPhysics() {
 
   // Scene references
   const simContextRef = useRef(null);
-  const cameraAngleRef = useRef({ theta: 0.72, phi: 0.32, radius: 4.6 });
+  // Focused cinematic framing making the table and toast prominently fill the viewport
+  const cameraAngleRef = useRef({ theta: 0.58, phi: 0.22, radius: 0.98 });
   const isDraggingRef = useRef(false);
   const prevPointerRef = useRef({ x: 0, y: 0 });
   const updateCameraPosRef = useRef(null);
 
-  // Audio Synthesizer
+  // Web Audio Synthesizer
   const playThudSound = useCallback((isButterDown) => {
     try {
       if (!audioCtxRef.current) {
@@ -63,16 +208,16 @@ export default function MurphysLaw3DPhysics() {
       const gain = ctx.createGain();
 
       osc.type = isButterDown ? 'triangle' : 'sine';
-      osc.frequency.setValueAtTime(isButterDown ? 85 : 140, now);
-      osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+      osc.frequency.setValueAtTime(isButterDown ? 90 : 160, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.14);
 
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.15);
+      osc.stop(now + 0.18);
     } catch {
       // Audio context policy fallback
     }
@@ -83,124 +228,157 @@ export default function MurphysLaw3DPhysics() {
     if (!container) return;
 
     const width = container.clientWidth;
-    const height = 440;
+    const height = 520;
 
-    // 1. Scene
+    // 1. Scene with warm studio ambiance and smooth distance fog
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0c12);
+    scene.background = new THREE.Color(0x11141e);
+    scene.fog = new THREE.Fog(0x11141e, 4.5, 12);
 
-    // 2. Camera & Orbit
-    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+    // 2. Camera with focused cinematic focal length
+    const camera = new THREE.PerspectiveCamera(34, width / height, 0.05, 100);
+
     const updateCameraPos = () => {
       const { theta, phi, radius } = cameraAngleRef.current;
-      camera.position.x = radius * Math.cos(phi) * Math.sin(theta);
-      camera.position.y = radius * Math.sin(phi) + tableHeight * 0.7;
-      camera.position.z = radius * Math.cos(phi) * Math.cos(theta);
-      camera.lookAt(0.2, tableHeight * 0.45, 0);
+      // Proportional distance scaling so table elevation (0.5m to 3.0m) remains centered and visible
+      const effectiveDist = radius * (1.0 + (tableHeight - 0.75) * 0.35);
+      camera.position.x = effectiveDist * Math.cos(phi) * Math.sin(theta);
+      camera.position.y = effectiveDist * Math.sin(phi) + tableHeight * 0.52;
+      camera.position.z = effectiveDist * Math.cos(phi) * Math.cos(theta);
+      camera.lookAt(0.06, tableHeight * 0.52, 0);
     };
     updateCameraPosRef.current = updateCameraPos;
     updateCameraPos();
 
-    // 3. Renderer with PBR Soft Shadows
+    // 3. High-Quality WebGL Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.38; // Bright, luminous laboratory setup
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 4. Lighting System
-    const ambientLight = new THREE.AmbientLight(0xf8fafc, 1.35);
+    // 4. Balanced Multi-Point Studio Lighting (High Visibility)
+    // A. Bright Ambient Fill
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.4);
     scene.add(ambientLight);
 
-    // Warm Key Spotlight over Table
-    const keySpot = new THREE.SpotLight(0xffeedd, 3.4, 18, Math.PI / 3, 0.35, 1.2);
-    keySpot.position.set(2.4, 4.2, 3.0);
-    keySpot.castShadow = true;
-    keySpot.shadow.mapSize.width = 1024;
-    keySpot.shadow.mapSize.height = 1024;
-    keySpot.shadow.bias = -0.0005;
-    scene.add(keySpot);
-    scene.add(keySpot.target);
+    // B. Studio Key Directional Light
+    const keyLight = new THREE.DirectionalLight(0xfff7ed, 3.8);
+    keyLight.position.set(3.5, 5.5, 4.0);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.width = 1024;
+    keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.camera.near = 0.5;
+    keyLight.shadow.camera.far = 16;
+    keyLight.shadow.camera.left = -2.5;
+    keyLight.shadow.camera.right = 2.5;
+    keyLight.shadow.camera.top = 2.5;
+    keyLight.shadow.camera.bottom = -2.5;
+    keyLight.shadow.bias = -0.0004;
+    scene.add(keyLight);
 
-    // Cool Studio Fill Light
-    const fillLight = new THREE.DirectionalLight(0xe0e7ff, 1.2);
-    fillLight.position.set(-4.0, 3.5, 2.5);
-    scene.add(fillLight);
+    // C. Overhead Spot focused directly on Toast and Pivot Edge
+    const pivotSpot = new THREE.SpotLight(0xfef08a, 4.6, 8, Math.PI / 3.0, 0.35, 1.1);
+    pivotSpot.position.set(0.1, 3.0, 1.4);
+    pivotSpot.target.position.set(0.05, tableHeight, 0);
+    scene.add(pivotSpot);
+    scene.add(pivotSpot.target);
 
-    // Warm Rim Accent Light
-    const rimLight = new THREE.PointLight(0xe5a93c, 1.5, 8);
-    rimLight.position.set(-1.5, 1.5, -2.5);
+    // D. Warm Amber Rim Light for Crisp Silhouette
+    const rimLight = new THREE.PointLight(0xe5a93c, 3.2, 8);
+    rimLight.position.set(-2.0, 2.2, -1.8);
     scene.add(rimLight);
 
-    // 5. Floor (Dark Slate Hardwood Flooring with Grid Inlay)
+    // E. Under-Table Floor Fill Light (eliminates pitch-black ground shadows)
+    const groundFill = new THREE.PointLight(0xa5b4fc, 1.8, 5);
+    groundFill.position.set(0, 0.35, 0.4);
+    scene.add(groundFill);
+
+    // 5. Studio Platform Floor
+    // Polished Laboratory Studio Floor with smooth fog integration
     const floorGeo = new THREE.PlaneGeometry(16, 16);
     floorGeo.rotateX(-Math.PI / 2);
     const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x141722,
-      roughness: 0.55,
-      metalness: 0.35,
+      color: 0x161a27,
+      roughness: 0.45,
+      metalness: 0.2,
     });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.position.y = 0;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Floor Tile Grid Lines
-    const gridMat = new THREE.MeshStandardMaterial({ color: 0x222634, roughness: 0.8 });
-    for (let gx = -6; gx <= 6; gx += 1.0) {
-      const lineX = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.002, 12), gridMat);
-      lineX.position.set(gx, 0.001, 0);
-      scene.add(lineX);
-    }
+    // Laboratory Seam Grid
+    const gridHelper = new THREE.GridHelper(8, 16, 0xe5a93c, 0x272c3d);
+    gridHelper.position.y = 0.001;
+    scene.add(gridHelper);
 
-    // Impact Butter Smear Pool (Appears on floor when landing butter-down)
-    const butterStainGeo = new THREE.CircleGeometry(0.09, 20);
-    butterStainGeo.rotateX(-Math.PI / 2);
+    // Impact Butter Smear Pool & Splatter Droplets
+    const butterGroup = new THREE.Group();
+    butterGroup.position.set(0.26, 0.002, 0);
+    butterGroup.visible = false;
+    scene.add(butterGroup);
+
     const butterStainMat = new THREE.MeshStandardMaterial({
       color: 0xf59e0b,
-      roughness: 0.1,
-      metalness: 0.1,
+      roughness: 0.08,
+      metalness: 0.15,
+      emissive: 0xd97706,
+      emissiveIntensity: 0.4,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.92,
     });
-    const butterStain = new THREE.Mesh(butterStainGeo, butterStainMat);
-    butterStain.position.set(0.35, 0.002, 0);
-    butterStain.visible = false;
-    scene.add(butterStain);
 
-    // 6. Dynamic Laboratory Dining Table Group
+    const mainPuddle = new THREE.Mesh(new THREE.CircleGeometry(0.14, 24).rotateX(-Math.PI / 2), butterStainMat);
+    butterGroup.add(mainPuddle);
+
+    // Splatter satellites
+    const splatterOffsets = [
+      [0.12, 0.08, 0.035],
+      [-0.11, 0.07, 0.028],
+      [0.05, -0.12, 0.04],
+      [-0.08, -0.09, 0.025],
+      [0.15, -0.04, 0.02],
+    ];
+    splatterOffsets.forEach(([sx, sz, sr]) => {
+      const drop = new THREE.Mesh(new THREE.CircleGeometry(sr, 16).rotateX(-Math.PI / 2), butterStainMat);
+      drop.position.set(sx, 0.0005, sz);
+      butterGroup.add(drop);
+    });
+
+    // 6. Dynamic Dining Table Group
     const tableGroup = new THREE.Group();
     scene.add(tableGroup);
 
-    // Materials
     const woodMat = new THREE.MeshStandardMaterial({
-      color: 0x1f1712, // Rich dark walnut
-      roughness: 0.42,
-      metalness: 0.15,
+      color: 0x3d271d, // Rich polished dark walnut
+      roughness: 0.36,
+      metalness: 0.12,
     });
     const brassTrimMat = new THREE.MeshStandardMaterial({
-      color: 0xe5a93c,
-      roughness: 0.28,
-      metalness: 0.88,
+      color: 0xe5a93c, // Gleaming polished brass
+      roughness: 0.22,
+      metalness: 0.92,
     });
     const ceramicMat = new THREE.MeshStandardMaterial({
-      color: 0xf3f4f6,
-      roughness: 0.2,
+      color: 0xfbfbfb, // Fine glazed white porcelain
+      roughness: 0.15,
       metalness: 0.05,
     });
-    const coffeeLiquidMat = new THREE.MeshStandardMaterial({
-      color: 0x1a0f08,
-      roughness: 0.1,
+    const steelMat = new THREE.MeshStandardMaterial({
+      color: 0xd1d5db, // Polished cutlery steel
+      roughness: 0.18,
+      metalness: 0.95,
     });
 
-    // Tabletop Slab (Edge is precisely at x = 0)
-    const tableWidth = 1.7;
-    const tableDepth = 1.3;
-    const tableThick = 0.05;
+    // Tabletop Slab (Pivot edge is aligned at x = 0)
+    const tableWidth = 1.35;
+    const tableDepth = 1.05;
+    const tableThick = 0.048;
     const tableTop = new THREE.Mesh(
       new THREE.BoxGeometry(tableWidth, tableThick, tableDepth),
       woodMat
@@ -210,26 +388,27 @@ export default function MurphysLaw3DPhysics() {
     tableTop.receiveShadow = true;
     tableGroup.add(tableTop);
 
-    // Brass Bevel Edge Trim
+    // Gleaming Brass Pivot Edge Strip (Highlights the exact tipping boundary)
     const tableEdgeTrim = new THREE.Mesh(
-      new THREE.BoxGeometry(0.015, tableThick + 0.005, tableDepth + 0.01),
+      new THREE.BoxGeometry(0.018, tableThick + 0.004, tableDepth + 0.01),
       brassTrimMat
     );
-    tableEdgeTrim.position.set(0.005, tableHeight - tableThick / 2, 0);
+    tableEdgeTrim.position.set(0.009, tableHeight - tableThick / 2, 0);
+    tableEdgeTrim.castShadow = true;
     tableGroup.add(tableEdgeTrim);
 
-    // 4 Table Legs with Brass Ferrules
-    const legRadius = 0.032;
+    // 4 Turned Walnut Legs with Brass Ferrules
+    const legRadius = 0.028;
     const legOffsets = [
-      [-tableWidth + 0.12, -tableDepth / 2 + 0.12],
-      [-0.12, -tableDepth / 2 + 0.12],
-      [-tableWidth + 0.12, tableDepth / 2 - 0.12],
-      [-0.12, tableDepth / 2 - 0.12],
+      [-tableWidth + 0.11, -tableDepth / 2 + 0.11],
+      [-0.11, -tableDepth / 2 + 0.11],
+      [-tableWidth + 0.11, tableDepth / 2 - 0.11],
+      [-0.11, tableDepth / 2 - 0.11],
     ];
     const legMeshes = [];
 
     legOffsets.forEach(([lx, lz]) => {
-      const legGeom = new THREE.CylinderGeometry(legRadius, legRadius * 0.8, tableHeight - tableThick, 16);
+      const legGeom = new THREE.CylinderGeometry(legRadius, legRadius * 0.75, tableHeight - tableThick, 16);
       const leg = new THREE.Mesh(legGeom, woodMat);
       leg.position.set(lx, (tableHeight - tableThick) / 2, lz);
       leg.castShadow = true;
@@ -238,122 +417,143 @@ export default function MurphysLaw3DPhysics() {
 
       // Brass foot ferrule
       const ferrule = new THREE.Mesh(
-        new THREE.CylinderGeometry(legRadius * 0.85, legRadius * 0.85, 0.06, 16),
+        new THREE.CylinderGeometry(legRadius * 0.8, legRadius * 0.8, 0.06, 16),
         brassTrimMat
       );
       ferrule.position.set(lx, 0.03, lz);
       tableGroup.add(ferrule);
     });
 
-    // Ceramic Breakfast Plate sitting on table
-    const plate = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.18, 0.14, 0.018, 32),
-      ceramicMat
-    );
-    plate.position.set(-0.48, tableHeight + 0.009, 0.22);
+    // Fine Ceramic Breakfast Plate with Gold Rim
+    const plateGroup = new THREE.Group();
+    plateGroup.position.set(-0.45, tableHeight, 0.22);
+
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.14, 0.018, 32), ceramicMat);
+    plate.position.y = 0.009;
     plate.receiveShadow = true;
-    tableGroup.add(plate);
+    plateGroup.add(plate);
 
-    // Ceramic Coffee Mug with coffee liquid
+    const plateGoldRim = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.004, 8, 32), brassTrimMat);
+    plateGoldRim.position.y = 0.018;
+    plateGoldRim.rotation.x = Math.PI / 2;
+    plateGroup.add(plateGoldRim);
+
+    // Butter Knife on Plate
+    const knife = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.003, 0.018), steelMat);
+    knife.position.set(0.04, 0.022, 0.06);
+    knife.rotation.y = 0.45;
+    plateGroup.add(knife);
+
+    tableGroup.add(plateGroup);
+
+    // Warm Ceramic Coffee Mug
     const mugGroup = new THREE.Group();
-    mugGroup.position.set(-0.55, tableHeight, -0.32);
+    mugGroup.position.set(-0.48, tableHeight, -0.28);
 
-    const mug = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.05, 0.05, 0.10, 24),
-      ceramicMat
-    );
-    mug.position.y = 0.05;
+    const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.11, 24), ceramicMat);
+    mug.position.y = 0.055;
     mug.castShadow = true;
     mugGroup.add(mug);
 
-    const mugHandle = new THREE.Mesh(
-      new THREE.TorusGeometry(0.032, 0.01, 8, 16, Math.PI),
-      ceramicMat
-    );
-    mugHandle.position.set(0.05, 0.05, 0);
+    const mugHandle = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.01, 8, 16, Math.PI), ceramicMat);
+    mugHandle.position.set(0.055, 0.055, 0);
     mugHandle.rotation.y = Math.PI / 2;
     mugGroup.add(mugHandle);
 
-    const coffee = new THREE.Mesh(
-      new THREE.CircleGeometry(0.045, 16),
-      coffeeLiquidMat
+    const coffeeSurface = new THREE.Mesh(
+      new THREE.CircleGeometry(0.048, 16).rotateX(-Math.PI / 2),
+      new THREE.MeshStandardMaterial({ color: 0x1c120c, roughness: 0.1 })
     );
-    coffee.rotateX(-Math.PI / 2);
-    coffee.position.y = 0.09;
-    mugGroup.add(coffee);
+    coffeeSurface.position.y = 0.1;
+    mugGroup.add(coffeeSurface);
 
     tableGroup.add(mugGroup);
 
-    // 7. Buttered Toast Rigid-Body Object
-    const toastGroup = new THREE.Group();
-    const L = 0.11; // Toast length (meters)
-    const H = 0.014; // Thickness (meters)
-    const toastMatCrumb = new THREE.MeshStandardMaterial({
-      color: 0xd4a373, // Toasted golden crumb
-      roughness: 0.82,
-      metalness: 0.02,
+    // 7. Scientific Height Caliper Gauge
+    const rulerGroup = new THREE.Group();
+    rulerGroup.position.set(0.04, 0, -0.58);
+    scene.add(rulerGroup);
+
+    const rulerPoleGeo = new THREE.BoxGeometry(0.025, tableHeight, 0.08);
+    const rulerPoleMat = new THREE.MeshStandardMaterial({
+      map: createHeightRulerTexture(tableHeight),
+      roughness: 0.3,
+      metalness: 0.5,
     });
-    const toastMatCrust = new THREE.MeshStandardMaterial({
-      color: 0x6e3710, // Roasted dark crust rim
+    const rulerPole = new THREE.Mesh(rulerPoleGeo, rulerPoleMat);
+    rulerPole.position.y = tableHeight / 2;
+    rulerPole.castShadow = true;
+    rulerGroup.add(rulerPole);
+
+    const rulerBase = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.015, 24), brassTrimMat);
+    rulerBase.position.y = 0.0075;
+    rulerGroup.add(rulerBase);
+
+    // 8. Artisan Buttered Toast Object (Substantial, Highly Visible Dimensions)
+    const toastGroup = new THREE.Group();
+    const L = 0.20; // Length in meters (20 cm - clearly visible and identifiable)
+    const W = 0.20; // Width
+    const H = 0.032; // Thickness (3.2 cm)
+
+    const butterTex = createButterTopTexture();
+    const crumbTex = createBreadCrumbTexture();
+
+    // Multi-material cube: [right, left, top, bottom, front, back]
+    const crustMat = new THREE.MeshStandardMaterial({
+      color: 0x6e3710, // Roasted golden crust
       roughness: 0.88,
     });
-    const toastMatButter = new THREE.MeshStandardMaterial({
-      color: 0xf59e0b, // Luminous golden melted butter
+    const butterMat = new THREE.MeshStandardMaterial({
+      map: butterTex,
+      color: 0xffffff,
       roughness: 0.12,
-      metalness: 0.15,
+      metalness: 0.2,
       emissive: 0xd97706,
-      emissiveIntensity: 0.2,
+      emissiveIntensity: 0.25,
+    });
+    const bottomCrumbMat = new THREE.MeshStandardMaterial({
+      map: crumbTex,
+      color: 0xffffff,
+      roughness: 0.85,
     });
 
-    // Procedural Toast Baseline
-    const breadMesh = new THREE.Mesh(new THREE.BoxGeometry(L, H, L), toastMatCrumb);
-    breadMesh.castShadow = true;
-    toastGroup.add(breadMesh);
+    const toastMaterials = [
+      crustMat, // +X
+      crustMat, // -X
+      butterMat, // +Y (BUTTER SIDE)
+      bottomCrumbMat, // -Y (DRY CRUMB SIDE)
+      crustMat, // +Z
+      crustMat, // -Z
+    ];
 
-    const crustRim = new THREE.Mesh(new THREE.BoxGeometry(L + 0.004, H - 0.001, L + 0.004), toastMatCrust);
-    toastGroup.add(crustRim);
-
-    // Butter Layer on Top (+Y surface)
-    const butterLayer = new THREE.Mesh(
-      new THREE.BoxGeometry(L * 0.82, 0.003, L * 0.82),
-      toastMatButter
+    const breadSlice = new THREE.Mesh(
+      new THREE.BoxGeometry(L, H, W),
+      toastMaterials
     );
-    butterLayer.position.y = H / 2 + 0.0015;
-    toastGroup.add(butterLayer);
+    breadSlice.castShadow = true;
+    breadSlice.receiveShadow = true;
+    toastGroup.add(breadSlice);
 
-    // Melting Butter Pat in Center
+    // Glistening Butter Pat Cube in Center
+    const butterPatMat = new THREE.MeshStandardMaterial({
+      color: 0xfef08a,
+      roughness: 0.08,
+      metalness: 0.15,
+      emissive: 0xf59e0b,
+      emissiveIntensity: 0.35,
+    });
     const butterPat = new THREE.Mesh(
-      new THREE.BoxGeometry(0.028, 0.006, 0.028),
-      toastMatButter
+      new THREE.BoxGeometry(0.055, 0.014, 0.055),
+      butterPatMat
     );
-    butterPat.position.set(0.008, H / 2 + 0.004, -0.005);
-    butterPat.rotation.y = 0.35;
+    butterPat.position.set(0.01, H / 2 + 0.007, -0.01);
+    butterPat.rotation.y = 0.32;
+    butterPat.castShadow = true;
     toastGroup.add(butterPat);
 
     scene.add(toastGroup);
 
-    // Load Blender-modeled fine-grained asset if available
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.load(
-      '/models/buttered_toast.glb',
-      (gltf) => {
-        const model = gltf.scene;
-        model.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-          }
-        });
-        toastGroup.clear();
-        toastGroup.add(model);
-      },
-      undefined,
-      () => {
-        // Retains procedural detailed model
-      }
-    );
-
-    // 8. Rigid-Body Physics Engine State
+    // 9. Rigid-Body Physics Engine State
     let posX = -L / 2 - initialOverhang;
     let posY = tableHeight + H / 2;
     let posZ = 0;
@@ -368,15 +568,26 @@ export default function MurphysLaw3DPhysics() {
       // Reposition table surface
       tableTop.position.y = h - tableThick / 2;
       tableEdgeTrim.position.y = h - tableThick / 2;
-      plate.position.y = h + 0.009;
+      plateGroup.position.y = h;
       mugGroup.position.y = h;
 
+      // Scale table legs smoothly
       legMeshes.forEach((leg) => {
         leg.scale.y = (h - tableThick) / (0.75 - tableThick);
         leg.position.y = (h - tableThick) / 2;
       });
 
-      posX = -L / 2 - 0.02; // Sitting near edge
+      // Update height caliper ruler
+      rulerPole.scale.y = h / 0.75;
+      rulerPole.position.y = h / 2;
+      if (rulerPole.material.map) {
+        rulerPole.material.map.dispose();
+      }
+      rulerPole.material.map = createHeightRulerTexture(h);
+      rulerPole.material.needsUpdate = true;
+
+      // Reposition toast sitting right at the pivot edge
+      posX = -L / 2 - 0.025;
       posY = h + H / 2;
       posZ = 0;
       rotZ = 0;
@@ -389,7 +600,7 @@ export default function MurphysLaw3DPhysics() {
       toastGroup.position.set(posX, posY, posZ);
       toastGroup.rotation.set(0, 0, rotZ);
 
-      butterStain.visible = false;
+      butterGroup.visible = false;
       setSimState('idle');
       setOutcome(null);
       setCurrentAngle(0);
@@ -407,25 +618,18 @@ export default function MurphysLaw3DPhysics() {
       launch: () => {
         resetToast(tableHeight, initialOverhang);
         state = 'sliding';
-        velX = 0.18; // Sliding nudge velocity
+        velX = 0.22; // Gentle edge nudge velocity
         setSimState('sliding');
       },
       batchMonteCarlo: () => {
-        // Execute 100 stochastic trials based on Robert Matthews' statistical model
         let downCount = 0;
         let upCount = 0;
         const trials = 100;
 
         for (let t = 0; t < trials; t++) {
-          // Perturb nudge speed & initial overhang by +/- 15%
-          const nudge = 0.18 * (0.85 + Math.random() * 0.3);
-          const oh = initialOverhang * (0.85 + Math.random() * 0.3);
           const g = gravity;
           const h = tableHeight;
-
-          // Free-fall time
           const tFall = Math.sqrt((2 * h) / g);
-          // Overhang pivot angular velocity: omega = sqrt((3g / L) * sin(theta_slip))
           const thetaSlip = 0.52 + Math.random() * 0.1; // ~30-36 deg
           const w = Math.sqrt((3 * g / L) * Math.sin(thetaSlip)) * 0.55;
           const totalAngleRad = thetaSlip + w * tFall;
@@ -447,7 +651,7 @@ export default function MurphysLaw3DPhysics() {
       },
     };
 
-    // 9. Animation & Physics Simulation Loop
+    // 10. Animation & Physics Simulation Loop
     let animId;
     let lastTime = performance.now();
 
@@ -460,39 +664,38 @@ export default function MurphysLaw3DPhysics() {
 
       if (state === 'sliding') {
         posX += velX * dt;
-        // Check when Center of Mass crosses the table edge at x = 0
+        // Center of mass passes table edge at x = 0
         if (posX >= 0) {
           state = 'pivoting';
           setSimState('pivoting');
         }
       } else if (state === 'pivoting') {
-        // Pivot around table edge (x = 0, y = tableHeight)
         // Torque = m * g * (L/2) * cos(theta)
         // Moment of Inertia I = (1/3) * m * L^2
         // Alpha = (3g / 2L) * cos(theta)
         const alpha = (3 * gravity) / (2 * L) * Math.cos(rotZ);
-        omega -= alpha * dt * 0.85;
+        omega -= alpha * dt * 0.88;
         rotZ += omega * dt;
 
-        // Sliding outward as tilt angle increases
+        // Geometric pivot around table edge (x = 0, y = tableHeight)
         posX = (L / 2) * (1 - Math.cos(rotZ));
         posY = tableHeight + H / 2 - (L / 2) * Math.sin(-rotZ);
 
-        // Slip condition: normal force vanishes when rotZ exceeds ~32 degrees
+        // Edge slip condition: normal force vanishes when rotZ reaches ~32 degrees
         if (rotZ < -Math.PI * 0.18) {
           state = 'free_fall';
           setSimState('falling');
-          velX = 0.24;
-          velY = -0.15;
+          velX = 0.28;
+          velY = -0.16;
         }
       } else if (state === 'free_fall') {
         timeInAir += dt;
         velY -= gravity * dt;
         posX += velX * dt;
         posY += velY * dt;
-        rotZ += omega * dt; // Angular momentum is strictly conserved in air
+        rotZ += omega * dt; // Strict conservation of angular momentum
 
-        // Check Floor Impact (Ground plane is y = 0)
+        // Check Ground Impact (Floor plane is y = 0)
         if (posY <= H / 2) {
           posY = H / 2;
           state = 'impact';
@@ -500,9 +703,7 @@ export default function MurphysLaw3DPhysics() {
           velY = 0;
           omega = 0;
 
-          // Normalize angle into [0, 360)
           const finalDeg = ((rotZ * (180 / Math.PI)) % 360 + 360) % 360;
-          // If angle between 90 and 270 degrees -> Butter lands DOWN
           const isButterDown = finalDeg > 90 && finalDeg < 270;
           setOutcome(isButterDown ? 'butter_down' : 'butter_up');
           setSimState('impact');
@@ -511,8 +712,8 @@ export default function MurphysLaw3DPhysics() {
           playThudSound(isButterDown);
 
           if (isButterDown) {
-            butterStain.position.x = posX;
-            butterStain.visible = true;
+            butterGroup.position.x = posX;
+            butterGroup.visible = true;
           }
         }
 
@@ -528,7 +729,7 @@ export default function MurphysLaw3DPhysics() {
 
     animId = requestAnimationFrame(updatePhysics);
 
-    // 10. Interactive Camera Orbit Controls
+    // 11. Interactive Camera Controls (Drag to orbit, scroll to zoom)
     const dom = renderer.domElement;
     const onPointerDown = (e) => {
       isDraggingRef.current = true;
@@ -542,7 +743,7 @@ export default function MurphysLaw3DPhysics() {
       prevPointerRef.current = { x: e.clientX, y: e.clientY };
 
       cameraAngleRef.current.theta -= dx * 0.008;
-      cameraAngleRef.current.phi = Math.max(0.05, Math.min(0.85, cameraAngleRef.current.phi + dy * 0.008));
+      cameraAngleRef.current.phi = Math.max(0.04, Math.min(0.85, cameraAngleRef.current.phi + dy * 0.008));
       updateCameraPos();
     };
 
@@ -552,7 +753,7 @@ export default function MurphysLaw3DPhysics() {
 
     const onWheel = (e) => {
       e.preventDefault();
-      cameraAngleRef.current.radius = Math.max(2.2, Math.min(8.0, cameraAngleRef.current.radius + e.deltaY * 0.006));
+      cameraAngleRef.current.radius = Math.max(1.4, Math.min(5.5, cameraAngleRef.current.radius + e.deltaY * 0.005));
       updateCameraPos();
     };
 
@@ -585,7 +786,7 @@ export default function MurphysLaw3DPhysics() {
   }, [tableHeight, initialOverhang, gravity, slowMotion, playThudSound]);
 
   const handleResetCamera = () => {
-    cameraAngleRef.current = { theta: 0.72, phi: 0.32, radius: 4.6 };
+    cameraAngleRef.current = { theta: 0.58, phi: 0.22, radius: 0.98 };
     updateCameraPosRef.current?.();
   };
 
@@ -594,7 +795,7 @@ export default function MurphysLaw3DPhysics() {
       <div className={styles.header}>
         <div className={styles.badge}>
           <Icon name="atom" size={13} />
-          <span>Matthews Rotational Dynamics Lab</span>
+          <span>Matthews Rotational Dynamics Laboratory</span>
         </div>
         <h3 className={styles.title}>Murphy's Law: The Physics of Tumbling Toast</h3>
         <p className={styles.subtitle}>
@@ -643,7 +844,7 @@ export default function MurphysLaw3DPhysics() {
             onChange={(e) => setTableHeight(Number(e.target.value))}
             className={styles.rangeInput}
           />
-          <span className={styles.hint}>Kitchen table: 0.75m (180°) | High table: 2.6m (360°)</span>
+          <span className={styles.hint}>Kitchen table: 0.75m (180° Butter Down) | High table: 2.6m (360° Butter Up)</span>
         </div>
 
         <div className={styles.controlGroup}>
