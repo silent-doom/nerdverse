@@ -1,0 +1,127 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  border-radius: var(--radius-md, 8px);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold, 600);
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color var(--duration-fast, 120ms) ease,
+              border-color var(--duration-fast, 120ms) ease,
+              transform var(--duration-fast, 120ms) ease,
+              box-shadow var(--duration-fast, 120ms) ease;
+  user-select: none;
+  text-decoration: none;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ── Sizes ── */
+.sm {
+  padding: 6px 14px;
+  font-size: var(--text-xs, 12px);
+  gap: 6px;
+}
+
+.md {
+  padding: 10px 20px;
+  font-size: var(--text-sm, 14px);
+}
+
+.lg {
+  padding: 14px 28px;
+  font-size: var(--text-base, 16px);
+  border-radius: var(--radius-md, 8px);
+  font-weight: 800;
+}
+
+/* ── Variants: Solar Obsidian ── */
+.primary {
+  background-color: var(--color-brand-primary, #ff5722);
+  color: #ffffff;
+  border-color: var(--color-brand-primary, #ff5722);
+  box-shadow: 0 4px 14px rgba(255, 87, 34, 0.28);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: var(--color-brand-hover, #ff6e40);
+  border-color: var(--color-brand-hover, #ff6e40);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
+}
+
+.primary:active:not(:disabled) {
+  background-color: var(--color-brand-active, #e64a19);
+  transform: translateY(0);
+}
+
+.secondary {
+  background-color: var(--color-bg-secondary, #12141a);
+  color: var(--color-text-primary, #f5f6fa);
+  border-color: var(--color-border-default, #242836);
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: var(--color-bg-tertiary, #1a1d26);
+  border-color: var(--color-border-strong, #353b4f);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-text-secondary, #8e94a5);
+}
+
+.ghost:hover:not(:disabled) {
+  background-color: var(--color-bg-tertiary, #1a1d26);
+  color: var(--color-text-primary, #f5f6fa);
+}
+
+.outline {
+  background: transparent;
+  color: var(--color-text-primary, #f5f6fa);
+  border-color: var(--color-border-strong, #353b4f);
+}
+
+.outline:hover:not(:disabled) {
+  background-color: var(--color-bg-secondary, #12141a);
+  border-color: var(--color-brand-primary, #ff5722);
+}
+
+.danger {
+  background-color: var(--color-status-danger, #ff1744);
+  color: #ffffff;
+  border-color: var(--color-status-danger, #ff1744);
+}
+
+.danger:hover:not(:disabled) {
+  background-color: #d50000;
+  border-color: #d50000;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,379 @@
+.container {
+  background-color: var(--color-bg-secondary, #111622);
+  border: 1px solid var(--color-border-strong, #334155);
+  border-radius: var(--radius-xl, 14px);
+  padding: var(--space-6, 24px);
+  margin: var(--space-8, 32px) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 24px);
+}
+
+.simHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.simBadge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-bg-tertiary, #171e2e);
+  color: var(--color-text-link, #818cf8);
+  border: 1px solid var(--color-border-default, #242d3f);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: var(--text-xs, 12px);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.simTitle {
+  font-size: var(--text-xl, 20px);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.simSubtitle {
+  font-size: var(--text-sm, 14px);
+  color: var(--color-text-secondary, #94a3b8);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Controls Grid */
+.controlsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4, 16px);
+  background-color: var(--color-bg-tertiary, #171e2e);
+  padding: var(--space-4, 16px);
+  border-radius: var(--radius-lg, 10px);
+  border: 1px solid var(--color-border-default, #242d3f);
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-xs, 12px);
+  font-weight: 700;
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+.valueBadge {
+  font-family: var(--font-mono);
+  color: var(--color-category-math, #06b6d4);
+  font-weight: 800;
+}
+
+.rangeInput {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background-color: var(--color-bg-elevated, #1e2638);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--color-brand-primary, #4f46e5);
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transition: transform var(--duration-fast, 120ms) ease;
+}
+
+.rangeInput::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--color-text-tertiary, #64748b);
+}
+
+/* Stat Cards */
+.statsCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4, 16px);
+}
+
+.statCard {
+  background-color: var(--color-bg-tertiary, #171e2e);
+  border: 1px solid var(--color-border-default, #242d3f);
+  border-radius: var(--radius-lg, 10px);
+  padding: var(--space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.highlightCard {
+  border-color: var(--color-brand-primary, #4f46e5);
+  background-color: #1a2336;
+}
+
+.statLabel {
+  font-size: var(--text-xs, 12px);
+  color: var(--color-text-secondary, #94a3b8);
+  font-weight: 600;
+}
+
+.statValue {
+  font-size: var(--text-2xl, 24px);
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #ffffff;
+}
+
+.statValueHighlight {
+  font-size: var(--text-2xl, 24px);
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--color-category-philosophy, #f59e0b);
+}
+
+.statFormula {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--color-text-tertiary, #64748b);
+}
+
+/* Actions */
+.actionRow {
+  display: flex;
+  justify-content: center;
+}
+
+.runButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-brand-primary, #4f46e5);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: var(--text-sm, 14px);
+  padding: 12px 28px;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--color-brand-primary, #4f46e5);
+  cursor: pointer;
+  transition: background-color var(--duration-fast, 120ms) ease,
+              transform var(--duration-fast, 120ms) ease;
+}
+
+.runButton:hover:not(:disabled) {
+  background-color: var(--color-brand-hover, #4338ca);
+  transform: translateY(-1px);
+}
+
+.runButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Telemetry Section */
+.resultsSection {
+  border-top: 1px solid var(--color-border-subtle, #1a2232);
+  padding-top: var(--space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+.resultsTitle {
+  font-size: var(--text-xs, 12px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, #94a3b8);
+  font-weight: 700;
+  margin: 0;
+}
+
+.telemetryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.telemetryItem {
+  padding: 8px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.telemetrySuccess {
+  background-color: #064e3b;
+  border: 1px solid #059669;
+  color: #34d399;
+}
+
+.telemetryFailed {
+  background-color: #4c0519;
+  border: 1px solid #be123c;
+  color: #fca5a5;
+}
+
+.telemetryCycle {
+  opacity: 0.8;
+  font-size: 10px;
+}
+
+.telemetryStatus {
+  font-weight: 700;
+}
+
+/* Timeline & Branching styles for Grandfather Paradox */
+.timelineContainer {
+  background-color: var(--color-bg-tertiary, #171e2e);
+  padding: var(--space-4, 16px);
+  border-radius: var(--radius-lg, 10px);
+  border: 1px solid var(--color-border-default, #242d3f);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modelTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modelTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-bg-secondary, #111622);
+  border: 1px solid var(--color-border-default, #242d3f);
+  color: var(--color-text-secondary, #94a3b8);
+  padding: 8px 14px;
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--text-xs, 12px);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration-fast, 120ms) ease;
+}
+
+.modelTab:hover {
+  background-color: var(--color-bg-elevated, #1e2638);
+  color: #ffffff;
+}
+
+.modelTabActive {
+  background-color: var(--color-brand-primary, #4f46e5);
+  border-color: var(--color-brand-primary, #4f46e5);
+  color: #ffffff;
+}
+
+.paradoxVisual {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #0a0d14;
+  padding: 16px;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--color-border-default, #242d3f);
+}
+
+.timelineNode {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nodeIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-tertiary, #171e2e);
+  border: 1px solid var(--color-border-default, #242d3f);
+}
+
+.nodeContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nodeTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.nodeDesc {
+  font-size: 12px;
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+/* Monty Hall interactive doors */
+.doorsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.doorCard {
+  background-color: var(--color-bg-tertiary, #171e2e);
+  border: 2px solid var(--color-border-default, #242d3f);
+  border-radius: var(--radius-lg, 10px);
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: #ffffff;
+  transition: all var(--duration-fast, 120ms) ease;
+}
+
+.doorCard:hover:not(:disabled) {
+  border-color: var(--color-brand-primary, #4f46e5);
+  background-color: var(--color-bg-elevated, #1e2638);
+}
+
+.doorSelected {
+  border-color: var(--color-brand-primary, #4f46e5);
+  background-color: #1a2336;
+}
+
+.doorOpened {
+  opacity: 0.7;
+  border-color: var(--color-border-subtle, #1a2232);
+}
+
+.doorIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doorLabel {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+}

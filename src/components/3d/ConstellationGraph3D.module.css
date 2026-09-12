@@ -1,0 +1,184 @@
+.graphContainer {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-6, 24px);
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .graphContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.canvasWrapper {
+  width: 100%;
+  height: 560px;
+  background-color: #08090c;
+  border: 1px solid var(--color-border-default, #242836);
+  border-radius: var(--radius-xl, 16px);
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+}
+
+.canvasOverlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.overlayPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(18, 20, 26, 0.9);
+  border: 1px solid var(--color-border-strong, #353b4f);
+  padding: 6px 14px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-xs, 12px);
+  font-weight: 700;
+  color: var(--color-text-secondary, #8e94a5);
+}
+
+.hoverTooltip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-brand-primary, #ff5722);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: var(--text-xs, 12px);
+  font-weight: 800;
+}
+
+.hoverDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffffff;
+}
+
+/* Sidebar Sci-Fi HUD */
+.sidebar {
+  background-color: var(--color-bg-secondary, #12141a);
+  border: 1px solid var(--color-border-default, #242836);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-6, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebarBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-brand-primary, #ff5722);
+}
+
+.nodeHash {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-tertiary, #5d6377);
+}
+
+.sidebarTitle {
+  font-size: var(--text-2xl, 24px);
+  font-weight: 800;
+  color: var(--color-text-primary, #f5f6fa);
+  margin: 0;
+}
+
+.sidebarDesc {
+  font-size: var(--text-sm, 14px);
+  color: var(--color-text-secondary, #8e94a5);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.connectionsBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--color-border-subtle, #181b24);
+  padding-top: 16px;
+}
+
+.connHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-xs, 12px);
+  font-weight: 700;
+  color: var(--color-text-secondary, #8e94a5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.connList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.connBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--color-bg-tertiary, #1a1d26);
+  border: 1px solid var(--color-border-default, #242836);
+  padding: 10px 14px;
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-text-primary, #f5f6fa);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--duration-fast, 120ms) ease;
+}
+
+.connBtn:hover {
+  background-color: var(--color-bg-elevated, #222632);
+  border-color: var(--color-brand-primary, #ff5722);
+}
+
+.connName {
+  font-size: var(--text-xs, 12px);
+  font-weight: 600;
+}
+
+.launchBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-brand-primary, #ff5722);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: var(--text-sm, 14px);
+  padding: 14px 22px;
+  border-radius: var(--radius-md, 8px);
+  text-decoration: none;
+  margin-top: auto;
+  transition: background-color var(--duration-fast, 120ms) ease;
+}
+
+.launchBtn:hover {
+  background-color: var(--color-brand-hover, #ff6e40);
+}

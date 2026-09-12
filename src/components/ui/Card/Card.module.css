@@ -1,0 +1,54 @@
+.card {
+  background-color: var(--color-card-bg, #12141a);
+  border: 1px solid var(--color-border-default, #242836);
+  border-radius: var(--radius-lg, 12px);
+  color: var(--color-text-primary, #f5f6fa);
+  transition: border-color var(--duration-fast, 120ms) ease,
+              background-color var(--duration-fast, 120ms) ease,
+              transform var(--duration-fast, 120ms) ease,
+              box-shadow var(--duration-fast, 120ms) ease;
+}
+
+/* ── Padding ── */
+.padding-none {
+  padding: 0;
+}
+
+.padding-sm {
+  padding: var(--space-3, 12px);
+}
+
+.padding-md {
+  padding: var(--space-5, 20px);
+}
+
+.padding-lg {
+  padding: var(--space-6, 24px);
+}
+
+/* ── Variants ── */
+.interactive {
+  cursor: pointer;
+}
+
+.interactive:hover {
+  background-color: var(--color-card-hover-bg, #1a1d26);
+  border-color: var(--color-brand-primary, #ff5722);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.elevated {
+  background-color: var(--color-bg-tertiary, #1a1d26);
+  border-color: var(--color-border-strong, #353b4f);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.6));
+}
+
+.outline {
+  background-color: var(--color-bg-secondary, #12141a);
+  border: 1px solid var(--color-border-strong, #353b4f);
+}
+
+.glow:hover {
+  border-color: var(--color-brand-primary, #ff5722);
+}
