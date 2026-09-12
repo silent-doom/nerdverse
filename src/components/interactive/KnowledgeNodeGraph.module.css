@@ -73,15 +73,15 @@
 
 .node:hover {
   transform: scale(1.15);
-  border-color: var(--color-brand-primary);
-  box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+  border-color: var(--color-brand-light);
+  box-shadow: 0 0 20px rgba(229, 169, 60, 0.35);
 }
 
 .nodeActive {
   z-index: 10;
   transform: scale(1.15);
-  border-color: var(--color-brand-primary);
-  box-shadow: 0 0 24px rgba(0, 210, 255, 0.5);
+  border-color: var(--color-brand-light);
+  box-shadow: 0 0 24px rgba(229, 169, 60, 0.45);
 }
 
 .nodeLink {

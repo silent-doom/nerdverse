@@ -4,11 +4,11 @@
   gap: 6px;
   font-family: var(--font-sans);
   font-weight: 700;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm, 6px);
   white-space: nowrap;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border: 1px solid var(--color-border-default, #202636);
+  border: 1px solid var(--color-border-default, #21232C);
   transition: all var(--duration-fast, 120ms) ease;
 }
 
@@ -23,27 +23,27 @@
   font-size: var(--text-xs, 12px);
 }
 
-/* ── Variants (Disciplined 3-4 Color Palette) ── */
+/* ── Variants (Scholarly Amber & Obsidian) ── */
 .default {
-  background-color: var(--color-bg-tertiary, #141721);
-  color: var(--color-text-secondary, #94A3B8);
-  border-color: var(--color-border-default, #202636);
+  background-color: var(--color-bg-tertiary, #13151C);
+  color: var(--color-text-secondary, #9CA3AF);
+  border-color: var(--color-border-default, #21232C);
 }
 
 .category {
-  background-color: rgba(0, 210, 255, 0.08);
-  color: var(--color-brand-primary, #00D2FF);
-  border-color: rgba(0, 210, 255, 0.2);
+  background-color: rgba(229, 169, 60, 0.08);
+  color: var(--color-brand-light, #E5A93C);
+  border-color: rgba(229, 169, 60, 0.22);
 }
 
 .difficulty {
-  background-color: var(--color-bg-tertiary, #141721);
-  color: var(--color-text-secondary, #94A3B8);
-  border-color: var(--color-border-default, #202636);
+  background-color: var(--color-bg-tertiary, #13151C);
+  color: var(--color-text-secondary, #9CA3AF);
+  border-color: var(--color-border-default, #21232C);
 }
 
 .status {
-  background-color: rgba(0, 210, 255, 0.08);
-  color: var(--color-brand-primary, #00D2FF);
-  border-color: rgba(0, 210, 255, 0.2);
+  background-color: rgba(229, 169, 60, 0.08);
+  color: var(--color-brand-light, #E5A93C);
+  border-color: rgba(229, 169, 60, 0.22);
 }

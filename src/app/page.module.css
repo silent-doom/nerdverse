@@ -1,5 +1,5 @@
 /* =====================================================
-   NerdVerse — Landing Page Styles (Deep Obsidian Sci-Fi)
+   NerdVerse — Landing Page Styles (Mature Indigo & Steel)
    ===================================================== */
 
 /* ── Hero ── */
@@ -35,9 +35,9 @@
   border-radius: var(--radius-full, 9999px);
   background-color: var(--color-bg-tertiary);
   border: 1px solid var(--color-border-strong);
-  color: var(--color-brand-primary);
+  color: var(--color-brand-light);
   font-size: var(--text-xs, 12px);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -52,8 +52,8 @@
 }
 
 .heroAccent {
-  color: var(--color-brand-primary);
-  background: linear-gradient(135deg, #00D2FF 0%, #38BDF8 100%);
+  color: var(--color-brand-light);
+  background: linear-gradient(135deg, #FDE68A 0%, #E5A93C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -114,7 +114,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-3xl, 30px);
   font-weight: 800;
-  color: var(--color-brand-primary);
+  color: var(--color-brand-light);
 }
 
 .statLabel {
@@ -122,7 +122,7 @@
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .statDivider {
@@ -180,9 +180,9 @@
 }
 
 .conceptCard:hover {
-  transform: translateY(-4px);
-  border-color: var(--color-brand-primary);
-  box-shadow: 0 8px 24px rgba(0, 210, 255, 0.12);
+  transform: translateY(-3px);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .conceptCardInner {
@@ -237,8 +237,8 @@
   align-items: center;
   gap: 6px;
   font-size: var(--text-xs, 12px);
-  font-weight: 700;
-  color: var(--color-brand-primary);
+  font-weight: 600;
+  color: var(--color-brand-light);
 }
 
 /* ── Categories ── */
@@ -334,9 +334,9 @@
 
 .stepNum {
   font-family: var(--font-mono);
-  font-size: var(--text-lg, 18px);
-  font-weight: 800;
-  color: var(--color-brand-primary);
+  font-size: var(--text-base, 16px);
+  font-weight: 700;
+  color: var(--color-brand-light);
 }
 
 .stepIconBadge {
