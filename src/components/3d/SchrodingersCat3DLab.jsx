@@ -7,17 +7,204 @@ import Button from '@/components/ui/Button/Button';
 import Icon from '@/components/common/Icon';
 
 /**
- * High-fidelity 3D WebGL Quantum Simulation Laboratory for Schrödinger's Cat.
- * Features full physical apparatus in 3D:
- * - Sealed Obsidian steel chamber with rotatable 3D camera
- * - Articulated 3D cat with alive breathing/tail animations & ground-state collapse
- * - Radioactive isotope core emitting quantum sparks
- * - Geiger counter with needle deflection & Web Audio synthesized clicks
- * - Trip hammer & glass vial
- * - X-Ray / Quantum Peeking mode into the superposition
- * - Variable elapsed time & decay probability curve (P = 1 - e^(-lambda*t))
- * - Copenhagen wave collapse vs. Everett Many-Worlds multiverse branching
- * - Trial statistical counter tracking empirical frequency
+ * Procedural Vintage 1935 Geiger-Müller Dial Plate Texture
+ */
+function createGeigerDialTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  // Aged ivory parchment background
+  ctx.fillStyle = '#EAE5D8';
+  ctx.beginPath();
+  ctx.arc(128, 128, 124, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Outer brass retention ring
+  ctx.strokeStyle = '#92702E';
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // Inner black bezel line
+  ctx.strokeStyle = '#22252E';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(128, 128, 116, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Scale Arcs
+  const startAngle = Math.PI * 0.78;
+  const endAngle = Math.PI * 2.22;
+
+  // Safe zone arc
+  ctx.strokeStyle = '#181A22';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(128, 138, 92, startAngle, startAngle + (endAngle - startAngle) * 0.72);
+  ctx.stroke();
+
+  // Danger zone arc
+  ctx.strokeStyle = '#D97706';
+  ctx.beginPath();
+  ctx.arc(128, 138, 92, startAngle + (endAngle - startAngle) * 0.72, endAngle);
+  ctx.stroke();
+
+  // Calibration Tick Marks
+  const totalTicks = 25;
+  for (let i = 0; i <= totalTicks; i++) {
+    const angle = startAngle + (i / totalTicks) * (endAngle - startAngle);
+    const isMajor = i % 5 === 0;
+    const rIn = isMajor ? 78 : 84;
+    const rOut = 92;
+    const x1 = 128 + Math.cos(angle) * rIn;
+    const y1 = 138 + Math.sin(angle) * rIn;
+    const x2 = 128 + Math.cos(angle) * rOut;
+    const y2 = 138 + Math.sin(angle) * rOut;
+
+    ctx.strokeStyle = i >= 18 ? '#D97706' : '#181A22';
+    ctx.lineWidth = isMajor ? 3 : 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    if (isMajor) {
+      const val = i * 40;
+      const textR = 66;
+      const tx = 128 + Math.cos(angle) * textR;
+      const ty = 138 + Math.sin(angle) * textR;
+      ctx.fillStyle = '#181A22';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${val}`, tx, ty);
+    }
+  }
+
+  // Dial typography
+  ctx.fillStyle = '#181A22';
+  ctx.font = 'bold 10px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('COUNTS / MIN', 128, 172);
+
+  ctx.fillStyle = '#6B7280';
+  ctx.font = '8px monospace';
+  ctx.fillText('GEIGER-MÜLLER • 1935', 128, 188);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 4;
+  return texture;
+}
+
+/**
+ * Procedural Industrial Hazard Placard Texture
+ */
+function createHazardPlacardTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 384;
+  canvas.height = 192;
+  const ctx = canvas.getContext('2d');
+
+  // Heavy steel plate
+  ctx.fillStyle = '#141722';
+  ctx.fillRect(0, 0, 384, 192);
+
+  // Warning amber perimeter border
+  ctx.strokeStyle = '#E5A93C';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(6, 6, 372, 180);
+
+  ctx.strokeStyle = '#2B3042';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(14, 14, 356, 164);
+
+  // Radiation Trefoil Symbol
+  ctx.fillStyle = '#E5A93C';
+  ctx.beginPath();
+  ctx.arc(60, 96, 12, 0, Math.PI * 2);
+  ctx.fill();
+
+  for (let b = 0; b < 3; b++) {
+    const angle = (b * 120 - 90) * (Math.PI / 180);
+    ctx.beginPath();
+    ctx.arc(60, 96, 34, angle - 0.52, angle + 0.52);
+    ctx.arc(60, 96, 16, angle + 0.52, angle - 0.52, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Text
+  ctx.fillStyle = '#F9FAFB';
+  ctx.font = 'bold 15px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('ACHTUNG: STAHLKAMMER', 112, 58);
+
+  ctx.fillStyle = '#E5A93C';
+  ctx.font = 'bold 11px monospace';
+  ctx.fillText('QUANTUM ENTANGLEMENT CHAMBER', 112, 86);
+
+  ctx.fillStyle = '#9CA3AF';
+  ctx.font = '10px monospace';
+  ctx.fillText('RADIOACTIVE ISOTOPE & HCN POISON', 112, 114);
+
+  ctx.fillStyle = '#6B7280';
+  ctx.font = '9px monospace';
+  ctx.fillText('ERWIN SCHRÖDINGER • BERLIN 1935', 112, 140);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 4;
+  return texture;
+}
+
+/**
+ * Procedural Realistic Cat Eye Iris Texture
+ */
+function createCatEyeTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+
+  // Warm luminous amber iris gradient
+  const grad = ctx.createRadialGradient(64, 64, 8, 64, 64, 60);
+  grad.addColorStop(0, '#F59E0B');
+  grad.addColorStop(0.5, '#D97706');
+  grad.addColorStop(0.85, '#92400E');
+  grad.addColorStop(1, '#3B1A04');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(64, 64, 60, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Feline vertical slit pupil
+  ctx.fillStyle = '#08090C';
+  ctx.beginPath();
+  ctx.ellipse(64, 64, 8, 46, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Highlight specular reflection glint
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.beginPath();
+  ctx.arc(74, 50, 7, 0, Math.PI * 2);
+  ctx.fill();
+
+  return new THREE.CanvasTexture(canvas);
+}
+
+/**
+ * High-Fidelity 3D WebGL Quantum Simulation Laboratory for Schrödinger's Cat.
+ * Rebuilt for realistic physical presence:
+ * - Riveted lead-lined industrial steel chamber (Stahlkammer)
+ * - Sculpted feline anatomy (ribcage, flanks, folded paws, alert ears, slit eyes, Catmull-Rom tail)
+ * - Authentic 1930s Geiger-Müller counter with cylindrical tube, bakelite dials, calibrated scale
+ * - Lead collimator box with radioactive uranium crystal emitting sparks
+ * - Precision electromechanical solenoid relay, spring trip hammer, and Erlenmeyer cyanide flask
+ * - Realistic glass refraction, liquid meniscus, and shattered glass spill in collapsed state
+ * - Synthesized Web Audio Geiger clicks and vault unlatch clinks
  */
 export default function SchrodingersCat3DLab() {
   const mountRef = useRef(null);
@@ -26,8 +213,8 @@ export default function SchrodingersCat3DLab() {
   // Simulation State
   const [boxState, setBoxState] = useState('sealed'); // 'sealed', 'measuring', 'alive', 'dead'
   const [xrayMode, setXrayMode] = useState(false);
-  const [elapsedMinutes, setElapsedMinutes] = useState(30); // half-life is 30 mins -> 50%
-  const [interpretation, setInterpretation] = useState('copenhagen'); // 'copenhagen' | 'many-worlds'
+  const [elapsedMinutes, setElapsedMinutes] = useState(30);
+  const [interpretation, setInterpretation] = useState('copenhagen');
   const [trials, setTrials] = useState({ total: 0, alive: 0, dead: 0 });
   const [audioEnabled, setAudioEnabled] = useState(true);
 
@@ -43,7 +230,9 @@ export default function SchrodingersCat3DLab() {
   const sparksRef = useRef(null);
   const geigerNeedleRef = useRef(null);
   const hammerRef = useRef(null);
-  const vialFluidRef = useRef(null);
+  const intactFlaskRef = useRef(null);
+  const shatteredFlaskRef = useRef(null);
+  const poisonPoolRef = useRef(null);
   const chamberWallsRef = useRef([]);
   const animFrameIdRef = useRef(null);
   const updateCameraPosRef = useRef(null);
@@ -53,13 +242,12 @@ export default function SchrodingersCat3DLab() {
   const prevPointerRef = useRef({ x: 0, y: 0 });
   const cameraAngleRef = useRef({ theta: 0.35, phi: 0.22, radius: 13.5 });
 
-  // Calculate theoretical decay probability: P(decay) = 1 - (0.5)^(t / t_half)
-  // Half-life is 30 minutes
+  // Physics: P(decay) = 1 - (0.5)^(t / t_half)
   const halfLife = 30;
   const decayProb = Math.min(0.99, Math.max(0.01, 1 - Math.pow(0.5, elapsedMinutes / halfLife)));
   const aliveProb = 1 - decayProb;
 
-  // Synthesize realistic Geiger click via Web Audio API
+  // Synthesize realistic acoustic Geiger click
   const playGeigerClick = useCallback(() => {
     if (!audioEnabled) return;
     try {
@@ -70,7 +258,7 @@ export default function SchrodingersCat3DLab() {
         audioCtxRef.current.resume();
       }
       const ctx = audioCtxRef.current;
-      const bufferSize = ctx.sampleRate * 0.003; // 3ms click
+      const bufferSize = ctx.sampleRate * 0.003;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
@@ -93,7 +281,7 @@ export default function SchrodingersCat3DLab() {
     }
   }, [audioEnabled]);
 
-  // Synthesize mechanical latch clink sound
+  // Synthesize mechanical vault latch sound
   const playLatchSound = useCallback(() => {
     if (!audioEnabled) return;
     try {
@@ -104,14 +292,14 @@ export default function SchrodingersCat3DLab() {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.12);
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+      osc.frequency.setValueAtTime(480, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.14);
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.14);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.12);
+      osc.stop(ctx.currentTime + 0.14);
     } catch {
       // audio fallback
     }
@@ -124,23 +312,23 @@ export default function SchrodingersCat3DLab() {
       if (Math.random() < decayProb * 0.85) {
         playGeigerClick();
         if (geigerNeedleRef.current) {
-          geigerNeedleRef.current.rotation.z = -0.4 - Math.random() * 0.8;
+          geigerNeedleRef.current.rotation.z = -0.35 - Math.random() * 0.7;
           setTimeout(() => {
-            if (geigerNeedleRef.current) geigerNeedleRef.current.rotation.z = -0.2;
-          }, 150);
+            if (geigerNeedleRef.current) geigerNeedleRef.current.rotation.z = -0.15;
+          }, 140);
         }
       }
     }, 450);
     return () => clearInterval(interval);
   }, [boxState, decayProb, playGeigerClick]);
 
-  // Three.js Scene Setup
+  // Build Three.js Scene
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
 
     const width = container.clientWidth;
-    const height = container.clientHeight || 460;
+    const height = container.clientHeight || 480;
 
     // 1. Scene
     const scene = new THREE.Scene();
@@ -155,66 +343,100 @@ export default function SchrodingersCat3DLab() {
       camera.position.x = radius * Math.cos(phi) * Math.sin(theta);
       camera.position.y = radius * Math.sin(phi) + 1.2;
       camera.position.z = radius * Math.cos(phi) * Math.cos(theta);
-      camera.lookAt(0, 0.5, 0);
+      camera.lookAt(0, 0.4, 0);
     };
     updateCameraPosRef.current = updateCameraPos;
     updateCameraPos();
 
-    // 3. Renderer
+    // 3. Renderer with PBR soft shadows
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
-    // 4. Lights
-    const ambientLight = new THREE.AmbientLight(0xfff5ea, 0.85);
+
+    // 4. Lighting System
+    const ambientLight = new THREE.AmbientLight(0xf5f3ee, 0.75);
     scene.add(ambientLight);
 
+    // Warm key light from top-right front
     const mainLight = new THREE.DirectionalLight(0xffeedd, 1.8);
-    mainLight.position.set(8, 12, 10);
+    mainLight.position.set(9, 13, 11);
     mainLight.castShadow = true;
     mainLight.shadow.mapSize.width = 1024;
     mainLight.shadow.mapSize.height = 1024;
+    mainLight.shadow.camera.near = 2;
+    mainLight.shadow.camera.far = 30;
+    mainLight.shadow.camera.left = -7;
+    mainLight.shadow.camera.right = 7;
+    mainLight.shadow.camera.top = 7;
+    mainLight.shadow.camera.bottom = -7;
+    mainLight.shadow.bias = -0.0005;
     scene.add(mainLight);
 
-    const fillLight = new THREE.DirectionalLight(0xffeedd, 0.9);
-    fillLight.position.set(-6, 8, 8);
+    // Soft fill light from left
+    const fillLight = new THREE.DirectionalLight(0xdbe4f0, 0.7);
+    fillLight.position.set(-8, 9, 8);
     scene.add(fillLight);
 
-    const interiorLight = new THREE.PointLight(0xfff8ee, 2.8, 12);
-    interiorLight.position.set(0, 1.8, 0);
-    scene.add(interiorLight);
+    // Interior Tungsten Overhead Spotlight
+    const interiorSpot = new THREE.SpotLight(0xffebc4, 3.2, 12, Math.PI / 3, 0.4, 1.2);
+    interiorSpot.position.set(0, 2.1, 0);
+    interiorSpot.target.position.set(0, -1.2, 0);
+    interiorSpot.castShadow = true;
+    interiorSpot.shadow.bias = -0.001;
+    scene.add(interiorSpot);
+    scene.add(interiorSpot.target);
 
-    // 5. Build The Chamber Box
-    const chamberWalls = [];
-    const wallMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1a1d28,
-      roughness: 0.55,
-      metalness: 0.35,
+    // Subtle warm point light inside
+    const interiorPoint = new THREE.PointLight(0xf59e0b, 1.2, 8);
+    interiorPoint.position.set(-1.6, 0.2, -1.0);
+    scene.add(interiorPoint);
+
+    // 5. Materials
+    const steelWallMat = new THREE.MeshStandardMaterial({
+      color: 0x181a24,
+      roughness: 0.52,
+      metalness: 0.45,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 1.0,
     });
 
-    const boxWidth = 7;
+    const brassFrameMat = new THREE.MeshStandardMaterial({
+      color: 0xe5a93c,
+      roughness: 0.28,
+      metalness: 0.88,
+    });
+
+    const darkTrimMat = new THREE.MeshStandardMaterial({
+      color: 0x0f1118,
+      roughness: 0.7,
+      metalness: 0.3,
+    });
+
+    const boxWidth = 7.2;
     const boxHeight = 4.8;
     const boxDepth = 5.6;
+    const chamberWalls = [];
 
-    // Outer laboratory base plate
+    // Heavy Laboratory Base Pedestal
     const basePlate = new THREE.Mesh(
-      new THREE.BoxGeometry(11, 0.3, 9),
-      new THREE.MeshStandardMaterial({ color: 0x0e1017, roughness: 0.7, metalness: 0.6 })
+      new THREE.BoxGeometry(11.5, 0.35, 9.5),
+      new THREE.MeshStandardMaterial({ color: 0x0d0e14, roughness: 0.75, metalness: 0.5 })
     );
-    basePlate.position.y = -boxHeight / 2 - 0.15;
+    basePlate.position.y = -boxHeight / 2 - 0.175;
     basePlate.receiveShadow = true;
     scene.add(basePlate);
 
     // Wall creation helper
     const addWall = (w, h, d, x, y, z) => {
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMaterial.clone());
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), steelWallMat.clone());
       mesh.position.set(x, y, z);
       mesh.castShadow = true;
       mesh.receiveShadow = true;
@@ -230,39 +452,102 @@ export default function SchrodingersCat3DLab() {
     addWall(0.25, boxHeight, boxDepth, -boxWidth / 2, 0, 0);
     addWall(0.25, boxHeight, boxDepth, boxWidth / 2, 0, 0);
 
-    // Golden Chamber Frame Trim (Perimeter Border only, leaving doorway hollow)
-    const trimT = 0.15;
-    const trimD = 0.2;
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0xe5a93c, roughness: 0.3, metalness: 0.9 });
-
-    const topTrim = new THREE.Mesh(new THREE.BoxGeometry(boxWidth + trimT * 2, trimT, trimD), frameMat);
+    // Riveted Steel Corner Reinforcements
+    const trimT = 0.16;
+    const trimD = 0.22;
+    const topTrim = new THREE.Mesh(new THREE.BoxGeometry(boxWidth + trimT * 2, trimT, trimD), brassFrameMat);
     topTrim.position.set(0, boxHeight / 2 + trimT / 2, boxDepth / 2);
     scene.add(topTrim);
 
-    const botTrim = new THREE.Mesh(new THREE.BoxGeometry(boxWidth + trimT * 2, trimT, trimD), frameMat);
+    const botTrim = new THREE.Mesh(new THREE.BoxGeometry(boxWidth + trimT * 2, trimT, trimD), brassFrameMat);
     botTrim.position.set(0, -boxHeight / 2 - trimT / 2, boxDepth / 2);
     scene.add(botTrim);
 
-    const leftTrim = new THREE.Mesh(new THREE.BoxGeometry(trimT, boxHeight, trimD), frameMat);
+    const leftTrim = new THREE.Mesh(new THREE.BoxGeometry(trimT, boxHeight, trimD), brassFrameMat);
     leftTrim.position.set(-boxWidth / 2 - trimT / 2, 0, boxDepth / 2);
     scene.add(leftTrim);
 
-    const rightTrim = new THREE.Mesh(new THREE.BoxGeometry(trimT, boxHeight, trimD), frameMat);
+    const rightTrim = new THREE.Mesh(new THREE.BoxGeometry(trimT, boxHeight, trimD), brassFrameMat);
     rightTrim.position.set(boxWidth / 2 + trimT / 2, 0, boxDepth / 2);
     scene.add(rightTrim);
 
+    // Steel Rivet Details along the front frame
+    const rivetGeom = new THREE.CylinderGeometry(0.045, 0.045, 0.06, 12);
+    rivetGeom.rotateX(Math.PI / 2);
+    const rivetMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.9, roughness: 0.2 });
+    for (let r = -3.2; r <= 3.2; r += 0.8) {
+      const topRivet = new THREE.Mesh(rivetGeom, rivetMat);
+      topRivet.position.set(r, boxHeight / 2 + trimT / 2, boxDepth / 2 + trimD / 2 + 0.02);
+      scene.add(topRivet);
+      const botRivet = new THREE.Mesh(rivetGeom, rivetMat);
+      botRivet.position.set(r, -boxHeight / 2 - trimT / 2, boxDepth / 2 + trimD / 2 + 0.02);
+      scene.add(botRivet);
+    }
+
+    // Overhead Industrial Lamp Fixture in Chamber Ceiling
+    const lampGroup = new THREE.Group();
+    lampGroup.position.set(0, boxHeight / 2 - 0.15, 0);
+
+    const lampShade = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.35, 0.55, 0.25, 20),
+      new THREE.MeshStandardMaterial({ color: 0x1f2330, metalness: 0.8, roughness: 0.3 })
+    );
+    lampGroup.add(lampShade);
+
+    const bulb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.16, 16, 16),
+      new THREE.MeshStandardMaterial({ color: 0xffeedd, emissive: 0xffebc4, emissiveIntensity: 1.5 })
+    );
+    bulb.position.y = -0.12;
+    lampGroup.add(bulb);
+
+    // Wire cage around bulb
+    for (let c = 0; c < 4; c++) {
+      const wire = new THREE.Mesh(
+        new THREE.TorusGeometry(0.24, 0.015, 6, 16, Math.PI),
+        new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.9 })
+      );
+      wire.position.y = -0.14;
+      wire.rotation.x = Math.PI;
+      wire.rotation.y = (c * Math.PI) / 4;
+      lampGroup.add(wire);
+    }
+    scene.add(lampGroup);
+
+    // Electrical conduit tubing along ceiling to back wall
+    const conduitCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, boxHeight / 2 - 0.15, 0),
+      new THREE.Vector3(-1.8, boxHeight / 2 - 0.18, -0.8),
+      new THREE.Vector3(-2.1, 1.2, -2.1),
+    ]);
+    const conduitMesh = new THREE.Mesh(
+      new THREE.TubeGeometry(conduitCurve, 24, 0.04, 8, false),
+      new THREE.MeshStandardMaterial({ color: 0x374151, metalness: 0.8, roughness: 0.4 })
+    );
+    scene.add(conduitMesh);
+
     chamberWallsRef.current = chamberWalls;
 
-    // 6. The Hinged Door (Openable)
+    // 6. The Heavy Hinged Vault Door
     const doorGroup = new THREE.Group();
-    doorGroup.position.set(-boxWidth / 2, 0, boxDepth / 2); // hinge on left
+    doorGroup.position.set(-boxWidth / 2, 0, boxDepth / 2); // Hinge pivot on left
 
+    // Heavy Dual Barrel Hinges
+    const hingeMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3, metalness: 0.9 });
+    const topHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.6, 16), hingeMat);
+    topHinge.position.set(0, 1.4, 0);
+    doorGroup.add(topHinge);
+    const botHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.6, 16), hingeMat);
+    botHinge.position.set(0, -1.4, 0);
+    doorGroup.add(botHinge);
+
+    // Main Door Slab
     const doorMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(boxWidth, boxHeight - 0.1, 0.22),
+      new THREE.BoxGeometry(boxWidth, boxHeight - 0.1, 0.28),
       new THREE.MeshStandardMaterial({
-        color: 0x1f2330,
+        color: 0x1a1c26,
         roughness: 0.5,
-        metalness: 0.3,
+        metalness: 0.45,
         transparent: true,
         opacity: 1.0,
       })
@@ -272,248 +557,604 @@ export default function SchrodingersCat3DLab() {
     doorGroup.add(doorMesh);
     chamberWalls.push(doorMesh);
 
-    // Warning Radiation Symbol on Door Face
-    const radRing = new THREE.Mesh(
-      new THREE.RingGeometry(0.5, 0.65, 32),
-      new THREE.MeshStandardMaterial({ color: 0xe5a93c, side: THREE.DoubleSide })
+    // Heavy Vault Locking Wheel Mechanism
+    const lockCenter = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.35, 0.35, 0.18, 24),
+      new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.88, roughness: 0.25 })
     );
-    radRing.position.set(boxWidth / 2, 0.2, 0.13);
-    doorGroup.add(radRing);
+    lockCenter.rotation.x = Math.PI / 2;
+    lockCenter.position.set(boxWidth / 2, 0.1, 0.2);
+    doorGroup.add(lockCenter);
 
-    const radCenter = new THREE.Mesh(
-      new THREE.CircleGeometry(0.25, 32),
-      new THREE.MeshStandardMaterial({ color: 0xe5a93c, side: THREE.DoubleSide })
+    const wheelRim = new THREE.Mesh(
+      new THREE.TorusGeometry(0.72, 0.05, 12, 32),
+      brassFrameMat
     );
-    radCenter.position.set(boxWidth / 2, 0.2, 0.131);
-    doorGroup.add(radCenter);
+    wheelRim.position.set(boxWidth / 2, 0.1, 0.22);
+    doorGroup.add(wheelRim);
 
-    // Brass Lock Latch
-    const lockMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(0.3, 0.8, 0.25),
-      new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.2, metalness: 0.9 })
+    // 4 Wheel Spokes
+    for (let s = 0; s < 4; s++) {
+      const spoke = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.035, 1.44, 8),
+        brassFrameMat
+      );
+      spoke.position.set(boxWidth / 2, 0.1, 0.22);
+      spoke.rotation.z = (s * Math.PI) / 4;
+      doorGroup.add(spoke);
+    }
+
+    // Heavy Brass Latch Bar
+    const latchBar = new THREE.Mesh(
+      new THREE.BoxGeometry(0.32, 0.85, 0.3),
+      new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.9, roughness: 0.2 })
     );
-    lockMesh.position.set(boxWidth - 0.3, 0, 0.14);
-    doorGroup.add(lockMesh);
+    latchBar.position.set(boxWidth - 0.25, 0.1, 0.16);
+    doorGroup.add(latchBar);
+
+    // Warning Placard on Door Face
+    const placardTexture = createHazardPlacardTexture();
+    if (placardTexture) {
+      const placard = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.9, 0.95),
+        new THREE.MeshStandardMaterial({ map: placardTexture, roughness: 0.4, metalness: 0.2 })
+      );
+      placard.position.set(boxWidth / 2, 1.35, 0.155);
+      doorGroup.add(placard);
+    }
 
     scene.add(doorGroup);
     doorGroupRef.current = doorGroup;
 
-    // 7. Internal Apparatus: The Radioactive Isotope Atom
+    // 7. Internal Apparatus: Lead Isotope Collimator & Radioactive Core
     const isotopeGroup = new THREE.Group();
-    isotopeGroup.position.set(-2, -0.6, -1.2);
+    isotopeGroup.position.set(-2.2, -0.6, -1.2);
 
-    const pedestal = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.55, 0.65, 0.8, 24),
-      new THREE.MeshStandardMaterial({ color: 0x222634, metalness: 0.8, roughness: 0.4 })
+    // Heavy Octagonal Lead Castle / Collimator Housing
+    const leadWell = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.65, 0.75, 1.1, 8),
+      new THREE.MeshStandardMaterial({ color: 0x222634, metalness: 0.85, roughness: 0.35 })
     );
-    pedestal.position.y = -0.4;
-    isotopeGroup.add(pedestal);
+    leadWell.position.y = -0.3;
+    isotopeGroup.add(leadWell);
 
-    // Glowing Core
+    // Brass Collimator Aperture Ring pointing towards the Geiger counter
+    const apertureRing = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.22, 0.22, 0.1, 16),
+      new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.9, roughness: 0.2 })
+    );
+    apertureRing.rotation.z = Math.PI / 2;
+    apertureRing.position.set(0.65, 0.05, 0);
+    isotopeGroup.add(apertureRing);
+
+    // Natural Faceted Uranium / Pitchblende Ore Crystal
     const coreMesh = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(0.35, 2),
+      new THREE.DodecahedronGeometry(0.32, 1),
       new THREE.MeshStandardMaterial({
-        color: 0xe5a93c,
-        emissive: 0xe5a93c,
-        emissiveIntensity: 0.9,
-        roughness: 0.1,
+        color: 0xf59e0b,
+        emissive: 0xd97706,
+        emissiveIntensity: 1.2,
+        roughness: 0.3,
+        metalness: 0.4,
       })
     );
-    coreMesh.position.y = 0.3;
+    coreMesh.position.set(0.1, 0.05, 0);
     isotopeGroup.add(coreMesh);
     coreMeshRef.current = coreMesh;
 
-    // Orbiting particle sparks
-    const sparkCount = 45;
+    // Ionization Particle Spark Emitters
+    const sparkCount = 60;
     const sparkGeom = new THREE.BufferGeometry();
     const sparkPositions = new Float32Array(sparkCount * 3);
     for (let i = 0; i < sparkCount; i++) {
-      const radius = 0.55 + Math.random() * 0.45;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(Math.random() * 2 - 1);
-      sparkPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      sparkPositions[i * 3 + 1] = 0.3 + radius * Math.sin(phi) * Math.sin(theta);
-      sparkPositions[i * 3 + 2] = radius * Math.cos(phi);
+      // Direct sparks generally towards the Geiger tube (+X, +Y direction)
+      const dist = 0.4 + Math.random() * 0.9;
+      const spreadX = 0.3 + Math.random() * 0.8;
+      const spreadY = (Math.random() - 0.3) * 0.8;
+      const spreadZ = (Math.random() - 0.5) * 0.6;
+      sparkPositions[i * 3] = dist * spreadX;
+      sparkPositions[i * 3 + 1] = 0.05 + dist * spreadY;
+      sparkPositions[i * 3 + 2] = dist * spreadZ;
     }
     sparkGeom.setAttribute('position', new THREE.BufferAttribute(sparkPositions, 3));
-    const sparkMat = new THREE.PointsMaterial({ color: 0xfef08a, size: 0.08, transparent: true, opacity: 0.85 });
+    const sparkMat = new THREE.PointsMaterial({
+      color: 0xfef08a,
+      size: 0.065,
+      transparent: true,
+      opacity: 0.9,
+    });
     const sparkPoints = new THREE.Points(sparkGeom, sparkMat);
     isotopeGroup.add(sparkPoints);
     sparksRef.current = sparkPoints;
 
     scene.add(isotopeGroup);
 
-    // 8. Internal Apparatus: The Geiger Counter
+    // 8. Internal Apparatus: Vintage 1935 Geiger-Müller Detection Unit
     const geigerGroup = new THREE.Group();
-    geigerGroup.position.set(-2, 0.8, -1.2);
+    geigerGroup.position.set(-2.0, 0.8, -1.2);
 
-    const geigerBox = new THREE.Mesh(
-      new THREE.BoxGeometry(1.2, 0.9, 0.6),
-      new THREE.MeshStandardMaterial({ color: 0x1f2330, metalness: 0.7, roughness: 0.3 })
+    // Geiger Detector Main Metal Chassis
+    const geigerChassis = new THREE.Mesh(
+      new THREE.BoxGeometry(1.3, 0.95, 0.7),
+      new THREE.MeshStandardMaterial({ color: 0x1a1d28, metalness: 0.75, roughness: 0.35 })
     );
-    geigerGroup.add(geigerBox);
+    geigerGroup.add(geigerChassis);
 
-    // Gauge Dial
+    // Horizontal Geiger-Müller Sensing Tube (Chrome / Brass with mica window)
+    const gmTubeGroup = new THREE.Group();
+    gmTubeGroup.position.set(0, -0.65, 0.2);
+
+    const gmTube = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.12, 0.9, 20),
+      new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.95, roughness: 0.15 })
+    );
+    gmTube.rotation.z = Math.PI / 2;
+    gmTubeGroup.add(gmTube);
+
+    // Brass insulated mounting standoffs
+    const bracket1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.2), brassFrameMat);
+    bracket1.position.set(-0.3, -0.1, 0);
+    gmTubeGroup.add(bracket1);
+    const bracket2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.2), brassFrameMat);
+    bracket2.position.set(0.3, -0.1, 0);
+    gmTubeGroup.add(bracket2);
+
+    // Coaxial Cable leading into main amplifier
+    const cableCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.45, 0, 0),
+      new THREE.Vector3(-0.65, 0.2, 0),
+      new THREE.Vector3(-0.5, 0.5, -0.1),
+    ]);
+    const cableMesh = new THREE.Mesh(
+      new THREE.TubeGeometry(cableCurve, 16, 0.025, 8, false),
+      new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.8 })
+    );
+    gmTubeGroup.add(cableMesh);
+    geigerGroup.add(gmTubeGroup);
+
+    // Round Galvanometer Meter with Calibrated Scale
+    const dialPlateGeom = new THREE.CircleGeometry(0.32, 32);
+    const dialTex = createGeigerDialTexture();
     const dialPlate = new THREE.Mesh(
-      new THREE.CircleGeometry(0.3, 24),
-      new THREE.MeshBasicMaterial({ color: 0xf3f4f6 })
+      dialPlateGeom,
+      new THREE.MeshBasicMaterial({ map: dialTex })
     );
-    dialPlate.position.set(0, 0.05, 0.31);
+    dialPlate.position.set(-0.22, 0.08, 0.36);
     geigerGroup.add(dialPlate);
 
-    // Needle
-    const needleGeom = new THREE.BoxGeometry(0.04, 0.26, 0.02);
+    // Brass Meter Bezel Rim
+    const dialBezel = new THREE.Mesh(
+      new THREE.TorusGeometry(0.325, 0.025, 12, 32),
+      brassFrameMat
+    );
+    dialBezel.position.set(-0.22, 0.08, 0.37);
+    geigerGroup.add(dialBezel);
+
+    // Convex Protective Glass Lens Cover
+    const dialGlass = new THREE.Mesh(
+      new THREE.SphereGeometry(0.32, 24, 12, 0, Math.PI * 2, 0, Math.PI / 4),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        transmission: 0.95,
+        transparent: true,
+        roughness: 0.05,
+        ior: 1.5,
+      })
+    );
+    dialGlass.position.set(-0.22, 0.08, 0.34);
+    dialGlass.rotation.x = Math.PI / 2;
+    geigerGroup.add(dialGlass);
+
+    // Needle Pointer with Brass Pivot Cap
+    const needleGeom = new THREE.BoxGeometry(0.03, 0.26, 0.015);
     needleGeom.translate(0, 0.12, 0);
     const needle = new THREE.Mesh(needleGeom, new THREE.MeshBasicMaterial({ color: 0xd97706 }));
-    needle.position.set(0, -0.05, 0.32);
-    needle.rotation.z = -0.2;
+    needle.position.set(-0.22, -0.02, 0.375);
+    needle.rotation.z = -0.15;
     geigerGroup.add(needle);
     geigerNeedleRef.current = needle;
 
+    const needleCap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.045, 0.045, 0.03, 16),
+      brassFrameMat
+    );
+    needleCap.rotation.x = Math.PI / 2;
+    needleCap.position.set(-0.22, -0.02, 0.385);
+    geigerGroup.add(needleCap);
+
+    // Vintage Knurled Sensitivity Knob & Toggle Switch
+    const knob = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.1, 0.1, 0.12, 20),
+      new THREE.MeshStandardMaterial({ color: 0x0a0c10, roughness: 0.6 })
+    );
+    knob.rotation.x = Math.PI / 2;
+    knob.position.set(0.35, 0.18, 0.36);
+    geigerGroup.add(knob);
+
+    const toggleBase = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.04, 12), brassFrameMat);
+    toggleBase.rotation.x = Math.PI / 2;
+    toggleBase.position.set(0.35, -0.18, 0.36);
+    geigerGroup.add(toggleBase);
+
+    const toggleLever = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.1, 8), brassFrameMat);
+    toggleLever.position.set(0.35, -0.14, 0.4);
+    toggleLever.rotation.x = 0.3;
+    geigerGroup.add(toggleLever);
+
     scene.add(geigerGroup);
 
-    // 9. Internal Apparatus: The Trip Hammer & Glass Vial of Poison
-    const poisonGroup = new THREE.Group();
-    poisonGroup.position.set(-0.6, -1.2, -1.2);
+    // 9. Electromechanical Solenoid Relay, Spring Trip Hammer & Poison Flask
+    const relayPoisonGroup = new THREE.Group();
+    relayPoisonGroup.position.set(-0.6, -1.2, -1.2);
 
-    // Glass Flask
-    const flaskGeom = new THREE.CylinderGeometry(0.2, 0.38, 0.7, 16);
-    const flaskMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      transmission: 0.9,
-      opacity: 1,
-      transparent: true,
-      roughness: 0.1,
-      ior: 1.5,
-    });
-    const flask = new THREE.Mesh(flaskGeom, flaskMat);
-    flask.position.y = 0.35;
-    poisonGroup.add(flask);
+    // Solenoid Relay Coil Box
+    const relayChassis = new THREE.Mesh(
+      new THREE.BoxGeometry(0.65, 0.7, 0.65),
+      darkTrimMat
+    );
+    relayChassis.position.set(-0.1, 1.5, 0);
+    relayPoisonGroup.add(relayChassis);
 
-    // Poison Liquid Fluid
-    const fluidGeom = new THREE.CylinderGeometry(0.18, 0.35, 0.45, 16);
-    const fluidMat = new THREE.MeshStandardMaterial({ color: 0xe5a93c, roughness: 0.2, emissive: 0xd97706, emissiveIntensity: 0.3 });
-    const fluid = new THREE.Mesh(fluidGeom, fluidMat);
-    fluid.position.y = 0.25;
-    poisonGroup.add(fluid);
-    vialFluidRef.current = fluid;
+    // Copper Wire Solenoid Cylinder
+    const copperCoil = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.18, 0.18, 0.4, 20),
+      new THREE.MeshStandardMaterial({ color: 0xb45309, metalness: 0.85, roughness: 0.3 })
+    );
+    copperCoil.position.set(-0.1, 1.5, 0);
+    relayPoisonGroup.add(copperCoil);
 
-    // Mechanical Hammer
-    const hammerArmGeom = new THREE.BoxGeometry(0.08, 0.75, 0.08);
-    hammerArmGeom.translate(0, -0.35, 0);
-    const hammerHeadGeom = new THREE.BoxGeometry(0.3, 0.15, 0.2);
-    hammerHeadGeom.translate(0, -0.7, 0);
-
+    // Spring Trip Hammer Arm & Brass Pivot
     const hammerGroup = new THREE.Group();
-    hammerGroup.position.set(0, 1.4, 0);
-    const hammerArm = new THREE.Mesh(hammerArmGeom, new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.9 }));
-    const hammerHead = new THREE.Mesh(hammerHeadGeom, new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.8 }));
-    hammerGroup.add(hammerArm);
+    hammerGroup.position.set(0.18, 1.5, 0);
+
+    const pivotPin = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.22, 16), brassFrameMat);
+    pivotPin.rotation.x = Math.PI / 2;
+    hammerGroup.add(pivotPin);
+
+    // Steel Hammer Shank
+    const hammerShankGeom = new THREE.BoxGeometry(0.07, 0.95, 0.07);
+    hammerShankGeom.translate(0, -0.45, 0);
+    const hammerShank = new THREE.Mesh(
+      hammerShankGeom,
+      new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.92, roughness: 0.15 })
+    );
+    hammerGroup.add(hammerShank);
+
+    // Heavy Counterweighted Steel Hammer Head
+    const hammerHeadGeom = new THREE.BoxGeometry(0.32, 0.18, 0.22);
+    hammerHeadGeom.translate(0, -0.9, 0);
+    const hammerHead = new THREE.Mesh(
+      hammerHeadGeom,
+      new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.85, roughness: 0.25 })
+    );
     hammerGroup.add(hammerHead);
-    hammerGroup.rotation.z = -Math.PI / 4; // ready to strike
-    poisonGroup.add(hammerGroup);
+
+    hammerGroup.rotation.z = -Math.PI * 0.35; // Cocked ready to strike
+    relayPoisonGroup.add(hammerGroup);
     hammerRef.current = hammerGroup;
 
-    scene.add(poisonGroup);
+    // Prussic Acid Chemical Flask (Refractive Glass Erlenmeyer Flask)
+    const flaskGroup = new THREE.Group();
+    flaskGroup.position.set(0.3, 0.35, 0);
 
-    // 10. The 3D Cat Model (Articulated Compound Geometry)
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      transmission: 0.95,
+      transparent: true,
+      roughness: 0.08,
+      ior: 1.52,
+      thickness: 0.45,
+    });
+
+    const flaskBody = new THREE.Mesh(new THREE.ConeGeometry(0.42, 0.7, 24), glassMat);
+    flaskBody.castShadow = true;
+    flaskGroup.add(flaskBody);
+
+    const flaskNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.32, 20), glassMat);
+    flaskNeck.position.y = 0.45;
+    flaskGroup.add(flaskNeck);
+
+    const stopper = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.14, 0.1, 0.15, 16),
+      new THREE.MeshStandardMaterial({ color: 0x374151, roughness: 0.7 })
+    );
+    stopper.position.y = 0.62;
+    flaskGroup.add(stopper);
+
+    // Amber Toxic Liquid Meniscus inside
+    const liquidMesh = new THREE.Mesh(
+      new THREE.ConeGeometry(0.38, 0.45, 20),
+      new THREE.MeshStandardMaterial({
+        color: 0xe5a93c,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.4,
+        roughness: 0.15,
+        transparent: true,
+        opacity: 0.85,
+      })
+    );
+    liquidMesh.position.y = -0.12;
+    flaskGroup.add(liquidMesh);
+
+    relayPoisonGroup.add(flaskGroup);
+    intactFlaskRef.current = flaskGroup;
+
+    // Shattered Glass Shards for Collapsed State
+    const shatteredGroup = new THREE.Group();
+    shatteredGroup.position.set(0.3, 0.05, 0);
+    shatteredGroup.visible = false;
+
+    for (let g = 0; g < 8; g++) {
+      const shard = new THREE.Mesh(
+        new THREE.TetrahedronGeometry(0.08 + Math.random() * 0.08, 0),
+        glassMat
+      );
+      shard.position.set((Math.random() - 0.5) * 0.6, 0.02, (Math.random() - 0.5) * 0.6);
+      shard.rotation.set(Math.random() * 3, Math.random() * 3, Math.random() * 3);
+      shatteredGroup.add(shard);
+    }
+    relayPoisonGroup.add(shatteredGroup);
+    shatteredFlaskRef.current = shatteredGroup;
+
+    // Spilled Cyanide Liquid Puddle on the floor
+    const puddleGeom = new THREE.CircleGeometry(0.45, 20);
+    puddleGeom.rotateX(-Math.PI / 2);
+    const puddle = new THREE.Mesh(
+      puddleGeom,
+      new THREE.MeshStandardMaterial({
+        color: 0xe5a93c,
+        roughness: 0.1,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.3,
+        transparent: true,
+        opacity: 0.75,
+      })
+    );
+    puddle.position.set(0.3, 0.02, 0);
+    puddle.scale.set(1.4, 1.0, 0.9);
+    puddle.visible = false;
+    relayPoisonGroup.add(puddle);
+    poisonPoolRef.current = puddle;
+
+    scene.add(relayPoisonGroup);
+
+    // 10. Anatomically Credible 3D Cat Model
     const catGroup = new THREE.Group();
-    catGroup.position.set(1.4, -1.1, 0.2);
+    catGroup.position.set(1.3, -1.2, 0.15);
 
-    // Helper for building the 3D Cat
-    const createCatMesh = (isDeadPose = false) => {
+    // Build Realistic Anatomical Cat (Alive & Collapsed Poses)
+    const createAnatomicalCat = (isDeadPose = false) => {
       const catSubGroup = new THREE.Group();
-      const catColor = isDeadPose ? 0x475569 : 0xe5a93c;
-      const catMat = new THREE.MeshStandardMaterial({
-        color: catColor,
-        roughness: 0.6,
-        metalness: 0.1,
+
+      // Fur material (Matte, velvety warm dark-amber/charcoal coat)
+      const furColor = isDeadPose ? 0x3d4352 : 0xd97706;
+      const furMat = new THREE.MeshStandardMaterial({
+        color: furColor,
+        roughness: 0.82,
+        metalness: 0.04,
       });
 
+      const innerEarMat = new THREE.MeshStandardMaterial({
+        color: isDeadPose ? 0x475569 : 0xfbbf24,
+        roughness: 0.7,
+      });
+
+      const noseMat = new THREE.MeshStandardMaterial({
+        color: 0x27272a,
+        roughness: 0.4,
+      });
+
+      const catEyeTex = createCatEyeTexture();
+
       if (!isDeadPose) {
-        // ALIVE POSE (Sitting upright, alert)
-        // Torso
-        const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.65, 1.1, 8, 16), catMat);
-        body.position.set(0, 0.7, 0);
-        body.rotation.z = 0.15;
-        body.castShadow = true;
-        catSubGroup.add(body);
+        // ================= ALIVE POSE (Alert, natural seated feline posture) =================
 
-        // Head
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 16), catMat);
-        head.position.set(0.1, 1.7, 0.1);
-        head.castShadow = true;
-        catSubGroup.add(head);
+        // 1. Ribcage & Thorax (leaned slightly forward)
+        const ribcage = new THREE.Mesh(new THREE.SphereGeometry(0.52, 20, 16), furMat);
+        ribcage.scale.set(0.95, 1.15, 1.25);
+        ribcage.position.set(0, 0.8, -0.05);
+        ribcage.rotation.x = -0.22;
+        ribcage.castShadow = true;
+        ribcage.name = 'chest';
+        catSubGroup.add(ribcage);
 
-        // Ears
-        const earGeom = new THREE.ConeGeometry(0.2, 0.38, 4);
-        const earLeft = new THREE.Mesh(earGeom, catMat);
-        earLeft.position.set(-0.25, 2.2, 0.1);
-        earLeft.rotation.z = 0.2;
-        const earRight = new THREE.Mesh(earGeom, catMat);
-        earRight.position.set(0.4, 2.2, 0.1);
-        earRight.rotation.z = -0.2;
-        catSubGroup.add(earLeft);
-        catSubGroup.add(earRight);
+        // 2. Pelvis & Abdomen Haunches
+        const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.56, 20, 16), furMat);
+        pelvis.scale.set(1.12, 0.95, 1.15);
+        pelvis.position.set(0, 0.45, -0.25);
+        pelvis.castShadow = true;
+        catSubGroup.add(pelvis);
 
-        // Eyes (Bright alert amber/ivory)
-        const eyeGeom = new THREE.SphereGeometry(0.08, 12, 12);
-        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x08090c });
-        const eyeLeft = new THREE.Mesh(eyeGeom, eyeMat);
-        eyeLeft.position.set(-0.1, 1.8, 0.55);
-        const eyeRight = new THREE.Mesh(eyeGeom, eyeMat);
-        eyeRight.position.set(0.3, 1.8, 0.55);
-        catSubGroup.add(eyeLeft);
-        catSubGroup.add(eyeRight);
+        // 3. Folded Rear Thighs (Left and Right)
+        const thighL = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 12), furMat);
+        thighL.scale.set(0.7, 1.1, 1.25);
+        thighL.position.set(-0.45, 0.35, -0.22);
+        thighL.castShadow = true;
+        catSubGroup.add(thighL);
 
-        // Paws
-        const pawGeom = new THREE.SphereGeometry(0.22, 12, 12);
-        const pawLeft = new THREE.Mesh(pawGeom, catMat);
-        pawLeft.position.set(-0.25, 0.15, 0.6);
-        const pawRight = new THREE.Mesh(pawGeom, catMat);
-        pawRight.position.set(0.3, 0.15, 0.6);
-        catSubGroup.add(pawLeft);
-        catSubGroup.add(pawRight);
+        const thighR = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 12), furMat);
+        thighR.scale.set(0.7, 1.1, 1.25);
+        thighR.position.set(0.45, 0.35, -0.22);
+        thighR.castShadow = true;
+        catSubGroup.add(thighR);
 
-        // Animated Tail
+        // 4. Front Forelegs & Paws
+        const legGeom = new THREE.CylinderGeometry(0.11, 0.09, 0.7, 12);
+        const legL = new THREE.Mesh(legGeom, furMat);
+        legL.position.set(-0.24, 0.35, 0.38);
+        legL.castShadow = true;
+        catSubGroup.add(legL);
+
+        const legR = new THREE.Mesh(legGeom, furMat);
+        legR.position.set(0.24, 0.35, 0.38);
+        legR.castShadow = true;
+        catSubGroup.add(legR);
+
+        const pawGeom = new THREE.SphereGeometry(0.14, 12, 10);
+        pawGeom.scale(1.1, 0.7, 1.3);
+        const pawL = new THREE.Mesh(pawGeom, furMat);
+        pawL.position.set(-0.24, 0.05, 0.46);
+        catSubGroup.add(pawL);
+
+        const pawR = new THREE.Mesh(pawGeom, furMat);
+        pawR.position.set(0.24, 0.05, 0.46);
+        catSubGroup.add(pawR);
+
+        // 5. Cranium & Skull
+        const headGroup = new THREE.Group();
+        headGroup.position.set(0, 1.48, 0.12);
+        headGroup.name = 'head';
+
+        const cranium = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 16), furMat);
+        cranium.scale.set(1.05, 0.95, 1.0);
+        cranium.castShadow = true;
+        headGroup.add(cranium);
+
+        // Muzzle & Whisker Pads
+        const muzzleL = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), furMat);
+        muzzleL.position.set(-0.1, -0.12, 0.35);
+        headGroup.add(muzzleL);
+
+        const muzzleR = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), furMat);
+        muzzleR.position.set(0.1, -0.12, 0.35);
+        headGroup.add(muzzleR);
+
+        const nose = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.06, 3), noseMat);
+        nose.rotation.x = Math.PI;
+        nose.position.set(0, -0.07, 0.44);
+        headGroup.add(nose);
+
+        // Alert Feline Ears (Sculpted Outer Shell + Inner Cavity)
+        const earGeom = new THREE.ConeGeometry(0.17, 0.34, 4);
+        earGeom.scale(1.0, 1.0, 0.65);
+
+        const earL = new THREE.Mesh(earGeom, furMat);
+        earL.position.set(-0.24, 0.4, 0.02);
+        earL.rotation.z = 0.25;
+        earL.rotation.y = -0.2;
+        headGroup.add(earL);
+
+        const earR = new THREE.Mesh(earGeom, furMat);
+        earR.position.set(0.24, 0.4, 0.02);
+        earR.rotation.z = -0.25;
+        earR.rotation.y = 0.2;
+        headGroup.add(earR);
+
+        const innerEarGeom = new THREE.ConeGeometry(0.11, 0.24, 4);
+        innerEarGeom.scale(0.8, 1.0, 0.4);
+        const innerEarL = new THREE.Mesh(innerEarGeom, innerEarMat);
+        innerEarL.position.set(-0.22, 0.37, 0.07);
+        innerEarL.rotation.z = 0.25;
+        headGroup.add(innerEarL);
+
+        const innerEarR = new THREE.Mesh(innerEarGeom, innerEarMat);
+        innerEarR.position.set(0.22, 0.37, 0.07);
+        innerEarR.rotation.z = -0.25;
+        headGroup.add(innerEarR);
+
+        // Glossy Feline Eyes with Procedural Slit Pupil Texture
+        const eyeGeom = new THREE.SphereGeometry(0.095, 16, 16);
+        const eyeMat = new THREE.MeshStandardMaterial({
+          map: catEyeTex,
+          roughness: 0.1,
+          metalness: 0.2,
+        });
+
+        const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
+        eyeL.position.set(-0.16, 0.04, 0.36);
+        eyeL.rotation.y = -0.15;
+        eyeL.rotation.z = 0.08;
+        headGroup.add(eyeL);
+
+        const eyeR = new THREE.Mesh(eyeGeom, eyeMat);
+        eyeR.position.set(0.16, 0.04, 0.36);
+        eyeR.rotation.y = 0.15;
+        eyeR.rotation.z = -0.08;
+        headGroup.add(eyeR);
+
+        catSubGroup.add(headGroup);
+
+        // 6. Graceful S-Curved Swishing Tail
         const tailCurve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, 0.2, -0.5),
-          new THREE.Vector3(0.3, 0.6, -1.0),
-          new THREE.Vector3(0.5, 1.1, -1.1),
+          new THREE.Vector3(0, 0.25, -0.4),
+          new THREE.Vector3(0.4, 0.15, -0.5),
+          new THREE.Vector3(0.8, 0.08, -0.1),
+          new THREE.Vector3(0.65, 0.08, 0.45),
+          new THREE.Vector3(0.35, 0.16, 0.65),
         ]);
-        const tailMesh = new THREE.Mesh(new THREE.TubeGeometry(tailCurve, 16, 0.12, 8, false), catMat);
+        const tailMesh = new THREE.Mesh(
+          new THREE.TubeGeometry(tailCurve, 24, 0.085, 10, false),
+          furMat
+        );
         tailMesh.name = 'tail';
         catSubGroup.add(tailMesh);
       } else {
-        // DEAD / GROUND STATE POSE (Curled peacefully on side asleep)
-        const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.65, 1.2, 8, 16), catMat);
-        body.position.set(0, 0.35, 0);
-        body.rotation.z = Math.PI / 2;
-        body.rotation.x = 0.4;
+        // ================= DEAD / COLLAPSED POSE (Resting limp in repose on side) =================
+
+        // Ribcage flat on the floor
+        const body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 14), furMat);
+        body.scale.set(1.4, 0.85, 0.95);
+        body.position.set(-0.2, 0.28, 0);
+        body.rotation.z = 0.08;
         body.castShadow = true;
         catSubGroup.add(body);
 
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), catMat);
-        head.position.set(-0.95, 0.35, 0.3);
+        // Pelvis haunches
+        const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.48, 16, 14), furMat);
+        pelvis.scale.set(1.15, 0.8, 0.95);
+        pelvis.position.set(0.55, 0.26, -0.05);
+        catSubGroup.add(pelvis);
+
+        // Reclined Head resting on the floor
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 14), furMat);
+        head.scale.set(1.05, 0.85, 0.95);
+        head.position.set(-0.95, 0.22, 0.1);
+        head.rotation.z = -0.25;
         catSubGroup.add(head);
 
-        const earLeft = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.3, 4), catMat);
-        earLeft.position.set(-1.1, 0.7, 0.3);
-        catSubGroup.add(earLeft);
+        const earL = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.25, 4), furMat);
+        earL.position.set(-1.15, 0.42, 0.18);
+        earL.rotation.z = -0.4;
+        catSubGroup.add(earL);
 
-        // Closed eyes (lines)
-        const closedEyeGeom = new THREE.BoxGeometry(0.12, 0.03, 0.03);
-        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1f2330 });
-        const eye1 = new THREE.Mesh(closedEyeGeom, eyeMat);
-        eye1.position.set(-0.9, 0.38, 0.75);
-        catSubGroup.add(eye1);
+        // Limp extended paws
+        const paw1 = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.45, 6, 10), furMat);
+        paw1.rotation.z = Math.PI / 2.5;
+        paw1.position.set(-0.4, 0.1, 0.4);
+        catSubGroup.add(paw1);
+
+        const paw2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.45, 6, 10), furMat);
+        paw2.rotation.z = Math.PI / 2.8;
+        paw2.position.set(0.35, 0.1, 0.4);
+        catSubGroup.add(paw2);
+
+        // Soft closed eyelid slit (peaceful sleeping lines)
+        const closedEye1 = new THREE.Mesh(
+          new THREE.BoxGeometry(0.12, 0.02, 0.02),
+          new THREE.MeshBasicMaterial({ color: 0x181a24 })
+        );
+        closedEye1.position.set(-0.92, 0.24, 0.42);
+        closedEye1.rotation.z = -0.15;
+        catSubGroup.add(closedEye1);
+
+        // Limp Tail curved on the floor
+        const tailCurveDead = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0.95, 0.15, -0.05),
+          new THREE.Vector3(1.3, 0.08, 0.1),
+          new THREE.Vector3(1.4, 0.06, 0.4),
+        ]);
+        const tailDead = new THREE.Mesh(
+          new THREE.TubeGeometry(tailCurveDead, 16, 0.075, 8, false),
+          furMat
+        );
+        catSubGroup.add(tailDead);
       }
 
       return catSubGroup;
     };
 
-    const aliveMesh = createCatMesh(false);
-    const deadMesh = createCatMesh(true);
+    const aliveMesh = createAnatomicalCat(false);
+    const deadMesh = createAnatomicalCat(true);
     catGroup.add(aliveMesh);
     catGroup.add(deadMesh);
 
@@ -530,24 +1171,48 @@ export default function SchrodingersCat3DLab() {
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
 
-      // Spin & pulse radioactive core
+      // Subtle pulse and tumble on uranium crystal
       if (coreMeshRef.current) {
-        coreMeshRef.current.rotation.y += delta * 1.2;
-        coreMeshRef.current.rotation.x += delta * 0.8;
+        coreMeshRef.current.rotation.y += delta * 0.9;
+        coreMeshRef.current.rotation.x += delta * 0.6;
       }
 
-      // Orbit particles
+      // Orbit ionization sparks towards Geiger detector
       if (sparksRef.current) {
-        sparksRef.current.rotation.y += delta * 0.9;
+        const positions = sparksRef.current.geometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+          positions[i] += delta * 0.4;
+          if (positions[i] > 1.8) {
+            positions[i] = 0.2 + Math.random() * 0.3;
+            positions[i + 1] = 0.05 + (Math.random() - 0.3) * 0.6;
+            positions[i + 2] = (Math.random() - 0.5) * 0.5;
+          }
+        }
+        sparksRef.current.geometry.attributes.position.needsUpdate = true;
       }
 
-      // Tail swish & cat subtle breathing
+      // Articulated Living Cat Animations: Subtle Breathing & Swishing Tail
       if (catAliveMeshRef.current && catAliveMeshRef.current.visible) {
+        // Breathing oscillation in ribcage
+        const chest = catAliveMeshRef.current.getObjectByName('chest');
+        if (chest) {
+          const breath = 1.0 + Math.sin(time * 2.6) * 0.025;
+          chest.scale.set(0.95 * breath, 1.15 * breath, 1.25 * breath);
+        }
+
+        // Feline tail flicking at tip
         const tail = catAliveMeshRef.current.getObjectByName('tail');
         if (tail) {
-          tail.rotation.y = Math.sin(time * 3) * 0.25;
+          tail.rotation.y = Math.sin(time * 2.8) * 0.15;
+          tail.rotation.z = Math.cos(time * 1.4) * 0.05;
         }
-        catAliveMeshRef.current.position.y = Math.sin(time * 2.2) * 0.02;
+
+        // Head micro-tilt (curious alert feline)
+        const head = catAliveMeshRef.current.getObjectByName('head');
+        if (head) {
+          head.rotation.y = Math.sin(time * 0.8) * 0.08;
+          head.rotation.z = Math.cos(time * 1.1) * 0.03;
+        }
       }
 
       renderer.render(scene, camera);
@@ -555,6 +1220,7 @@ export default function SchrodingersCat3DLab() {
     animate();
 
     // 12. Pointer Controls for Camera Orbit
+    const dom = renderer.domElement;
     const onPointerDown = (e) => {
       isDraggingRef.current = true;
       prevPointerRef.current = { x: e.clientX, y: e.clientY };
@@ -567,7 +1233,7 @@ export default function SchrodingersCat3DLab() {
       prevPointerRef.current = { x: e.clientX, y: e.clientY };
 
       cameraAngleRef.current.theta -= dx * 0.008;
-      cameraAngleRef.current.phi = Math.max(-0.2, Math.min(1.1, cameraAngleRef.current.phi + dy * 0.008));
+      cameraAngleRef.current.phi = Math.max(-0.1, Math.min(0.85, cameraAngleRef.current.phi + dy * 0.008));
       updateCameraPos();
     };
 
@@ -581,7 +1247,6 @@ export default function SchrodingersCat3DLab() {
       updateCameraPos();
     };
 
-    const dom = renderer.domElement;
     dom.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
@@ -591,7 +1256,7 @@ export default function SchrodingersCat3DLab() {
     const handleResize = () => {
       if (!container || !renderer || !camera) return;
       const newW = container.clientWidth;
-      const newH = container.clientHeight || 460;
+      const newH = container.clientHeight || 480;
       camera.aspect = newW / newH;
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
@@ -646,9 +1311,9 @@ export default function SchrodingersCat3DLab() {
     // 3. Superposition vs Collapsed Cat Visualization
     if (catAliveMeshRef.current && catDeadMeshRef.current) {
       if (boxState === 'sealed' || boxState === 'measuring') {
-        // In Superposition: Both states are active / blended (Quantum superposition)
+        // In Superposition: Alive cat is primary, phantom dead pose visible in X-Ray mode
         catAliveMeshRef.current.visible = true;
-        catDeadMeshRef.current.visible = xrayMode; // In X-Ray mode, show the dual phantom state!
+        catDeadMeshRef.current.visible = xrayMode;
         catAliveMeshRef.current.traverse((child) => {
           if (child.isMesh && child.material) {
             child.material.transparent = true;
@@ -661,8 +1326,13 @@ export default function SchrodingersCat3DLab() {
             child.material.opacity = 0.45;
           }
         });
+        // Intact flask, cocked hammer
+        if (hammerRef.current) hammerRef.current.rotation.z = -Math.PI * 0.35;
+        if (intactFlaskRef.current) intactFlaskRef.current.visible = true;
+        if (shatteredFlaskRef.current) shatteredFlaskRef.current.visible = false;
+        if (poisonPoolRef.current) poisonPoolRef.current.visible = false;
       } else if (boxState === 'alive') {
-        // Collapsed ALIVE
+        // Collapsed ALIVE: Cat fully solid, breathing happily, hammer cocked safely
         catAliveMeshRef.current.visible = true;
         catDeadMeshRef.current.visible = false;
         catAliveMeshRef.current.traverse((child) => {
@@ -671,10 +1341,12 @@ export default function SchrodingersCat3DLab() {
             child.material.opacity = 1.0;
           }
         });
-        // Reset hammer
-        if (hammerRef.current) hammerRef.current.rotation.z = -Math.PI / 4;
+        if (hammerRef.current) hammerRef.current.rotation.z = -Math.PI * 0.35;
+        if (intactFlaskRef.current) intactFlaskRef.current.visible = true;
+        if (shatteredFlaskRef.current) shatteredFlaskRef.current.visible = false;
+        if (poisonPoolRef.current) poisonPoolRef.current.visible = false;
       } else if (boxState === 'dead') {
-        // Collapsed DEAD
+        // Collapsed DEAD: Cat in resting ground state, hammer struck, flask shattered, cyanide pooled
         catAliveMeshRef.current.visible = false;
         catDeadMeshRef.current.visible = true;
         catDeadMeshRef.current.traverse((child) => {
@@ -683,8 +1355,10 @@ export default function SchrodingersCat3DLab() {
             child.material.opacity = 1.0;
           }
         });
-        // Hammer strikes
-        if (hammerRef.current) hammerRef.current.rotation.z = 0;
+        if (hammerRef.current) hammerRef.current.rotation.z = 0; // Struck down
+        if (intactFlaskRef.current) intactFlaskRef.current.visible = false;
+        if (shatteredFlaskRef.current) shatteredFlaskRef.current.visible = true;
+        if (poisonPoolRef.current) poisonPoolRef.current.visible = true;
       }
     }
   }, [boxState, xrayMode]);
@@ -696,7 +1370,6 @@ export default function SchrodingersCat3DLab() {
     setBoxState('measuring');
 
     setTimeout(() => {
-      // Quantum RNG based on calculated exponential decay probability
       const roll = Math.random();
       const isAlive = roll > decayProb;
 
@@ -790,7 +1463,7 @@ export default function SchrodingersCat3DLab() {
         </div>
       </div>
 
-      {/* Many-Worlds Multiverse Branch Modal/View if active */}
+      {/* Many-Worlds Multiverse Branch View */}
       {interpretation === 'many-worlds' && (boxState === 'alive' || boxState === 'dead') && (
         <div className={styles.manyWorldsBanner}>
           <div className={styles.branchHeader}>
