@@ -755,7 +755,7 @@ export default function GrandfatherSpacetime3D() {
                   <>
                     <li>
                       <span>1.</span>
-                      <span><strong>Spacetime Worldlines:</strong> Green node is Grandfather <span className={styles.keyBadge}>1950</span>, Blue is Parent <span className={styles.keyBadge}>1975</span>, Amber is Traveler <span className={styles.keyBadge}>2026</span>. The purple conduit is the retrocausal wormhole.</span>
+                      <span><strong>Spacetime Worldlines:</strong> Green node is Grandfather (1950), Blue is Parent (1975), Amber is Traveler (2026). The purple conduit is the retrocausal wormhole.</span>
                     </li>
                     <li>
                       <span>2.</span>
