@@ -156,6 +156,95 @@
   100% { opacity: 1; }
 }
 
+/* Experiment Guide HUD (Collapsible) */
+.instructionCard {
+  position: absolute;
+  top: 4.8rem;
+  left: 1rem;
+  max-width: 320px;
+  background: rgba(13, 16, 23, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 169, 60, 0.35);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  z-index: 10;
+}
+
+.instructionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-accent-amber, #E5A93C);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.instructionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.instructionToggle {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.instructionToggle:hover {
+  color: #F9FAFB;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.instructionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.725rem;
+  color: #9CA3AF;
+  line-height: 1.4;
+}
+
+.instructionList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.instructionList strong {
+  color: #F3F4F6;
+  font-weight: 600;
+}
+
+.keyBadge {
+  background-color: #1F2433;
+  color: #E5A93C;
+  border: 1px solid rgba(229, 169, 60, 0.4);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.625rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* Quick Viewport Controls (Top Right) */
 .viewportControls {
   position: absolute;

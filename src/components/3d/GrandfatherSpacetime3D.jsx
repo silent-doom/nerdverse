@@ -43,6 +43,7 @@ export default function GrandfatherSpacetime3D() {
   const [selectedTheory, setSelectedTheory] = useState('novikov');
   const [jumpYear, setJumpYear] = useState(1952);
   const [throatRadius, setThroatRadius] = useState(1.2);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   const activeTheory = THEORIES.find((t) => t.id === selectedTheory);
 
@@ -182,9 +183,55 @@ export default function GrandfatherSpacetime3D() {
         </p>
       </div>
 
-      <div className={styles.canvasWrapper} ref={mountRef} />
+      <div className={styles.canvasWrapper}>
+        <div ref={mountRef} style={{ width: '100%', height: '380px' }} />
 
-      {/* Model Selection Tabs */}
+        {/* Spacetime Topology Overlay & Experiment Guide */}
+        <div className={styles.canvasOverlay}>
+          <div className={styles.orbitHint}>
+            <Icon name="compass" size={13} />
+            <span>Spacetime Geodesic Topology • Continuous Lorentzian Simulation</span>
+          </div>
+
+          <div className={styles.instructionCard}>
+            <div className={styles.instructionHeader}>
+              <div className={styles.instructionTitle}>
+                <Icon name="help-circle" size={14} />
+                <span>Experiment Guide</span>
+              </div>
+              <button
+                type="button"
+                className={styles.instructionToggle}
+                onClick={() => setShowInstructions(!showInstructions)}
+                title={showInstructions ? 'Minimize guide' : 'Expand guide'}
+              >
+                {showInstructions ? 'Hide' : 'Show'}
+              </button>
+            </div>
+
+            {showInstructions && (
+              <ul className={styles.instructionList}>
+                <li>
+                  <span>1.</span>
+                  <span><strong>Wormhole Throat:</strong> Blue ring is Departure (2026); Amber ring is Arrival (Past). Slide <strong>Curvature Radius</strong> to bend the gravitational throat geometry.</span>
+                </li>
+                <li>
+                  <span>2.</span>
+                  <span><strong>Novikov Loop:</strong> Green geodesic forms an unbroken deterministic cycle. Probability of paradox is strictly 0%.</span>
+                </li>
+                <li>
+                  <span>3.</span>
+                  <span><strong>Many-Worlds:</strong> Travel branches spacetime into Timeline B. You can alter the past without erasing your origin timeline.</span>
+                </li>
+                <li>
+                  <span>4.</span>
+                  <span><strong>Hawking Conjecture:</strong> Quantum vacuum energy explodes to infinity, physically destroying the wormhole before CTC forms.</span>
+                </li>
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         {THEORIES.map((theory) => (
           <button

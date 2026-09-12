@@ -10,6 +10,7 @@ export default function MontyHallSimulator() {
   const [revealedHostDoor, setRevealedHostDoor] = useState(null);
   const [gameState, setGameState] = useState('choose'); // 'choose', 'switch_or_stay', 'finished'
   const [result, setResult] = useState(null);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   const [stats, setStats] = useState({
     stayWins: 14,
@@ -77,6 +78,45 @@ export default function MontyHallSimulator() {
         <p className={styles.simSubtitle}>
           Behind one door is the grand prize; behind the other two are goats. Test why switching doors mathematically doubles your win probability from 33.3% to 66.7%.
         </p>
+      </div>
+
+      {/* Experiment Guide Card */}
+      <div className={styles.instructionCard}>
+        <div className={styles.instructionHeader}>
+          <div className={styles.instructionTitle}>
+            <Icon name="help-circle" size={14} />
+            <span>Experiment Guide • How to Prove the Paradox</span>
+          </div>
+          <button
+            type="button"
+            className={styles.instructionToggle}
+            onClick={() => setShowInstructions(!showInstructions)}
+            title={showInstructions ? 'Minimize guide' : 'Expand guide'}
+          >
+            {showInstructions ? 'Hide' : 'Show'}
+          </button>
+        </div>
+
+        {showInstructions && (
+          <ul className={styles.instructionList}>
+            <li>
+              <span>1.</span>
+              <span><strong>Initial Guess:</strong> Select any of the 3 doors. Your chance of picking the sports car is exactly <span className={styles.keyBadge}>1/3 (33.3%)</span>, leaving a <span className={styles.keyBadge}>2/3 (66.7%)</span> probability that the car is behind one of the unchosen doors.</span>
+            </li>
+            <li>
+              <span>2.</span>
+              <span><strong>Host's Action:</strong> Monty Hall—who knows where the car is—opens one of the unchosen doors to reveal a goat. Because he <em>never</em> opens the prize door, his action is an intelligent information filter.</span>
+            </li>
+            <li>
+              <span>3.</span>
+              <span><strong>Bayesian Transfer:</strong> All <span className={styles.keyBadge}>66.7%</span> of the unchosen probability mass transfers directly onto the <em>remaining unchosen door</em>.</span>
+            </li>
+            <li>
+              <span>4.</span>
+              <span><strong>Decision:</strong> Test <strong>Switch Doors</strong> vs <strong>Stay with Original</strong> across multiple rounds. Watch the empirical win counter converge to double odds for switching!</span>
+            </li>
+          </ul>
+        )}
       </div>
 
       <div className={styles.doorsGrid}>

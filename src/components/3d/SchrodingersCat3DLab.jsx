@@ -217,6 +217,7 @@ export default function SchrodingersCat3DLab() {
   const [interpretation, setInterpretation] = useState('copenhagen');
   const [trials, setTrials] = useState({ total: 0, alive: 0, dead: 0 });
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   // 3D Scene Refs
   const sceneRef = useRef(null);
@@ -1550,6 +1551,31 @@ export default function SchrodingersCat3DLab() {
     }
   };
 
+  // Keyboard Shortcuts (Space to measure/reseal, R to reset, X for X-Ray)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target?.tagName)) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (boxState === 'sealed') {
+          handleMeasure();
+        } else if (boxState === 'alive' || boxState === 'dead') {
+          handleReset();
+        }
+      } else if (e.code === 'KeyR') {
+        e.preventDefault();
+        handleReset();
+      } else if (e.code === 'KeyX') {
+        e.preventDefault();
+        setXrayMode((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [boxState, decayProb]);
+
   return (
     <div className={styles.container}>
       {/* Simulation Header */}
@@ -1589,6 +1615,45 @@ export default function SchrodingersCat3DLab() {
             {boxState === 'alive' && 'MEASURED: ALIVE (Eigenstate |1⟩)'}
             {boxState === 'dead' && 'MEASURED: COLLAPSED (Eigenstate |0⟩)'}
           </div>
+        </div>
+
+        {/* Experiment Guide HUD (Collapsible) */}
+        <div className={styles.instructionCard}>
+          <div className={styles.instructionHeader}>
+            <div className={styles.instructionTitle}>
+              <Icon name="help-circle" size={13} />
+              <span>Experiment Guide</span>
+            </div>
+            <button
+              type="button"
+              className={styles.instructionToggle}
+              onClick={() => setShowInstructions(!showInstructions)}
+              title={showInstructions ? 'Minimize guide' : 'Expand guide'}
+            >
+              {showInstructions ? 'Hide' : 'Show'}
+            </button>
+          </div>
+
+          {showInstructions && (
+            <ul className={styles.instructionList}>
+              <li>
+                <span>1.</span>
+                <span><strong>Quantum Superposition:</strong> Click <span className={styles.keyBadge}>Quantum X-Ray</span> or press <span className={styles.keyBadge}>X</span> to view the cat inside the sealed chamber in uncollapsed state <span className={styles.keyBadge}>|Ψ⟩ = α|Alive⟩ + β|Dead⟩</span>.</span>
+              </li>
+              <li>
+                <span>2.</span>
+                <span><strong>Decay Probability:</strong> Adjust <strong>Exposure Time</strong> (<span className={styles.keyBadge}>1m – 90m</span>). Longer duration exponentially increases decay likelihood from 10% to 87%.</span>
+              </li>
+              <li>
+                <span>3.</span>
+                <span><strong>Force Wave Collapse:</strong> Click <strong>Open Chamber (Measure)</strong> or press <span className={styles.keyBadge}>Space</span>. The wave function decoheres into a classical eigenstate (Alive vs Collapsed).</span>
+              </li>
+              <li>
+                <span>4.</span>
+                <span><strong>Multiverse Branching:</strong> Switch interpretation to <strong>Many-Worlds</strong> to inspect the alternate parallel universe where the opposite outcome occurred. Press <span className={styles.keyBadge}>R</span> to reseal.</span>
+              </li>
+            </ul>
+          )}
         </div>
 
         {/* Quick Viewport Controls */}
