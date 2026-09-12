@@ -1,6 +1,6 @@
 .container {
-  background-color: var(--color-bg-secondary, #12141a);
-  border: 1px solid var(--color-border-default, #242836);
+  background-color: var(--color-bg-secondary, #0c0d12);
+  border: 1px solid var(--color-border-default, #222634);
   border-radius: var(--radius-xl, 16px);
   padding: var(--space-6, 24px);
   margin: var(--space-8, 32px) 0;
@@ -20,9 +20,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background-color: var(--color-bg-tertiary, #1a1d26);
-  color: var(--color-brand-primary, #ff5722);
-  border: 1px solid var(--color-border-default, #242836);
+  background-color: rgba(229, 169, 60, 0.12);
+  color: #e5a93c;
+  border: 1px solid rgba(229, 169, 60, 0.3);
   padding: 4px 12px;
   border-radius: var(--radius-sm, 4px);
   font-size: var(--text-xs, 12px);
@@ -32,15 +32,15 @@
 }
 
 .title {
-  font-size: var(--text-xl, 20px);
+  font-size: var(--text-xl, 22px);
   font-weight: 800;
-  color: var(--color-text-primary, #f5f6fa);
+  color: #f9fafb;
   margin: 0;
 }
 
 .subtitle {
   font-size: var(--text-sm, 14px);
-  color: var(--color-text-secondary, #8e94a5);
+  color: #9ca3af;
   line-height: 1.6;
   margin: 0;
 }
@@ -48,12 +48,73 @@
 /* 3D Canvas Frame */
 .canvasWrapper {
   width: 100%;
-  height: 400px;
+  height: 440px;
   background-color: #08090c;
-  border: 1px solid var(--color-border-default, #242836);
+  border: 1px solid #222634;
   border-radius: var(--radius-lg, 12px);
   overflow: hidden;
   position: relative;
+  touch-action: none;
+}
+
+.canvasOverlay {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.orbitHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(8, 9, 12, 0.78);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #9ca3af;
+  font-family: var(--font-mono);
+}
+
+.canvasTools {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.toolBtn {
+  background-color: rgba(19, 21, 28, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid #2b3042;
+  color: #e5a93c;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 120ms ease;
+}
+
+.toolBtn:hover {
+  background-color: #1f2330;
+  border-color: #e5a93c;
+}
+
+.activeToolBtn {
+  background-color: #e5a93c;
+  color: #08090c;
+  border-color: #e5a93c;
 }
 
 /* Controls Grid */
@@ -61,10 +122,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-4, 16px);
-  background-color: var(--color-bg-tertiary, #1a1d26);
+  background-color: #11131a;
   padding: var(--space-4, 16px);
   border-radius: var(--radius-lg, 12px);
-  border: 1px solid var(--color-border-default, #242836);
+  border: 1px solid #222634;
 }
 
 .controlGroup {
@@ -79,12 +140,12 @@
   align-items: center;
   font-size: var(--text-xs, 12px);
   font-weight: 700;
-  color: var(--color-text-secondary, #8e94a5);
+  color: #9ca3af;
 }
 
 .valBadge {
   font-family: var(--font-mono);
-  color: var(--color-brand-primary, #ff5722);
+  color: #e5a93c;
   font-weight: 800;
 }
 
@@ -93,7 +154,7 @@
   appearance: none;
   width: 100%;
   height: 6px;
-  background-color: var(--color-bg-elevated, #222632);
+  background-color: #1c202c;
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -104,14 +165,14 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: var(--color-brand-primary, #ff5722);
+  background-color: #e5a93c;
   border: 2px solid #ffffff;
   cursor: pointer;
 }
 
 .hint {
   font-size: 11px;
-  color: var(--color-text-tertiary, #5d6377);
+  color: #6b7280;
 }
 
 /* Stats Cards */
@@ -122,28 +183,29 @@
 }
 
 .statCard {
-  background-color: var(--color-bg-tertiary, #1a1d26);
-  border: 1px solid var(--color-border-default, #242836);
+  background-color: #11131a;
+  border: 1px solid #222634;
   border-radius: var(--radius-lg, 12px);
   padding: var(--space-4, 16px);
   display: flex;
   flex-direction: column;
   gap: 6px;
+  transition: all 150ms ease;
 }
 
 .cardAlert {
-  border-color: var(--color-status-danger, #ff1744);
-  background-color: rgba(255, 23, 68, 0.12);
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 .cardSuccess {
-  border-color: var(--color-status-success, #00e676);
-  background-color: rgba(0, 230, 118, 0.12);
+  border-color: #e5a93c;
+  background-color: rgba(229, 169, 60, 0.12);
 }
 
 .statLabel {
   font-size: var(--text-xs, 12px);
-  color: var(--color-text-secondary, #8e94a5);
+  color: #9ca3af;
   font-weight: 600;
 }
 
@@ -151,19 +213,73 @@
   font-size: var(--text-2xl, 24px);
   font-weight: 800;
   font-family: var(--font-mono);
-  color: #f5f6fa;
+  color: #f9fafb;
 }
 
 .statValueOutcome {
-  font-size: var(--text-base, 16px);
+  font-size: var(--text-base, 15px);
   font-weight: 800;
-  color: #f5f6fa;
+  color: #f9fafb;
 }
 
 .statFormula {
   font-size: 11px;
   font-family: var(--font-mono);
-  color: var(--color-text-tertiary, #5d6377);
+  color: #6b7280;
+}
+
+/* Monte Carlo Probability Bar */
+.monteCarloCard {
+  background-color: #11131a;
+  border: 1px solid #222634;
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.monteCarloHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f9fafb;
+}
+
+.probRatio {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #e5a93c;
+}
+
+.probBarContainer {
+  height: 12px;
+  background-color: #1c202c;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+}
+
+.probBarDown {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+  height: 100%;
+  transition: width 300ms ease;
+}
+
+.probBarUp {
+  background: linear-gradient(90deg, #e5a93c, #fbbf24);
+  height: 100%;
+  transition: width 300ms ease;
+}
+
+.probLegend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: #9ca3af;
 }
 
 /* Actions */
@@ -178,19 +294,20 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--color-brand-primary, #ff5722);
-  color: #ffffff;
+  background-color: #e5a93c;
+  color: #08090c;
   font-weight: 800;
   font-size: var(--text-sm, 14px);
   padding: 12px 26px;
   border-radius: var(--radius-md, 8px);
-  border: 1px solid var(--color-brand-primary, #ff5722);
+  border: 1px solid #e5a93c;
   cursor: pointer;
-  transition: background-color var(--duration-fast, 120ms) ease;
+  transition: all var(--duration-fast, 120ms) ease;
 }
 
 .launchBtn:hover:not(:disabled) {
-  background-color: var(--color-brand-hover, #ff6e40);
+  background-color: #f59e0b;
+  box-shadow: 0 4px 16px rgba(229, 169, 60, 0.35);
 }
 
 .launchBtn:disabled {
@@ -198,22 +315,43 @@
   cursor: not-allowed;
 }
 
-.resetBtn {
+.monteBtn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--color-bg-secondary, #12141a);
-  color: var(--color-text-primary, #f5f6fa);
+  background-color: #1a1d28;
+  color: #e5a93c;
   font-weight: 700;
   font-size: var(--text-sm, 14px);
   padding: 12px 20px;
   border-radius: var(--radius-md, 8px);
-  border: 1px solid var(--color-border-strong, #353b4f);
+  border: 1px solid #353c52;
+  cursor: pointer;
+  transition: all var(--duration-fast, 120ms) ease;
+}
+
+.monteBtn:hover:not(:disabled) {
+  background-color: #242838;
+  border-color: #e5a93c;
+}
+
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  color: #9ca3af;
+  font-weight: 700;
+  font-size: var(--text-sm, 14px);
+  padding: 12px 20px;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid #242836;
   cursor: pointer;
   transition: all var(--duration-fast, 120ms) ease;
 }
 
 .resetBtn:hover {
-  background-color: var(--color-bg-tertiary, #1a1d26);
-  border-color: var(--color-brand-primary, #ff5722);
+  background-color: #11131a;
+  color: #f9fafb;
+  border-color: #4b5563;
 }
