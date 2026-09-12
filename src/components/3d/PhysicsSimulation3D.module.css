@@ -442,3 +442,126 @@
   color: #f9fafb;
   border-color: #4b5563;
 }
+
+/* Grandfather Paradox Mode Tabs */
+.modeTabs {
+  display: flex;
+  gap: 8px;
+  background-color: #10121a;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #222634;
+  align-self: flex-start;
+}
+
+.modeTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.modeTab:hover {
+  color: #f9fafb;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.activeModeTab {
+  background-color: #e5a93c;
+  color: #08090c;
+}
+
+.activeModeTab:hover {
+  background-color: #f59e0b;
+  color: #08090c;
+}
+
+/* Theory Selector Grid */
+.theoriesContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.theoryCardBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #222636;
+  background-color: #12141c;
+  cursor: pointer;
+  text-align: left;
+  transition: all 120ms ease;
+}
+
+.theoryCardBtn:hover {
+  background-color: #191c28;
+  border-color: #3b4258;
+}
+
+.activeTheoryCard {
+  border-color: var(--theory-accent, #e5a93c);
+  background-color: rgba(229, 169, 60, 0.08);
+}
+
+.theoryTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f9fafb;
+}
+
+.theorySubtitle {
+  font-size: 11px;
+  color: #9ca3af;
+  font-family: var(--font-mono);
+}
+
+/* Temporal Stability Gauge */
+.stabilityMeter {
+  width: 100%;
+  height: 8px;
+  background-color: #171a24;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.stabilityFill {
+  height: 100%;
+  transition: width 300ms ease, background-color 300ms ease;
+}
+
+/* Oscillation Alert Banner */
+.oscillationAlert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  font-size: 12px;
+  font-weight: 600;
+  animation: pulseAlert 1s infinite alternate;
+}
+
+@keyframes pulseAlert {
+  from { opacity: 0.8; }
+  to { opacity: 1; box-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
+}
+
