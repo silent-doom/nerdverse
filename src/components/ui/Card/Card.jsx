@@ -21,7 +21,7 @@ export default function Card({
   const classNames = [
     styles.card,
     styles[variant],
-    styles[`pad-${padding}`],
+    styles[`padding-${padding}`] || styles[`pad-${padding}`],
     glow ? styles.glow : '',
     className,
   ].filter(Boolean).join(' ');

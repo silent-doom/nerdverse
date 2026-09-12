@@ -6,42 +6,40 @@ import Card from '@/components/ui/Card/Card';
 import Badge from '@/components/ui/Badge/Badge';
 import Button from '@/components/ui/Button/Button';
 import Icon from '@/components/common/Icon';
-import SpacetimeHeroCanvas from '@/components/3d/SpacetimeHeroCanvas';
 
 export default function HomePage() {
   const featured = getFeaturedConcepts();
 
   return (
     <>
-      {/* 3D Spacetime Hero Section */}
+      {/* Neo-Brutalist Hero Section */}
       <section className={styles.hero}>
-        <SpacetimeHeroCanvas />
         <div className={`container ${styles.heroContent}`}>
           <div className={styles.heroBadge}>
-            <Icon name="atom" size={14} color="var(--color-brand-primary)" />
-            <span>3D WebGL Scientific Knowledge Engine</span>
+            <Icon name="atom" size={16} />
+            <span>Interactive Learning Engine</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Explore the Universe,{' '}
-            <span className={styles.heroAccent}>One Concept at a Time</span>
+            Learn Complex Ideas <br />
+            <span className={styles.heroAccent}>By Playing With Them</span>
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Rigorous, interactive 3D visual models of paradoxes, quantum mechanics, spacetime theories, and cognitive psychology.
+            No jargon. No confusing math. Just literal, interactive thought experiments you can poke, prod, and break to understand how reality works.
           </p>
 
           <div className={styles.heroCtas}>
             <Link href="/concepts">
               <Button size="lg" variant="primary">
-                <span>Start Exploring</span>
+                <span>View Concept Catalog</span>
                 <Icon name="arrow-right" size={16} />
               </Button>
             </Link>
             <Link href="/explore">
               <Button variant="secondary" size="lg">
                 <Icon name="network" size={16} />
-                <span>3D Knowledge Constellation</span>
+                <span>Knowledge Map</span>
               </Button>
             </Link>
           </div>
@@ -49,17 +47,17 @@ export default function HomePage() {
           <div className={styles.heroStats}>
             <div className={styles.stat}>
               <span className={styles.statNumber}>5+</span>
-              <span className={styles.statLabel}>3D Interactive Labs</span>
+              <span className={styles.statLabel}>Playgrounds</span>
             </div>
             <div className={styles.statDivider} />
             <div className={styles.stat}>
-              <span className={styles.statNumber}>7</span>
-              <span className={styles.statLabel}>Disciplines</span>
+              <span className={styles.statNumber}>100%</span>
+              <span className={styles.statLabel}>Metaphor-Based</span>
             </div>
             <div className={styles.statDivider} />
             <div className={styles.stat}>
-              <span className={styles.statNumber}>WebGL</span>
-              <span className={styles.statLabel}>Physics Accelerated</span>
+              <span className={styles.statNumber}>0%</span>
+              <span className={styles.statLabel}>Boring Lectures</span>
             </div>
           </div>
         </div>
@@ -69,9 +67,9 @@ export default function HomePage() {
       <section className={styles.featured}>
         <div className="container">
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionHeading}>Featured 3D Interactive Labs</h2>
+            <h2 className={styles.sectionHeading}>Featured Interactive Labs</h2>
             <p className={styles.sectionSubtitle}>
-              Directly manipulate the variables of famous mathematical proofs and physics thought experiments.
+              Stop reading about theories and start testing them. Open a lab and see what happens.
             </p>
           </div>
 
@@ -103,12 +101,12 @@ export default function HomePage() {
 
                       <div className={styles.conceptCardFooter}>
                         <div className={styles.readTime}>
-                          <Icon name="clock" size={13} />
-                          <span>{concept.readTime} min read</span>
+                          <Icon name="clock" size={14} />
+                          <span>{concept.readTime} min activity</span>
                         </div>
                         <div className={styles.exploreAction}>
-                          <span>Open 3D Lab</span>
-                          <Icon name="arrow-right" size={14} />
+                          <span>Open Lab</span>
+                          <Icon name="arrow-right" size={16} />
                         </div>
                       </div>
                     </div>
@@ -124,9 +122,9 @@ export default function HomePage() {
       <section className={styles.categories}>
         <div className="container">
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionHeading}>Browse by Scientific Discipline</h2>
+            <h2 className={styles.sectionHeading}>Browse by Discipline</h2>
             <p className={styles.sectionSubtitle}>
-              Structured academic taxonomies spanning theoretical physics to algorithmic computation.
+              Find exactly what you want to learn, from philosophy to physics.
             </p>
           </div>
 
@@ -141,9 +139,9 @@ export default function HomePage() {
                   <div className={styles.categoryCardInner}>
                     <div
                       className={styles.categoryIconBadge}
-                      style={{ backgroundColor: `${cat.color}20`, borderColor: cat.color, color: cat.color }}
+                      style={{ backgroundColor: cat.color }}
                     >
-                      <Icon name={cat.iconName} size={20} color={cat.color} />
+                      <Icon name={cat.iconName} size={24} color="#1A1A1A" />
                     </div>
                     <h3 className={styles.categoryName}>{cat.name}</h3>
                     <p className={styles.categoryDesc}>{cat.description}</p>
@@ -159,9 +157,9 @@ export default function HomePage() {
       <section className={styles.howItWorks}>
         <div className="container">
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionHeading}>The NerdVerse Methodology</h2>
+            <h2 className={styles.sectionHeading}>How We Teach</h2>
             <p className={styles.sectionSubtitle}>
-              Moving beyond passive reading into dynamic conceptual inquiry.
+              We believe metaphors &gt; math equations.
             </p>
           </div>
 
@@ -170,27 +168,27 @@ export default function HomePage() {
               {
                 num: '01',
                 icon: 'search',
-                title: 'Discover & Query',
-                desc: 'Explore topological connections between paradoxes, formulas, and cognitive laws in our indexed knowledge base.',
+                title: 'Literal Metaphors',
+                desc: 'If an experiment involves a cat in a box, we give you a cat in a box. Not a glowing blue sphere representing a particle.',
               },
               {
                 num: '02',
                 icon: 'atom',
-                title: '3D Simulation & Stress-Test',
-                desc: 'Adjust variables in real time. Run 3D rotational mechanics, Bloch sphere quantum collapse, and wormhole geodesics.',
+                title: 'Play to Learn',
+                desc: 'Tweak variables and watch the simulation react in real-time. Make mistakes, cause paradoxes, and see why they break.',
               },
               {
                 num: '03',
                 icon: 'network',
-                title: 'Constellation & Connect',
-                desc: 'Trace cross-disciplinary relationships in the 3D knowledge graph with verifiable academic citations.',
+                title: 'Connect the Dots',
+                desc: 'See how everything relates. Jump from a psychology concept to a physics rule using our structural knowledge graph.',
               },
             ].map((step) => (
               <div key={step.num} className={styles.step}>
                 <div className={styles.stepHeader}>
                   <span className={styles.stepNum}>{step.num}</span>
                   <div className={styles.stepIconBadge}>
-                    <Icon name={step.icon} size={16} color="var(--color-brand-primary)" />
+                    <Icon name={step.icon} size={20} color="#1A1A1A" />
                   </div>
                 </div>
                 <h3 className={styles.stepTitle}>{step.title}</h3>
@@ -206,9 +204,9 @@ export default function HomePage() {
         <div className="container">
           <div className={styles.ctaCard}>
             <div className={styles.ctaInner}>
-              <h2 className={styles.ctaTitle}>Ready to explore the laws of reality?</h2>
+              <h2 className={styles.ctaTitle}>Ready to Break Reality?</h2>
               <p className={styles.ctaSubtitle}>
-                Dive into 3D interactive simulations of physics, logic, and philosophy.
+                Start poking around our interactive playgrounds.
               </p>
               <Link href="/concepts">
                 <Button size="lg" variant="primary">

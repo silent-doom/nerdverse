@@ -5,22 +5,26 @@
   gap: var(--space-2, 8px);
   border-radius: var(--radius-md, 8px);
   font-family: var(--font-sans);
-  font-weight: var(--font-weight-semibold, 600);
+  font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: background-color var(--duration-fast, 120ms) ease,
-              border-color var(--duration-fast, 120ms) ease,
-              transform var(--duration-fast, 120ms) ease,
-              box-shadow var(--duration-fast, 120ms) ease;
+  border: 1px solid var(--color-border-default, #222736);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-fast, 120ms) ease;
   user-select: none;
   text-decoration: none;
+  letter-spacing: 0.02em;
 }
 
 .button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
   transform: none !important;
+  box-shadow: none !important;
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 /* ── Sizes ── */
@@ -38,71 +42,71 @@
 .lg {
   padding: 14px 28px;
   font-size: var(--text-base, 16px);
-  border-radius: var(--radius-md, 8px);
-  font-weight: 800;
+  font-weight: 700;
 }
 
-/* ── Variants: Solar Obsidian ── */
+/* ── Variants ── */
 .primary {
-  background-color: var(--color-brand-primary, #ff5722);
-  color: #ffffff;
-  border-color: var(--color-brand-primary, #ff5722);
-  box-shadow: 0 4px 14px rgba(255, 87, 34, 0.28);
+  background-color: var(--color-brand-primary, #00D2FF);
+  color: #08090C;
+  border-color: var(--color-brand-primary, #00D2FF);
+  box-shadow: 0 4px 16px rgba(0, 210, 255, 0.25);
 }
 
 .primary:hover:not(:disabled) {
-  background-color: var(--color-brand-hover, #ff6e40);
-  border-color: var(--color-brand-hover, #ff6e40);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
-}
-
-.primary:active:not(:disabled) {
-  background-color: var(--color-brand-active, #e64a19);
-  transform: translateY(0);
+  background-color: var(--color-brand-hover, #33DCFF);
+  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.35);
+  transform: translateY(-2px);
 }
 
 .secondary {
-  background-color: var(--color-bg-secondary, #12141a);
-  color: var(--color-text-primary, #f5f6fa);
-  border-color: var(--color-border-default, #242836);
+  background-color: var(--color-bg-tertiary, #151922);
+  color: var(--color-text-primary, #FFFFFF);
+  border-color: var(--color-border-default, #222736);
 }
 
 .secondary:hover:not(:disabled) {
-  background-color: var(--color-bg-tertiary, #1a1d26);
-  border-color: var(--color-border-strong, #353b4f);
+  background-color: var(--color-bg-elevated, #1B202D);
+  border-color: var(--color-border-strong, #333A4F);
+  color: #FFFFFF;
+  transform: translateY(-2px);
 }
 
 .ghost {
   background: transparent;
-  color: var(--color-text-secondary, #8e94a5);
+  color: var(--color-text-secondary, #94A3B8);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .ghost:hover:not(:disabled) {
-  background-color: var(--color-bg-tertiary, #1a1d26);
-  color: var(--color-text-primary, #f5f6fa);
+  background-color: var(--color-bg-tertiary, #151922);
+  color: var(--color-text-primary, #FFFFFF);
+  border-color: var(--color-border-subtle, #191D28);
 }
 
 .outline {
   background: transparent;
-  color: var(--color-text-primary, #f5f6fa);
-  border-color: var(--color-border-strong, #353b4f);
+  color: var(--color-text-primary, #FFFFFF);
+  border-color: var(--color-border-strong, #333A4F);
 }
 
 .outline:hover:not(:disabled) {
-  background-color: var(--color-bg-secondary, #12141a);
-  border-color: var(--color-brand-primary, #ff5722);
+  background-color: rgba(0, 210, 255, 0.08);
+  border-color: var(--color-brand-primary, #00D2FF);
+  color: var(--color-brand-primary, #00D2FF);
+  transform: translateY(-2px);
 }
 
 .danger {
-  background-color: var(--color-status-danger, #ff1744);
-  color: #ffffff;
-  border-color: var(--color-status-danger, #ff1744);
+  background-color: rgba(255, 51, 102, 0.15);
+  color: var(--color-status-danger, #FF3366);
+  border-color: rgba(255, 51, 102, 0.3);
 }
 
 .danger:hover:not(:disabled) {
-  background-color: #d50000;
-  border-color: #d50000;
+  background-color: var(--color-status-danger, #FF3366);
+  color: #FFFFFF;
 }
 
 .icon {
@@ -114,8 +118,8 @@
 .spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: currentColor;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }

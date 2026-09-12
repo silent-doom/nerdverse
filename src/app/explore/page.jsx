@@ -4,11 +4,11 @@ import dynamic from 'next/dynamic';
 import Icon from '@/components/common/Icon';
 import styles from './ExploreGraph.module.css';
 
-const ConstellationGraph3D = dynamic(() => import('@/components/3d/ConstellationGraph3D'), {
+const KnowledgeNodeGraph = dynamic(() => import('@/components/interactive/KnowledgeNodeGraph'), {
   ssr: false,
   loading: () => (
-    <div style={{ height: '540px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0d1117', borderRadius: '12px', border: '1px solid #30363d', color: '#8b949e' }}>
-      Initializing 3D Constellation WebGL Engine...
+    <div style={{ height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F4F4F0', border: '4px solid #1A1A1A', color: '#1A1A1A', fontWeight: 'bold' }}>
+      Loading Knowledge Web...
     </div>
   ),
 });
@@ -18,17 +18,18 @@ export default function ExplorePage() {
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.badge}>
-          <Icon name="network" size={14} color="var(--color-brand-primary)" />
-          <span>Interactive 3D Knowledge Nexus</span>
+          <Icon name="network" size={16} />
+          <span>Structural Data Map</span>
         </div>
-        <h1 className={styles.title}>3D Concept Constellation</h1>
+        <h1 className={styles.title}>Knowledge Web</h1>
         <p className={styles.subtitle}>
-          Interactive 3D graph visualizing the topological connections across quantum mechanics, retrocausality, mathematical paradoxes, and psychology.
+          Trace the logical connections between physics, mathematics, and philosophy. 
+          No space themes. Just data.
         </p>
       </header>
 
-      {/* 3D Knowledge Graph */}
-      <ConstellationGraph3D />
+      {/* 2D Neo-Brutalist Knowledge Graph */}
+      <KnowledgeNodeGraph />
     </div>
   );
 }
