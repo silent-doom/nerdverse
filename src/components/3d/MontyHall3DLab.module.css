@@ -1,0 +1,732 @@
+/* =====================================================
+   NerdVerse — Monty Hall 3D Decision Laboratory Styles
+   Obsidian, Emerald & Cyber-Amber Palette
+   ===================================================== */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  color: var(--color-text-primary, #F9FAFB);
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+}
+
+/* Header */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tagline {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent-amber, #F59E0B);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.taglineBadge {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+}
+
+.title {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #F9FAFB);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary, #9CA3AF);
+  margin: 0;
+  line-height: 1.55;
+  max-width: 58rem;
+}
+
+/* Domain Selector Tabs (Practical Contexts) */
+.domainSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.domainLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-tertiary, #6B7280);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono, monospace);
+}
+
+.domainTabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.domainTab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(19, 21, 28, 0.65);
+  border: 1px solid var(--color-border-subtle, #21232C);
+  color: var(--color-text-secondary, #9CA3AF);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.domainTab:hover {
+  background: rgba(27, 30, 42, 0.85);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #F3F4F6;
+  transform: translateY(-1px);
+}
+
+.domainTabActive {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: var(--color-accent-amber, #F59E0B) !important;
+  color: #F9FAFB !important;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12);
+}
+
+.domainTabTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.domainTabCategory {
+  font-size: 0.6875rem;
+  font-family: var(--font-mono, monospace);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #D1D5DB;
+}
+
+.domainTabDesc {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  line-height: 1.35;
+}
+
+/* Experiment Mode Sub-Navigation */
+.modeNav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+}
+
+.modeBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #9CA3AF;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.modeBtn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modeBtnActive {
+  color: #F59E0B !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+/* 3D Stage Canvas Container */
+.stageCard {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  background: #0A0C10;
+  border: 1px solid #1E222D;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: radial-gradient(ellipse at 50% 30%, #151924 0%, #080A0E 100%);
+  cursor: grab;
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* Canvas Overlays */
+.stageOverlayTop {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.contextBanner {
+  background: rgba(10, 12, 16, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  pointer-events: auto;
+  max-width: 320px;
+}
+
+.contextPrize {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10B981;
+}
+
+.contextDud {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: #9CA3AF;
+  margin-top: 2px;
+}
+
+.camControls {
+  display: flex;
+  gap: 0.35rem;
+  background: rgba(10, 12, 16, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.3rem;
+  border-radius: 8px;
+  pointer-events: auto;
+}
+
+.camBtn {
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.camBtn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.camBtnActive {
+  background: #2563EB !important;
+  color: #FFFFFF !important;
+}
+
+.stageOverlayBottom {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hintBadge {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-family: var(--font-mono, monospace);
+  color: #9CA3AF;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Interactive Decision Console */
+.decisionConsole {
+  background: rgba(14, 17, 24, 0.95);
+  border-top: 1px solid #1E222D;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.statusMessage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.statusTextMain {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statusTextSub {
+  font-size: 0.8125rem;
+  color: #9CA3AF;
+  line-height: 1.4;
+}
+
+/* 3 Doors Selector Bar */
+.doorButtonsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+}
+
+.doorSelectorBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem;
+  background: rgba(22, 27, 38, 0.7);
+  border: 2px solid #2B3347;
+  border-radius: 10px;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.doorSelectorBtn:hover:not(:disabled) {
+  background: rgba(35, 43, 62, 0.9);
+  border-color: #F59E0B;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.15);
+}
+
+.doorSelectorSelected {
+  border-color: #F59E0B !important;
+  background: rgba(245, 158, 11, 0.15) !important;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.25);
+}
+
+.doorSelectorRevealed {
+  opacity: 0.5;
+  border-color: #EF4444 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  cursor: not-allowed;
+}
+
+.doorSelectorWinner {
+  border-color: #10B981 !important;
+  background: rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+}
+
+.doorBtnNum {
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #F59E0B;
+}
+
+.doorBtnLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #E5E7EB;
+}
+
+.doorBtnStatus {
+  font-size: 0.6875rem;
+  font-family: var(--font-mono, monospace);
+  color: #9CA3AF;
+}
+
+/* Switch vs Stay Prompt Action Box */
+.actionChoiceBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: rgba(25, 30, 44, 0.65);
+  border: 1px solid #374151;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+}
+
+.actionChoiceHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.actionChoiceTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #F59E0B;
+}
+
+.actionButtonsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.switchActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  border: 1px solid #3B82F6;
+  color: #FFFFFF;
+  padding: 0.85rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s ease;
+}
+
+.switchActionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.45);
+}
+
+.stayActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid #4B5563;
+  color: #E5E7EB;
+  padding: 0.85rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.stayActionBtn:hover {
+  background: rgba(55, 65, 81, 0.9);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.resetBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #F59E0B;
+  color: #F59E0B;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resetBtn:hover {
+  background: rgba(245, 158, 11, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Statistics & Scoreboard Cards */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: rgba(17, 20, 29, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.statCardHighlight {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-mono, monospace);
+}
+
+.statValue {
+  font-size: 1.625rem;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #FFFFFF;
+}
+
+.statValueGreen {
+  color: #10B981 !important;
+}
+
+.statSub {
+  font-size: 0.6875rem;
+  color: #6B7280;
+  font-family: var(--font-mono, monospace);
+}
+
+/* Monte Carlo Batch Runner */
+.monteCarloCard {
+  background: #0E121B;
+  border: 1px solid #1E2536;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.monteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.monteTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.batchControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.batchBtn {
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid #3B82F6;
+  color: #93C5FD;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.batchBtn:hover {
+  background: #2563EB;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.chartContainer {
+  width: 100%;
+  height: 220px;
+  background: #080A0E;
+  border: 1px solid #181D2A;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 100-Door Extreme Intuition Grid */
+.grid100Card {
+  background: #0E121B;
+  border: 1px solid #1E2536;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.grid100Title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.doors100Grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.4rem;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background: #080A0E;
+  border-radius: 8px;
+  border: 1px solid #181D2A;
+}
+
+.door100Cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid #2B3347;
+  background: #151A24;
+  color: #9CA3AF;
+  font-size: 0.6875rem;
+  font-family: var(--font-mono, monospace);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.door100Cell:hover:not(:disabled) {
+  border-color: #F59E0B;
+  color: #FFFFFF;
+  transform: scale(1.08);
+  z-index: 2;
+}
+
+.door100Selected {
+  border-color: #F59E0B !important;
+  background: rgba(245, 158, 11, 0.3) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+.door100Swept {
+  opacity: 0.18;
+  background: #0D0F14 !important;
+  border-color: #181D2A !important;
+  cursor: not-allowed;
+}
+
+.door100Survivor {
+  border-color: #10B981 !important;
+  background: rgba(16, 185, 129, 0.3) !important;
+  color: #10B981 !important;
+  font-weight: 800;
+  animation: pulseSurvivor 1.5s infinite;
+}
+
+@keyframes pulseSurvivor {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 12px 4px rgba(16, 185, 129, 0.55); }
+}
+
+/* Bayesian Probability Mass Diagram */
+.bayesCard {
+  background: #0E121B;
+  border: 1px solid #1E2536;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.bayesWaterfall {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.bayesBarTrack {
+  height: 28px;
+  width: 100%;
+  background: #151924;
+  border-radius: 6px;
+  display: flex;
+  overflow: hidden;
+  border: 1px solid #232A3B;
+}
+
+.bayesBarSegment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: #FFFFFF;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 380px;
+  }
+  .domainTabs {
+    grid-template-columns: 1fr;
+  }
+  .actionButtonsRow {
+    grid-template-columns: 1fr;
+  }
+  .doors100Grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

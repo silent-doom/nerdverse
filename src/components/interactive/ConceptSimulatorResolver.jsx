@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 const MurphysLaw3DPhysics = dynamic(() => import('@/components/3d/MurphysLaw3DPhysics'), { ssr: false });
 const GrandfatherSpacetime3D = dynamic(() => import('@/components/3d/GrandfatherSpacetime3D'), { ssr: false });
 const SchrodingersCat3DLab = dynamic(() => import('@/components/3d/SchrodingersCat3DLab'), { ssr: false });
-const MontyHallSimulator = dynamic(() => import('./MontyHallSimulator'), { ssr: false });
+const MontyHall3DLab = dynamic(() => import('@/components/3d/MontyHall3DLab'), { ssr: false });
 const TrolleyProblem3DLab = dynamic(() => import('@/components/3d/TrolleyProblem3DLab'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type }) {
@@ -17,7 +17,7 @@ export default function ConceptSimulatorResolver({ type }) {
     case 'SchrodingersCat':
       return <SchrodingersCat3DLab />;
     case 'MontyHall':
-      return <MontyHallSimulator />;
+      return <MontyHall3DLab />;
     case 'TrolleyProblem':
       return <TrolleyProblem3DLab />;
     default:

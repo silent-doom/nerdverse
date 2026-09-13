@@ -404,7 +404,38 @@ Now Monty Hall steps forward. With practiced showmanship, he sweeps down the sta
 
 Do you switch?
 
-Now the answer is instant and undeniable. What are the odds that your original blind stab happened to hit the 1% bullseye? Virtually zero. Why did Monty skip Door 77 out of all ninety-nine candidates? Because the car is almost certainly sitting right behind Door 77!`,
+Now the answer is instant and undeniable. What are the odds that your original blind stab happened to hit the 1% bullseye? Virtually zero. Why did Monty skip Door 77 out of all ninety-nine candidates? Because the car is almost certainly sitting right behind Door 77!
+
+## Practical Context: Why High-Stakes Decision Makers Care
+
+The Monty Hall problem is far more than an amusing game-show curiosity. It is the purest mathematical expression of **asymmetric information filtering**—a recurring structure that dictates outcomes in high-stakes capital allocation, epidemiology, and distributed systems engineering:
+
+### 1. Venture Capital & Power-Law Portfolios
+Suppose an early-stage fund screens three prospective seed investments. In a power-law distribution, one startup will be an outlier decacorn generating 100x fund returns, while the others are capital write-offs. You write an initial check to Startup A. A syndicate lead conducts an exhaustive forensic audit on the unselected pipeline and confirms that Startup C is completely fraudulent and liquidates it. 
+
+Do you double down your dry powder into Startup A, or pivot follow-on capital to Startup B?
+
+Because the audit specifically searched the non-invested cohort and filtered out a confirmed failure, Startup B now carries a **66.7% probability** of harboring the fund-returning outlier. Preserving loyalty to your initial blind bet forfeits half of the expected fund return.
+
+### 2. Clinical Differential Diagnosis & Pathology Triage
+An emergency patient presents with acute respiratory failure. Three pathogens are clinically viable candidates with equal prior probabilities (33.3% each). Initial triage puts the patient on empiric regimen for Pathogen 1. 
+
+Within hours, an emergency biomarker assay conclusively excludes Pathogen 3 from the unselected differential. Should the medical team maintain the initial regimen, or pivot antimicrobial targeting toward Pathogen 2?
+
+Under Bayesian update rules, Pathogen 2's posterior probability of being the true causative agent surges to **66.7%**. Persisting with the initial guess out of cognitive inertia or fear of admitting diagnostic uncertainty exposes the patient to twice the risk of clinical deterioration, directly violating the imperative to maximize Quality-Adjusted Life Years (QALYs).
+
+### 3. Distributed SRE & Cascading Fault Isolation
+During a high-severity cloud outage, telemetry alerts point toward three upstream microservice clusters as candidate root causes. An on-call engineer routes initial mitigation scripts to Cluster 1. Automated eBPF kernel tracing then validates that Cluster 3 has zero packet drops and healthy CPU saturation. 
+
+Redirecting failover routing to Cluster 2 yields twice the likelihood of instantly severing the outage cascade compared to keeping resources on Cluster 1.
+
+## Consequence Calculus: The Cognitive Cost of Counterfactual Regret
+
+Why do intelligent people resist switching, even after understanding the math?
+
+Behavioral psychologists have identified the culprit: **omission bias and counterfactual regret**. If an agent stays with their original choice and loses, they attribute the loss to bad luck. But if they actively switch and happen to lose the 1-in-3 scenario, they experience severe self-blame: *"I had it in my hands, and I gave it away."*
+
+From a welfare-maximizing standpoint, this asymmetric regret is purely irrational. When measured across aggregate outcomes, prioritizing emotional self-protection over objective mathematical expectation results in a permanent 50% penalty on successful outcomes. Maximizing net utility requires overriding emotional inertia with cold, systematic consequence arithmetic.`,
     sources: [
       { title: "Marilyn vos Savant's Original Parade Column (1990)", url: 'https://web.archive.org/web/20130121183432/http://marilynvossavant.com/game-show-problem/' },
       { title: 'The New York Times: Behind Monty Hall\'s Doors: Puzzle, Debate and Answer? (1991)', url: 'https://www.nytimes.com/1991/07/21/us/behind-monty-hall-s-doors-puzzle-debate-and-answer.html' },
