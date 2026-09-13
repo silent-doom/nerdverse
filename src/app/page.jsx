@@ -6,14 +6,16 @@ import Card from '@/components/ui/Card/Card';
 import Badge from '@/components/ui/Badge/Badge';
 import Button from '@/components/ui/Button/Button';
 import Icon from '@/components/common/Icon';
+import SolarSystemHeroCanvas from '@/components/3d/SolarSystemHeroCanvas';
 
 export default function HomePage() {
   const featured = getFeaturedConcepts();
 
   return (
     <>
-      {/* Neo-Brutalist Hero Section */}
+      {/* Neo-Brutalist Hero Section with 3D Orrery */}
       <section className={styles.hero}>
+        <SolarSystemHeroCanvas />
         <div className={`container ${styles.heroContent}`}>
           <div className={styles.heroBadge}>
             <Icon name="logo" size={16} />
