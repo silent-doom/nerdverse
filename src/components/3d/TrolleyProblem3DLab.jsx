@@ -1007,29 +1007,78 @@ export default function TrolleyProblem3DLab() {
       emitTimer: 0,
     };
 
-    // 13. Pointer Drag Navigation (Orbit around scene overview)
+    // 13. Pointer Drag & Pinch Navigation (Orbit and zoom around scene)
+    const activePointers = new Map();
+    let initialPinchDist = null;
+    let initialPinchRadius = null;
+
     const onPointerDown = (e) => {
       if (e.target.closest('button, input, a')) return;
-      animStateRef.current.isDragging = true;
-      animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      container.setPointerCapture?.(e.pointerId);
+
+      if (activePointers.size === 1) {
+        animStateRef.current.isDragging = true;
+        animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+      } else if (activePointers.size === 2) {
+        const pts = Array.from(activePointers.values());
+        initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        initialPinchRadius = animStateRef.current.cameraAngle.radius;
+        animStateRef.current.isDragging = false;
+      }
     };
 
     const onPointerMove = (e) => {
-      if (!animStateRef.current.isDragging) return;
-      const dx = e.clientX - animStateRef.current.dragStart.x;
-      const dy = e.clientY - animStateRef.current.dragStart.y;
-      animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+      if (activePointers.has(e.pointerId)) {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
 
-      animStateRef.current.cameraAngle.theta -= dx * 0.007;
-      animStateRef.current.cameraAngle.phi = THREE.MathUtils.clamp(
-        animStateRef.current.cameraAngle.phi - dy * 0.007,
-        0.2,
-        Math.PI / 2 - 0.05
-      );
+      // Two-finger pinch to zoom on tablets & touchscreens
+      if (activePointers.size === 2 && initialPinchDist) {
+        const pts = Array.from(activePointers.values());
+        const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (currentDist > 5) {
+          const ratio = initialPinchDist / currentDist;
+          animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
+            initialPinchRadius * ratio,
+            20,
+            95
+          );
+        }
+        return;
+      }
+
+      if (animStateRef.current.isDragging && activePointers.size === 1) {
+        const dx = e.clientX - animStateRef.current.dragStart.x;
+        const dy = e.clientY - animStateRef.current.dragStart.y;
+        animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+
+        animStateRef.current.cameraAngle.theta -= dx * 0.007;
+        animStateRef.current.cameraAngle.phi = THREE.MathUtils.clamp(
+          animStateRef.current.cameraAngle.phi - dy * 0.007,
+          0.2,
+          Math.PI / 2 - 0.05
+        );
+      }
     };
 
-    const onPointerUp = () => {
-      animStateRef.current.isDragging = false;
+    const onPointerUp = (e) => {
+      activePointers.delete(e.pointerId);
+      container.releasePointerCapture?.(e.pointerId);
+      if (activePointers.size < 2) {
+        initialPinchDist = null;
+      }
+      if (activePointers.size === 0) {
+        animStateRef.current.isDragging = false;
+      }
+    };
+
+    const onPointerCancel = (e) => {
+      activePointers.delete(e.pointerId);
+      if (activePointers.size === 0) {
+        animStateRef.current.isDragging = false;
+        initialPinchDist = null;
+      }
     };
 
     const onWheel = (e) => {
@@ -1046,6 +1095,7 @@ export default function TrolleyProblem3DLab() {
     container.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
+    container.addEventListener('pointercancel', onPointerCancel);
     container.addEventListener('wheel', onWheel, { passive: false });
 
     // 14. High-Performance Kinetic Animation Loop (60 FPS)
@@ -1383,6 +1433,7 @@ export default function TrolleyProblem3DLab() {
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      container.removeEventListener('pointercancel', onPointerCancel);
       container.removeEventListener('wheel', onWheel);
       renderer.dispose();
     };

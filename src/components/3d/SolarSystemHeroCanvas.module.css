@@ -18,6 +18,7 @@
   height: 100%;
   display: block;
   cursor: grab;
+  touch-action: none;
 }
 
 .canvas:active {

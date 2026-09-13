@@ -887,24 +887,70 @@ export default function MurphysLaw3DPhysics() {
 
     // 13. Interactive Camera Controls (Drag to orbit, scroll to zoom)
     const dom = renderer.domElement;
+    const activePointers = new Map();
+    let initialPinchDist = null;
+    let initialPinchRadius = null;
+
     const onPointerDown = (e) => {
-      isDraggingRef.current = true;
-      prevPointerRef.current = { x: e.clientX, y: e.clientY };
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      dom.setPointerCapture?.(e.pointerId);
+
+      if (activePointers.size === 1) {
+        isDraggingRef.current = true;
+        prevPointerRef.current = { x: e.clientX, y: e.clientY };
+      } else if (activePointers.size === 2) {
+        const pts = Array.from(activePointers.values());
+        initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        initialPinchRadius = cameraAngleRef.current.radius;
+        isDraggingRef.current = false;
+      }
     };
 
     const onPointerMove = (e) => {
-      if (!isDraggingRef.current) return;
-      const dx = e.clientX - prevPointerRef.current.x;
-      const dy = e.clientY - prevPointerRef.current.y;
-      prevPointerRef.current = { x: e.clientX, y: e.clientY };
+      if (activePointers.has(e.pointerId)) {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
 
-      cameraAngleRef.current.theta -= dx * 0.008;
-      cameraAngleRef.current.phi = Math.max(0.04, Math.min(0.85, cameraAngleRef.current.phi + dy * 0.008));
-      updateCameraPos();
+      // Two-finger pinch to zoom on tablets & touchscreens
+      if (activePointers.size === 2 && initialPinchDist) {
+        const pts = Array.from(activePointers.values());
+        const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (currentDist > 5) {
+          const ratio = initialPinchDist / currentDist;
+          cameraAngleRef.current.radius = Math.max(0.7, Math.min(3.5, initialPinchRadius * ratio));
+          updateCameraPos();
+        }
+        return;
+      }
+
+      if (isDraggingRef.current && activePointers.size === 1) {
+        const dx = e.clientX - prevPointerRef.current.x;
+        const dy = e.clientY - prevPointerRef.current.y;
+        prevPointerRef.current = { x: e.clientX, y: e.clientY };
+
+        cameraAngleRef.current.theta -= dx * 0.008;
+        cameraAngleRef.current.phi = Math.max(0.04, Math.min(0.85, cameraAngleRef.current.phi + dy * 0.008));
+        updateCameraPos();
+      }
     };
 
-    const onPointerUp = () => {
-      isDraggingRef.current = false;
+    const onPointerUp = (e) => {
+      activePointers.delete(e.pointerId);
+      dom.releasePointerCapture?.(e.pointerId);
+      if (activePointers.size < 2) {
+        initialPinchDist = null;
+      }
+      if (activePointers.size === 0) {
+        isDraggingRef.current = false;
+      }
+    };
+
+    const onPointerCancel = (e) => {
+      activePointers.delete(e.pointerId);
+      if (activePointers.size === 0) {
+        isDraggingRef.current = false;
+        initialPinchDist = null;
+      }
     };
 
     const onWheel = (e) => {
@@ -927,6 +973,7 @@ export default function MurphysLaw3DPhysics() {
     dom.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
+    dom.addEventListener('pointercancel', onPointerCancel);
     dom.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('keydown', onKeyDown);
 
@@ -944,6 +991,7 @@ export default function MurphysLaw3DPhysics() {
       dom.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      dom.removeEventListener('pointercancel', onPointerCancel);
       dom.removeEventListener('wheel', onWheel);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('resize', handleResize);

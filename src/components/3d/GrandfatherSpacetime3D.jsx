@@ -253,22 +253,71 @@ export default function GrandfatherSpacetime3D() {
     };
     updateCamera();
 
+    const activePointers = new Map();
+    let initialPinchDist = null;
+    let initialPinchRadius = null;
+
     const onPointerDown = (e) => {
-      isDragging = true;
-      prevMouse = { x: e.clientX, y: e.clientY };
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      dom.setPointerCapture?.(e.pointerId);
+
+      if (activePointers.size === 1) {
+        isDragging = true;
+        prevMouse = { x: e.clientX, y: e.clientY };
+      } else if (activePointers.size === 2) {
+        const pts = Array.from(activePointers.values());
+        initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        initialPinchRadius = cameraAngle.radius;
+        isDragging = false;
+      }
     };
+
     const onPointerMove = (e) => {
-      if (!isDragging) return;
-      const dx = e.clientX - prevMouse.x;
-      const dy = e.clientY - prevMouse.y;
-      prevMouse = { x: e.clientX, y: e.clientY };
-      cameraAngle.theta -= dx * 0.008;
-      cameraAngle.phi = Math.max(0.1, Math.min(1.4, cameraAngle.phi + dy * 0.008));
-      updateCamera();
+      if (activePointers.has(e.pointerId)) {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+
+      // Two-finger pinch to zoom on tablets & touchscreens
+      if (activePointers.size === 2 && initialPinchDist) {
+        const pts = Array.from(activePointers.values());
+        const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (currentDist > 5) {
+          const ratio = initialPinchDist / currentDist;
+          cameraAngle.radius = Math.max(6, Math.min(18, initialPinchRadius * ratio));
+          updateCamera();
+        }
+        return;
+      }
+
+      if (isDragging && activePointers.size === 1) {
+        const dx = e.clientX - prevMouse.x;
+        const dy = e.clientY - prevMouse.y;
+        prevMouse = { x: e.clientX, y: e.clientY };
+        cameraAngle.theta -= dx * 0.008;
+        cameraAngle.phi = Math.max(0.1, Math.min(1.4, cameraAngle.phi + dy * 0.008));
+        updateCamera();
+      }
     };
-    const onPointerUp = () => {
-      isDragging = false;
+
+    const onPointerUp = (e) => {
+      activePointers.delete(e.pointerId);
+      dom.releasePointerCapture?.(e.pointerId);
+      if (activePointers.size < 2) {
+        initialPinchDist = null;
+      }
+      if (activePointers.size === 0) {
+        isDragging = false;
+      }
     };
+
+    const onPointerCancel = (e) => {
+      activePointers.delete(e.pointerId);
+      if (activePointers.size === 0) {
+        isDragging = false;
+        initialPinchDist = null;
+      }
+    };
+
     const onWheel = (e) => {
       e.preventDefault();
       cameraAngle.radius = Math.max(6, Math.min(18, cameraAngle.radius + e.deltaY * 0.015));
@@ -279,6 +328,7 @@ export default function GrandfatherSpacetime3D() {
     dom.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
+    dom.addEventListener('pointercancel', onPointerCancel);
     dom.addEventListener('wheel', onWheel, { passive: false });
 
     // Scene Lighting
@@ -675,6 +725,7 @@ export default function GrandfatherSpacetime3D() {
       dom.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      dom.removeEventListener('pointercancel', onPointerCancel);
       dom.removeEventListener('wheel', onWheel);
       if (container && renderer.domElement) {
         container.removeChild(renderer.domElement);

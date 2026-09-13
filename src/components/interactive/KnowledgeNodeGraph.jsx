@@ -88,7 +88,16 @@ export default function KnowledgeNodeGraph() {
               onMouseLeave={() => setActiveNode(null)}
               whileHover={{ scale: 1.1 }}
             >
-              <Link href={`/concepts/${concept.slug}`} className={styles.nodeLink}>
+              <Link
+                href={`/concepts/${concept.slug}`}
+                className={styles.nodeLink}
+                onClick={(e) => {
+                  if (activeNode !== concept.slug) {
+                    e.preventDefault();
+                    setActiveNode(concept.slug);
+                  }
+                }}
+              >
                 <div className={styles.nodeIcon}>
                   <Icon name={category?.iconName || 'atom'} size={24} color="var(--color-text-inverse)" />
                 </div>

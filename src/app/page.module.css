@@ -189,6 +189,12 @@
   animation: heroBounce 2.4s ease-in-out infinite;
 }
 
+@media (max-width: 900px) {
+  .scrollDownIndicator {
+    bottom: 54px;
+  }
+}
+
 .scrollDownIndicator:hover {
   background: rgba(229, 169, 60, 0.2);
   border-color: #E5A93C;

@@ -716,7 +716,29 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
       }
 
       // Drag to rotate camera
-      if (animStateRef.current.isDragging) {
+      if (activePointers.has(e.pointerId)) {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+
+      // Two-finger pinch-to-zoom on tablets & touchscreens
+      if (activePointers.size === 2 && initialPinchDist) {
+        const pts = Array.from(activePointers.values());
+        const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (currentDist > 5) {
+          const ratio = initialPinchDist / currentDist;
+          animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
+            initialPinchRadius * ratio,
+            14,
+            95
+          );
+          if (onInteractionStateChangeRef.current) {
+            onInteractionStateChangeRef.current(true);
+          }
+        }
+        return;
+      }
+
+      if (animStateRef.current.isDragging && activePointers.size === 1) {
         const deltaX = e.clientX - animStateRef.current.dragStart.x;
         const deltaY = e.clientY - animStateRef.current.dragStart.y;
         animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
@@ -730,28 +752,60 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
       }
     };
 
+    const activePointers = new Map();
+    let initialPinchDist = null;
+    let initialPinchRadius = null;
+
     const onPointerDown = (e) => {
       // Don't drag if clicking buttons or links
       if (e.target.closest('button, a')) return;
-      animStateRef.current.isDragging = true;
-      animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      container.setPointerCapture?.(e.pointerId);
+
+      if (activePointers.size === 1) {
+        animStateRef.current.isDragging = true;
+        animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+      } else if (activePointers.size === 2) {
+        const pts = Array.from(activePointers.values());
+        initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        initialPinchRadius = animStateRef.current.cameraAngle.radius;
+        animStateRef.current.isDragging = false;
+      }
+
       if (onInteractionStateChangeRef.current) {
         onInteractionStateChangeRef.current(true);
       }
     };
 
     const onPointerUp = (e) => {
-      animStateRef.current.isDragging = false;
+      activePointers.delete(e.pointerId);
+      container.releasePointerCapture?.(e.pointerId);
+      if (activePointers.size < 2) {
+        initialPinchDist = null;
+      }
+      if (activePointers.size === 0) {
+        animStateRef.current.isDragging = false;
+      }
 
-      // Check click on planet to focus
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(interactiveHitboxes, false);
-      if (intersects.length > 0) {
-        const pData = intersects[0].object.userData.planetData;
-        setFocusedPlanet(pData);
-        if (onInteractionStateChangeRef.current) {
-          onInteractionStateChangeRef.current(true);
+      // Check click on planet to focus if not pinch-zoomed
+      if (!initialPinchDist) {
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(interactiveHitboxes, false);
+        if (intersects.length > 0) {
+          const pData = intersects[0].object.userData.planetData;
+          setFocusedPlanet(pData);
+          if (onInteractionStateChangeRef.current) {
+            onInteractionStateChangeRef.current(true);
+          }
         }
+      }
+    };
+
+    const onPointerCancel = (e) => {
+      activePointers.delete(e.pointerId);
+      if (activePointers.size === 0) {
+        animStateRef.current.isDragging = false;
+        initialPinchDist = null;
       }
     };
 
@@ -791,6 +845,7 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
     window.addEventListener('pointermove', onPointerMove);
     container.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointerup', onPointerUp);
+    container.addEventListener('pointercancel', onPointerCancel);
     window.addEventListener('wheel', onWheel, { passive: false });
 
     // ── 7. Resize Observer ──
@@ -918,6 +973,7 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
       window.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
+      container.removeEventListener('pointercancel', onPointerCancel);
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('resize', onResize);
 
