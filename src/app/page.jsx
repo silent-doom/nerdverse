@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
 import { CATEGORIES } from '@/lib/constants/categories';
@@ -10,13 +13,21 @@ import SolarSystemHeroCanvas from '@/components/3d/SolarSystemHeroCanvas';
 
 export default function HomePage() {
   const featured = getFeaturedConcepts();
+  const [isTextDimmed, setIsTextDimmed] = useState(false);
 
   return (
     <>
       {/* Neo-Brutalist Hero Section with 3D Orrery */}
       <section className={styles.hero}>
-        <SolarSystemHeroCanvas />
-        <div className={`container ${styles.heroContent}`}>
+        <SolarSystemHeroCanvas
+          onInteractionStateChange={setIsTextDimmed}
+          isTextDimmed={isTextDimmed}
+        />
+        <div
+          className={`container ${styles.heroContent} ${
+            isTextDimmed ? styles.heroContentDimmed : ''
+          }`}
+        >
           <div className={styles.heroBadge}>
             <Icon name="logo" size={16} />
             <span>Interactive Learning Engine</span>

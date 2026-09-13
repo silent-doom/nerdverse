@@ -30,12 +30,17 @@
   inset: 0;
   pointer-events: none;
   background: radial-gradient(
-    ellipse 65% 60% at 50% 45%,
-    rgba(8, 9, 12, 0.78) 0%,
-    rgba(8, 9, 12, 0.45) 55%,
-    rgba(8, 9, 12, 0.88) 100%
+    ellipse 75% 65% at 50% 45%,
+    rgba(8, 9, 12, 0.32) 0%,
+    rgba(8, 9, 12, 0.16) 55%,
+    rgba(8, 9, 12, 0.75) 100%
   );
   z-index: 1;
+  transition: opacity 400ms ease;
+}
+
+.vignetteClear {
+  opacity: 0.15;
 }
 
 /* Subtle top and bottom border gradients for smooth transitions */
@@ -45,7 +50,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 90px;
+  height: 80px;
   background: linear-gradient(to bottom, #08090C, transparent);
 }
 
@@ -55,7 +60,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 140px;
+  height: 120px;
   background: linear-gradient(to top, #08090C, transparent);
 }
 
@@ -352,11 +357,94 @@
   }
 }
 
+/* ── Planet Quick-Selection Bar ── */
+.planetBar {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(19, 21, 28, 0.75);
+  border: 1px solid rgba(229, 169, 60, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 12px rgba(229, 169, 60, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  max-width: 95vw;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.planetBar::-webkit-scrollbar {
+  display: none;
+}
+
+.planetBarLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #E5A93C;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.planetPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #D1D5DB;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 150ms ease;
+}
+
+.planetPill:hover {
+  background: rgba(229, 169, 60, 0.15);
+  border-color: rgba(229, 169, 60, 0.4);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.planetPillActive {
+  background: #E5A93C;
+  border-color: #E5A93C;
+  color: #08090C;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(229, 169, 60, 0.4);
+}
+
+.planetPillSymbol {
+  font-size: 12px;
+}
+
 @media (max-width: 768px) {
+  .planetBar {
+    top: 10px;
+    padding: 4px 8px;
+    gap: 4px;
+  }
+  .planetBarLabel {
+    display: none;
+  }
+  .planetPill {
+    padding: 3px 8px;
+    font-size: 10.5px;
+  }
   .controlsBar {
     bottom: 12px;
     right: 12px;
-    scale: 0.9;
+    scale: 0.85;
     transform-origin: bottom right;
   }
   .interactiveHint {

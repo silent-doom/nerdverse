@@ -13,10 +13,10 @@ const PLANET_DATA = [
     au: '0.39 AU',
     period: '87.97 days',
     velocity: '47.36 km/s',
-    orbitRadius: 6.8,
+    orbitRadius: 5.2,
     radius: 0.38,
     speed: 1.6,
-    color: 0x9b948d,
+    color: 0xa8a29e,
     tilt: 0.03,
     desc: 'Smallest terrestrial planet; experiences dramatic 600°C swings between blisteringly hot day and frozen night.',
   },
@@ -27,10 +27,10 @@ const PLANET_DATA = [
     au: '0.72 AU',
     period: '224.7 days',
     velocity: '35.02 km/s',
-    orbitRadius: 9.8,
-    radius: 0.72,
+    orbitRadius: 7.6,
+    radius: 0.62,
     speed: 1.18,
-    color: 0xe3bb7b,
+    color: 0xfde047,
     tilt: 3.1, // retrograde
     desc: 'Runaway greenhouse atmosphere shrouded in opaque sulfuric acid clouds, with surface temperatures hot enough to melt lead.',
   },
@@ -41,10 +41,10 @@ const PLANET_DATA = [
     au: '1.00 AU',
     period: '365.25 days',
     velocity: '29.78 km/s',
-    orbitRadius: 13.5,
-    radius: 0.78,
+    orbitRadius: 10.4,
+    radius: 0.70,
     speed: 1.0,
-    color: 0x2b82c9,
+    color: 0x3b82f6,
     tilt: 0.41,
     hasMoon: true,
     desc: 'The Pale Blue Dot; supports liquid water oceans, an active dynamic magnetosphere, and a thriving biosphere.',
@@ -56,10 +56,10 @@ const PLANET_DATA = [
     au: '1.52 AU',
     period: '686.98 days',
     velocity: '24.07 km/s',
-    orbitRadius: 17.5,
-    radius: 0.52,
+    orbitRadius: 13.5,
+    radius: 0.48,
     speed: 0.8,
-    color: 0xc1440e,
+    color: 0xef4444,
     tilt: 0.44,
     desc: 'The Red Planet; home to Olympus Mons, massive volcanic shields, and frozen polar carbon dioxide/water ice caps.',
   },
@@ -70,10 +70,10 @@ const PLANET_DATA = [
     au: '5.20 AU',
     period: '11.86 years',
     velocity: '13.07 km/s',
-    orbitRadius: 27.5,
-    radius: 1.85,
+    orbitRadius: 22.0,
+    radius: 1.55,
     speed: 0.44,
-    color: 0xd4a373,
+    color: 0xf59e0b,
     tilt: 0.05,
     isJovian: true,
     desc: 'Largest planet in the solar system; features dynamic alternating zonal cloud belts and the centuries-old Great Red Spot storm.',
@@ -85,10 +85,10 @@ const PLANET_DATA = [
     au: '9.58 AU',
     period: '29.45 years',
     velocity: '9.69 km/s',
-    orbitRadius: 36.5,
-    radius: 1.55,
+    orbitRadius: 28.5,
+    radius: 1.30,
     speed: 0.32,
-    color: 0xf4e2bb,
+    color: 0xfef08a,
     tilt: 0.47,
     hasRings: true,
     desc: 'Spectacular planetary ring system spanning 282,000 km, composed of billions of water-ice particles and silicates.',
@@ -100,10 +100,10 @@ const PLANET_DATA = [
     au: '19.22 AU',
     period: '84.02 years',
     velocity: '6.81 km/s',
-    orbitRadius: 44.5,
-    radius: 1.15,
+    orbitRadius: 34.5,
+    radius: 0.95,
     speed: 0.22,
-    color: 0x76d7ea,
+    color: 0x67e8f9,
     tilt: 1.71, // 98 deg tilt
     desc: 'Ice giant tilted 98° on its side, rolling through space around the Sun like a colossal cosmic billiard ball.',
   },
@@ -114,10 +114,10 @@ const PLANET_DATA = [
     au: '30.05 AU',
     period: '164.8 years',
     velocity: '5.43 km/s',
-    orbitRadius: 52.5,
-    radius: 1.1,
+    orbitRadius: 40.5,
+    radius: 0.90,
     speed: 0.17,
-    color: 0x274687,
+    color: 0x3b82f6,
     tilt: 0.49,
     desc: 'Most distant major planet; deep ultramarine methane atmosphere whipped by supersonic winds exceeding 2,100 km/h.',
   },
@@ -306,7 +306,7 @@ function createSaturnRingTexture() {
   return texture;
 }
 
-export default function SolarSystemHeroCanvas() {
+export default function SolarSystemHeroCanvas({ onInteractionStateChange, isTextDimmed }) {
   const mountRef = useRef(null);
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
   const [hudPos, setHudPos] = useState({ x: 0, y: 0 });
@@ -315,13 +315,18 @@ export default function SolarSystemHeroCanvas() {
   const [showOrbits, setShowOrbits] = useState(true);
   const [focusedPlanet, setFocusedPlanet] = useState(null);
 
+  const onInteractionStateChangeRef = useRef(onInteractionStateChange);
+  useEffect(() => {
+    onInteractionStateChangeRef.current = onInteractionStateChange;
+  }, [onInteractionStateChange]);
+
   // Mutable refs for real-time 60fps loop
   const animStateRef = useRef({
     speedMultiplier: 1,
     isPaused: false,
     focusedPlanet: null,
-    cameraAngle: { theta: 0.15, phi: 0.42, radius: 46 },
-    targetCamPos: new THREE.Vector3(0, 20, 44),
+    cameraAngle: { theta: 0.22, phi: 0.72, radius: 52 },
+    targetCamPos: new THREE.Vector3(10, 38, 34),
     targetLookAt: new THREE.Vector3(0, -1, 0),
     currentLookAt: new THREE.Vector3(0, -1, 0),
     isDragging: false,
@@ -345,7 +350,7 @@ export default function SolarSystemHeroCanvas() {
   const handleResetCamera = useCallback(() => {
     setFocusedPlanet(null);
     animStateRef.current.focusedPlanet = null;
-    animStateRef.current.cameraAngle = { theta: 0.15, phi: 0.42, radius: 46 };
+    animStateRef.current.cameraAngle = { theta: 0.22, phi: 0.72, radius: 52 };
     animStateRef.current.targetLookAt.set(0, -1, 0);
   }, []);
 
@@ -364,7 +369,7 @@ export default function SolarSystemHeroCanvas() {
     const height = container.clientHeight || window.innerHeight;
 
     const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1200);
-    camera.position.set(0, 20, 44);
+    camera.position.set(10, 38, 34);
     camera.lookAt(0, -1, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
@@ -459,12 +464,12 @@ export default function SolarSystemHeroCanvas() {
     sunGroup.add(coronaMesh);
 
     // Solar Light Source (Omnidirectional Radiant PointLight)
-    const sunLight = new THREE.PointLight(0xFFF7ED, 4.5, 140, 1.15);
+    const sunLight = new THREE.PointLight(0xFFF7ED, 5.0, 180, 0.7);
     sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
 
-    // Subtle Ambient Fill Light (Ensures night sides of planets maintain aesthetic visibility)
-    const ambientLight = new THREE.AmbientLight(0x1B1F2E, 0.75);
+    // Subtle Ambient Fill Light (Ensures night sides of planets maintain vibrant aesthetic visibility)
+    const ambientLight = new THREE.AmbientLight(0x40485C, 1.4);
     scene.add(ambientLight);
 
     // ── 4. Planetary Systems Creation ──
@@ -491,20 +496,22 @@ export default function SolarSystemHeroCanvas() {
       const orbitMat = new THREE.LineBasicMaterial({
         color: 0xE5A93C,
         transparent: true,
-        opacity: 0.14,
+        opacity: 0.18,
         blending: THREE.AdditiveBlending,
       });
       const orbitLine = new THREE.Line(orbitGeo, orbitMat);
       scene.add(orbitLine);
       orbitLines.push(orbitLine);
 
-      // Planet Sphere Mesh
+      // Planet Sphere Mesh with Emissive Celestial Tint
       const pGeo = new THREE.SphereGeometry(data.radius, 32, 32);
       const pTex = createPlanetTexture(data.name.toLowerCase());
       const pMat = new THREE.MeshStandardMaterial({
         map: pTex,
         roughness: data.isJovian ? 0.4 : 0.75,
         metalness: 0.1,
+        emissive: new THREE.Color(data.color),
+        emissiveIntensity: 0.22,
       });
       const pMesh = new THREE.Mesh(pGeo, pMat);
       pMesh.rotation.z = data.tilt;
@@ -517,6 +524,19 @@ export default function SolarSystemHeroCanvas() {
         Math.sin(initialAngle) * data.orbitRadius
       );
       planetPivot.add(pMesh);
+
+      // Subtle Luminous Orbital Beacon Ring so distant planets (Uranus, Neptune) pop clearly
+      const beaconGeo = new THREE.RingGeometry(data.radius * 1.3, data.radius * 1.55, 32);
+      beaconGeo.rotateX(Math.PI / 2);
+      const beaconMat = new THREE.MeshBasicMaterial({
+        color: data.color,
+        transparent: true,
+        opacity: 0.45,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+      });
+      const beaconMesh = new THREE.Mesh(beaconGeo, beaconMat);
+      pMesh.add(beaconMesh);
 
       // Special Case: Earth's Moon (Luna)
       let moonMesh = null;
@@ -546,7 +566,7 @@ export default function SolarSystemHeroCanvas() {
       }
 
       // Invisible Raycasting Hitbox for effortless hover detection even on small worlds
-      const hitRadius = Math.max(data.radius * 2.2, 1.2);
+      const hitRadius = Math.max(data.radius * 2.5, 1.4);
       const hitGeo = new THREE.SphereGeometry(hitRadius, 12, 12);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitMesh = new THREE.Mesh(hitGeo, hitMat);
@@ -577,7 +597,7 @@ export default function SolarSystemHeroCanvas() {
     const asteroidData = [];
 
     for (let i = 0; i < asteroidCount; i++) {
-      const dist = 21.0 + Math.random() * 4.2; // Between Mars and Jupiter
+      const dist = 16.5 + Math.random() * 2.8; // Between Mars (13.5) and Jupiter (22.0)
       const angle = Math.random() * Math.PI * 2;
       const speed = (0.55 + Math.random() * 0.15) * 0.006;
       const yOffset = (Math.random() - 0.5) * 1.6;
@@ -648,6 +668,9 @@ export default function SolarSystemHeroCanvas() {
       if (e.target.closest('button, a')) return;
       animStateRef.current.isDragging = true;
       animStateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+      if (onInteractionStateChangeRef.current) {
+        onInteractionStateChangeRef.current(true);
+      }
     };
 
     const onPointerUp = (e) => {
@@ -659,22 +682,38 @@ export default function SolarSystemHeroCanvas() {
       if (intersects.length > 0) {
         const pData = intersects[0].object.userData.planetData;
         setFocusedPlanet(pData);
+        if (onInteractionStateChangeRef.current) {
+          onInteractionStateChangeRef.current(true);
+        }
       }
     };
 
     const onWheel = (e) => {
-      // Zoom camera radius
-      animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
-        animStateRef.current.cameraAngle.radius + e.deltaY * 0.03,
-        22,
-        85
+      const rect = container.getBoundingClientRect();
+      const inHero = (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
       );
+      if (inHero) {
+        e.preventDefault();
+        const zoomDelta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY) * 0.08, 4.0);
+        animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
+          animStateRef.current.cameraAngle.radius + zoomDelta,
+          14,
+          95
+        );
+        if (onInteractionStateChangeRef.current) {
+          onInteractionStateChangeRef.current(true);
+        }
+      }
     };
 
     window.addEventListener('pointermove', onPointerMove);
     container.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointerup', onPointerUp);
-    container.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('wheel', onWheel, { passive: false });
 
     // ── 7. Resize Observer ──
     const onResize = () => {
@@ -749,15 +788,20 @@ export default function SolarSystemHeroCanvas() {
       // Camera positioning (Smooth Lerp)
       const currentTarget = animStateRef.current.focusedPlanet;
       if (currentTarget) {
-        // Focus on selected planet
+        // Focus on selected planet (view from sunward side so planet is fully illuminated against stars)
         const targetPlanetObj = planets.find((p) => p.name === currentTarget.name);
         if (targetPlanetObj) {
           const targetWorldPos = new THREE.Vector3();
           targetPlanetObj.mesh.getWorldPosition(targetWorldPos);
 
-          animStateRef.current.targetLookAt.lerp(targetWorldPos, 0.06);
-          const offset = new THREE.Vector3(0, targetPlanetObj.radius * 3.2, targetPlanetObj.radius * 6.5);
-          animStateRef.current.targetCamPos.copy(targetWorldPos).add(offset);
+          const planetDir = targetWorldPos.clone().normalize();
+          const camDist = Math.max(targetPlanetObj.radius * (targetPlanetObj.hasRings ? 7.5 : 5.0), 4.2);
+          const camPos = targetWorldPos.clone()
+            .sub(planetDir.clone().multiplyScalar(camDist))
+            .add(new THREE.Vector3(0, targetPlanetObj.radius * 1.8 + 1.0, 0));
+
+          animStateRef.current.targetCamPos.copy(camPos);
+          animStateRef.current.targetLookAt.copy(targetWorldPos);
         }
       } else {
         // Default Orrery View with Spherical Angles & Parallax
@@ -790,7 +834,7 @@ export default function SolarSystemHeroCanvas() {
       window.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
-      container.removeEventListener('wheel', onWheel);
+      window.removeEventListener('wheel', onWheel);
       window.removeEventListener('resize', onResize);
 
       // Dispose geometries & textures
@@ -810,8 +854,29 @@ export default function SolarSystemHeroCanvas() {
 
   return (
     <div className={styles.container} ref={mountRef}>
-      {/* Central Radial Vignette for Hero Text Contrast */}
-      <div className={styles.vignette} />
+      {/* Central Radial Vignette for Hero Text Contrast (Dims in Space Mode) */}
+      <div className={`${styles.vignette} ${isTextDimmed ? styles.vignetteClear : ''}`} />
+
+      {/* Planet Quick-Selection Navigation Toolbar */}
+      <div className={styles.planetBar}>
+        <span className={styles.planetBarLabel}>Planets:</span>
+        {PLANET_DATA.map((p) => (
+          <button
+            key={p.name}
+            className={`${styles.planetPill} ${focusedPlanet?.name === p.name ? styles.planetPillActive : ''}`}
+            onClick={() => {
+              setFocusedPlanet(p);
+              if (onInteractionStateChangeRef.current) {
+                onInteractionStateChangeRef.current(true);
+              }
+            }}
+            title={`Focus ${p.name} (${p.type})`}
+          >
+            <span className={styles.planetPillSymbol}>{p.symbol}</span>
+            <span>{p.name}</span>
+          </button>
+        ))}
+      </div>
 
       {/* Floating Planet Telemetry HUD Tooltip */}
       {hoveredPlanet && (
@@ -909,6 +974,42 @@ export default function SolarSystemHeroCanvas() {
 
         <div className={styles.divider} />
 
+        {/* Manual Zoom Buttons */}
+        <button
+          className={styles.controlBtn}
+          onClick={() => {
+            animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
+              animStateRef.current.cameraAngle.radius - 8,
+              14,
+              95
+            );
+            if (onInteractionStateChangeRef.current) {
+              onInteractionStateChangeRef.current(true);
+            }
+          }}
+          title="Zoom In (+)"
+        >
+          +
+        </button>
+        <button
+          className={styles.controlBtn}
+          onClick={() => {
+            animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
+              animStateRef.current.cameraAngle.radius + 8,
+              14,
+              95
+            );
+            if (onInteractionStateChangeRef.current) {
+              onInteractionStateChangeRef.current(true);
+            }
+          }}
+          title="Zoom Out (−)"
+        >
+          −
+        </button>
+
+        <div className={styles.divider} />
+
         {/* Toggle Orbit Trajectories */}
         <button
           className={`${styles.controlBtn} ${showOrbits ? styles.controlBtnActive : ''}`}
@@ -916,6 +1017,19 @@ export default function SolarSystemHeroCanvas() {
           title="Toggle Orbit Trajectory Lines"
         >
           Orbits
+        </button>
+
+        {/* Cinematic Space View / Dim Text Toggle */}
+        <button
+          className={`${styles.controlBtn} ${isTextDimmed ? styles.controlBtnActive : ''}`}
+          onClick={() => {
+            if (onInteractionStateChangeRef.current) {
+              onInteractionStateChangeRef.current(!isTextDimmed);
+            }
+          }}
+          title={isTextDimmed ? 'Restore Hero Text' : 'Fade Hero Text for Unobstructed View'}
+        >
+          {isTextDimmed ? '👁 Show Text' : '👁 Space View'}
         </button>
 
         {/* Reset Camera View button */}

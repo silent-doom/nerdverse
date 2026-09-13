@@ -26,6 +26,16 @@
   max-width: 880px;
   margin: 0 auto;
   pointer-events: none;
+  transition: opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
+              filter 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heroContentDimmed {
+  opacity: 0.08 !important;
+  transform: scale(0.96) translateY(-14px);
+  filter: blur(2.5px);
+  pointer-events: none !important;
 }
 
 .heroContent a,
@@ -34,19 +44,27 @@
   pointer-events: auto;
 }
 
+.heroContentDimmed a,
+.heroContentDimmed button,
+.heroContentDimmed .heroBadge {
+  pointer-events: none !important;
+}
+
 .heroBadge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
   border-radius: var(--radius-full, 9999px);
-  background-color: var(--color-bg-tertiary);
+  background-color: rgba(27, 31, 46, 0.7);
   border: 1px solid var(--color-border-strong);
   color: var(--color-brand-light);
   font-size: var(--text-xs, 12px);
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .heroTitle {
@@ -56,6 +74,7 @@
   letter-spacing: -0.03em;
   color: var(--color-text-primary);
   margin: 0;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
 .heroAccent {
@@ -69,14 +88,16 @@
   font-size: var(--text-lg, 18px);
   font-weight: 400;
   line-height: 1.6;
-  color: var(--color-text-secondary);
+  color: #D1D5DB;
   max-width: 700px;
   margin: 0;
-  border: 1px solid var(--color-border-default);
-  background: var(--color-bg-secondary);
+  border: 1px solid rgba(229, 169, 60, 0.2);
+  background: rgba(19, 21, 28, 0.6);
   padding: 16px 24px;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .heroCtas {
