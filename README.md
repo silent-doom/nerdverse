@@ -27,7 +27,7 @@ NerdVerse is a scholarly, highly interactive WebGL-powered web platform that ele
 ### 3. ⏳ Grandfather Paradox: Spacetime Causality Lab
 *Visualizing retrocausality across General Relativity and Quantum Mechanics.*
 * **Mode A: Causal Lineage Engine (Barjavel / McFly Generational Model):**
-  * 3D Minkowski coordinate stage with three generational nodes: Grandfather ($1950$), Parent ($1975$), and Traveler ($2026$), connected by luminous worldline geodesics and a retrocausal wormhole conduit.
+  * 3D Minkowski coordinate stage with three generational nodes: Grandfather (1950), Parent (1975), and Traveler (2026), connected by luminous worldline geodesics and a retrocausal wormhole conduit.
   * **Classical Paradox (Temporal Limit-Cycle):** Grandfather elimination wipes parent and fades traveler to $15\%$ opacity $\to$ without traveler, shot never occurs $\to$ timeline resets in an infinite oscillation loop ($0\%$ stability).
   * **Novikov Self-Consistency:** Intervention is deflected or inadvertently causes the grandparents' meeting; locks into an unbroken golden **Möbius Causal Loop** ($100\%$ stability).
   * **Everett Many-Worlds:** Spacetime bifurcates into Timeline $\alpha$ (origin) and Timeline $\beta$ (divergent branch where traveler is an orphan).
