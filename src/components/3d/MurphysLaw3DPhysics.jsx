@@ -963,7 +963,7 @@ export default function MurphysLaw3DPhysics() {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.badge}>
-          <Icon name="atom" size={13} />
+          <Icon name="logo" size={13} />
           <span>Matthews Rotational Dynamics Laboratory</span>
         </div>
         <h3 className={styles.title}>Murphy's Law: The Physics of Tumbling Toast</h3>

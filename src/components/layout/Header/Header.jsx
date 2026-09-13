@@ -39,7 +39,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className={styles.logo} aria-label="NerdVerse Home">
             <div className={styles.logoBadge}>
-              <Icon name="atom" size={18} color="#ffffff" />
+              <Icon name="logo" size={18} color="#ffffff" />
             </div>
             <span className={styles.logoText}>
               NERD<span className={styles.logoAccent}>VERSE</span>

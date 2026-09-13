@@ -47,7 +47,7 @@ export default function GrandfatherParadoxSimulator() {
     <div className={styles.container}>
       <div className={styles.simHeader}>
         <div className={styles.simBadge}>
-          <Icon name="atom" size={13} color="var(--color-category-physics)" />
+          <Icon name="logo" size={13} color="var(--color-category-physics)" />
           <span>Spacetime Causality Lab</span>
         </div>
         <h3 className={styles.simTitle}>Grandfather Paradox: Spacetime Resolution Engine</h3>

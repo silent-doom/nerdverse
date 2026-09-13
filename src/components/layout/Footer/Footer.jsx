@@ -33,7 +33,7 @@ export default function Footer() {
         <div className={styles.brand}>
           <Link href="/" className={styles.logo}>
             <div className={styles.logoBadge}>
-              <Icon name="atom" size={16} color="#ffffff" />
+              <Icon name="logo" size={16} color="#ffffff" />
             </div>
             <span className={styles.logoText}>
               NERD<span className={styles.logoAccent}>VERSE</span>
@@ -70,7 +70,7 @@ export default function Footer() {
             © {currentYear} NerdVerse. Open source knowledge infrastructure.
           </p>
           <div className={styles.madeWith}>
-            <Icon name="atom" size={12} color="var(--color-brand-primary)" />
+            <Icon name="logo" size={13} color="var(--color-brand-primary)" />
             <span>Built for rigorous scientific curiosity</span>
           </div>
         </div>

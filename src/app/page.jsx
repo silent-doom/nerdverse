@@ -16,7 +16,7 @@ export default function HomePage() {
       <section className={styles.hero}>
         <div className={`container ${styles.heroContent}`}>
           <div className={styles.heroBadge}>
-            <Icon name="atom" size={16} />
+            <Icon name="logo" size={16} />
             <span>Interactive Learning Engine</span>
           </div>
 
@@ -170,7 +170,7 @@ export default function HomePage() {
               },
               {
                 num: '02',
-                icon: 'atom',
+                icon: 'logo',
                 title: 'Play to Learn',
                 desc: 'Tweak variables and watch the simulation react in real-time. Make mistakes, cause paradoxes, and see why they break.',
               },

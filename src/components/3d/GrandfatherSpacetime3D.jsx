@@ -688,7 +688,7 @@ export default function GrandfatherSpacetime3D() {
       {/* Simulation Header */}
       <div className={styles.header}>
         <div className={styles.badge}>
-          <Icon name="atom" size={13} color="var(--color-brand-primary)" />
+          <Icon name="logo" size={13} color="var(--color-brand-primary)" />
           <span>Spacetime Causality Lab</span>
         </div>
         <h3 className={styles.title}>Grandfather Paradox: Causal Resolution Engine</h3>

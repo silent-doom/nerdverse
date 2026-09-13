@@ -17,13 +17,18 @@ export default function Icon({ name, size = 16, className = '', color = 'current
   };
 
   switch (name) {
-    case 'atom': // Physics
+    case 'logo':
+    case 'nerdverse':
+    case 'portal':
+    case 'atom': // Replaced generic atom with NerdVerse Hexagonal Multiverse Portal
       return (
         <svg {...props}>
-          <circle cx="12" cy="12" r="2" fill={color} />
-          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(0 12 12)" />
-          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
-          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
+          <path d="M12 2l8.5 4.9v9.8L12 21.5 3.5 16.7V6.9L12 2z" strokeWidth={1.8} />
+          <path d="M7.5 6.6v10.8" strokeWidth={2} />
+          <path d="M16.5 6.6v10.8" strokeWidth={2} />
+          <path d="M7.5 7.5l9 9" strokeWidth={2} />
+          <path d="M12 8.5L14.5 12L12 15.5L9.5 12Z" strokeWidth={1.2} fill={color} fillOpacity={0.25} />
+          <circle cx="12" cy="12" r="1.3" fill={color} stroke="none" />
         </svg>
       );
     case 'brain': // Psychology
