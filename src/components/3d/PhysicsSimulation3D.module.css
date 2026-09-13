@@ -565,3 +565,37 @@
   to { opacity: 1; box-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
 }
 
+/* Responsive Mobile Adjustments */
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 380px;
+  }
+
+  .canvasOverlay {
+    max-width: calc(100% - 100px);
+  }
+
+  .orbitHint {
+    display: none;
+  }
+
+  .instructionCard {
+    max-width: 100%;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .controlsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statsCards {
+    grid-template-columns: 1fr;
+  }
+
+  .theoriesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+

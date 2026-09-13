@@ -2,6 +2,13 @@ import './globals.css';
 import Header from '@/components/layout/Header/Header';
 import Footer from '@/components/layout/Footer/Footer';
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#08090c',
+};
+
 export const metadata = {
   title: {
     default: 'NerdVerse — Explore the Universe, One Concept at a Time',

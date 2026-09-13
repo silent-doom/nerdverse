@@ -161,7 +161,7 @@
   position: absolute;
   top: 4.8rem;
   left: 1rem;
-  max-width: 320px;
+  max-width: min(320px, calc(100% - 2rem));
   background: rgba(13, 16, 23, 0.92);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(229, 169, 60, 0.35);
@@ -365,6 +365,15 @@
 @media (max-width: 860px) {
   .dashboard {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .viewportWrapper {
+    height: 380px;
+  }
+  .cameraHint span {
+    display: none;
   }
 }
 

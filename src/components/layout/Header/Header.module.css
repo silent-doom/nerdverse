@@ -118,6 +118,21 @@
   transform: translateY(-1px);
 }
 
+@media (max-width: 640px) {
+  .searchShortcut {
+    display: none;
+  }
+  .searchButton {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ctaButton {
+    display: none;
+  }
+}
+
 /* ── Mobile Hamburger ── */
 .hamburger {
   display: flex;
