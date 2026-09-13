@@ -74,10 +74,22 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        {/* Scroll Down Indicator */}
+        <a
+          href="#featured-concepts"
+          className={`${styles.scrollDownIndicator} ${
+            isTextDimmed ? styles.scrollDownDimmed : ''
+          }`}
+          aria-label="Scroll down to explore concepts"
+        >
+          <span className={styles.scrollDownText}>Explore Labs</span>
+          <span className={styles.scrollDownChevron}>↓</span>
+        </a>
       </section>
 
       {/* Featured Concepts */}
-      <section className={styles.featured}>
+      <section id="featured-concepts" className={styles.featured}>
         <div className="container">
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionHeading}>Featured Interactive Labs</h2>

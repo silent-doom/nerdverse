@@ -361,6 +361,11 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
     onInteractionStateChangeRef.current = onInteractionStateChange;
   }, [onInteractionStateChange]);
 
+  const isTextDimmedRef = useRef(isTextDimmed);
+  useEffect(() => {
+    isTextDimmedRef.current = isTextDimmed;
+  }, [isTextDimmed]);
+
   // Mutable refs for real-time 60fps loop
   const animStateRef = useRef({
     speedMultiplier: 1,
@@ -758,17 +763,28 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom
       );
-      if (inHero) {
-        e.preventDefault();
-        const zoomDelta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY) * 0.08, 4.0);
-        animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
-          animStateRef.current.cameraAngle.radius + zoomDelta,
-          14,
-          95
-        );
-        if (onInteractionStateChangeRef.current) {
-          onInteractionStateChangeRef.current(true);
-        }
+      if (!inHero) return;
+
+      // Allow natural page scrolling!
+      // Only zoom the 3D Orrery when:
+      // 1. User holds Ctrl / Cmd / Shift (standard web canvas & map navigation pattern)
+      // 2. User performs a trackpad pinch gesture (browsers send e.ctrlKey = true)
+      const isZoomIntent = e.ctrlKey || e.metaKey || e.shiftKey;
+
+      if (!isZoomIntent) {
+        // Do NOT prevent default: let the browser scroll down the page naturally!
+        return;
+      }
+
+      e.preventDefault();
+      const zoomDelta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY) * 0.08, 4.0);
+      animStateRef.current.cameraAngle.radius = THREE.MathUtils.clamp(
+        animStateRef.current.cameraAngle.radius + zoomDelta,
+        14,
+        95
+      );
+      if (onInteractionStateChangeRef.current) {
+        onInteractionStateChangeRef.current(true);
       }
     };
 
@@ -1015,7 +1031,11 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
       {/* Interactive Drag Hint */}
       <div className={styles.interactiveHint}>
         <div className={styles.hintDot} />
-        <span>3D Orrery: Drag to rotate • Scroll to zoom • Hover/Click planets</span>
+        <span>
+          {isTextDimmed
+            ? 'Space View: Drag to rotate • Pinch / Ctrl+Scroll or +/- to zoom • Click planet to track'
+            : '3D Orrery: Drag to rotate • Pinch / Ctrl+Scroll or +/- to zoom • Click planet to track'}
+        </span>
       </div>
 
       {/* Floating Orrery Dashboard Controls */}

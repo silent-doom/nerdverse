@@ -159,6 +159,73 @@
   background-color: var(--color-border-default);
 }
 
+/* ── Scroll Down Indicator ── */
+.scrollDownIndicator {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(19, 21, 28, 0.75);
+  border: 1px solid rgba(229, 169, 60, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 12px rgba(229, 169, 60, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #E5A93C;
+  text-decoration: none;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 240ms ease;
+  animation: heroBounce 2.4s ease-in-out infinite;
+}
+
+.scrollDownIndicator:hover {
+  background: rgba(229, 169, 60, 0.2);
+  border-color: #E5A93C;
+  color: #FFFFFF;
+  box-shadow: 0 6px 24px rgba(229, 169, 60, 0.35);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.scrollDownDimmed {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.scrollDownText {
+  display: inline-block;
+}
+
+.scrollDownChevron {
+  font-size: 13px;
+  font-weight: 700;
+  transition: transform 200ms ease;
+}
+
+.scrollDownIndicator:hover .scrollDownChevron {
+  transform: translateY(2px);
+}
+
+@keyframes heroBounce {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
 /* ── Section Header ── */
 .sectionHeader {
   text-align: center;
