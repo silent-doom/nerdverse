@@ -118,6 +118,8 @@ export default function TrolleyProblem3DLab() {
   const bystanderGroupRef = useRef(null);
   const sparksParticlesRef = useRef(null);
   const steamParticlesRef = useRef(null);
+  const loopGroupRef = useRef(null);
+  const bufferStopRef = useRef(null);
 
   // Victim physics records array
   const victimRecordsRef = useRef([]);
@@ -129,7 +131,7 @@ export default function TrolleyProblem3DLab() {
     simState: 'IDLE',
     speed: 1,
     cameraView: 'overview',
-    cameraAngle: { theta: 0.38, phi: 1.05, radius: 52 },
+    cameraAngle: { theta: 0.40, phi: 0.94, radius: 64 },
     isDragging: false,
     dragStart: { x: 0, y: 0 },
     shakeIntensity: 0,
@@ -259,6 +261,176 @@ export default function TrolleyProblem3DLab() {
     }
     scene.add(hillGroup);
 
+    // 5b. Rich Natural Environment (Pine Trees, Leafy Woodland, Telegraph Poles, Boulders)
+    const envGroup = new THREE.Group();
+    scene.add(envGroup);
+
+    // Natural Materials Palette
+    const trunkMat = new THREE.MeshStandardMaterial({ color: '#3A281E', roughness: 0.92 });
+    const pineMats = [
+      new THREE.MeshStandardMaterial({ color: '#1B4029', roughness: 0.82 }),
+      new THREE.MeshStandardMaterial({ color: '#245235', roughness: 0.82 }),
+      new THREE.MeshStandardMaterial({ color: '#2E6342', roughness: 0.82 }),
+    ];
+    const deciduousMats = [
+      new THREE.MeshStandardMaterial({ color: '#2C5A38', roughness: 0.8 }),
+      new THREE.MeshStandardMaterial({ color: '#3E6F45', roughness: 0.8 }),
+      new THREE.MeshStandardMaterial({ color: '#B45309', roughness: 0.85 }),
+      new THREE.MeshStandardMaterial({ color: '#C28828', roughness: 0.85 }),
+    ];
+    const boulderMat = new THREE.MeshStandardMaterial({ color: '#29303D', roughness: 0.92, flatShading: true });
+    const poleMat = new THREE.MeshStandardMaterial({ color: '#3A2E24', roughness: 0.85, metalness: 0.1 });
+    const insulatorMat = new THREE.MeshStandardMaterial({ color: '#F3F4F6', roughness: 0.2, metalness: 0.5 });
+    const wireMat = new THREE.LineBasicMaterial({ color: '#1C222E', linewidth: 1 });
+
+    // Helper: Stylized Conifer Pine Tree
+    const addPineTree = (x, z, s = 1.0) => {
+      const tree = new THREE.Group();
+      tree.position.set(x, 0, z);
+
+      const trunkGeo = new THREE.CylinderGeometry(0.22 * s, 0.35 * s, 2.2 * s, 7);
+      const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+      trunk.position.y = 1.1 * s;
+      trunk.castShadow = true;
+      tree.add(trunk);
+
+      // 3 Tiers of pine foliage
+      const t1 = new THREE.Mesh(new THREE.ConeGeometry(1.8 * s, 2.4 * s, 7), pineMats[0]);
+      t1.position.y = 2.3 * s;
+      t1.castShadow = true;
+
+      const t2 = new THREE.Mesh(new THREE.ConeGeometry(1.35 * s, 2.1 * s, 7), pineMats[1]);
+      t2.position.y = 3.5 * s;
+      t2.castShadow = true;
+
+      const t3 = new THREE.Mesh(new THREE.ConeGeometry(0.9 * s, 1.8 * s, 7), pineMats[2]);
+      t3.position.y = 4.7 * s;
+      t3.castShadow = true;
+
+      tree.add(t1, t2, t3);
+      envGroup.add(tree);
+      return tree;
+    };
+
+    // Helper: Broadleaf / Autumn Deciduous Tree
+    const addDeciduousTree = (x, z, s = 1.0, matIdx = 0) => {
+      const tree = new THREE.Group();
+      tree.position.set(x, 0, z);
+
+      const trunkGeo = new THREE.CylinderGeometry(0.28 * s, 0.42 * s, 2.6 * s, 7);
+      const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+      trunk.position.y = 1.3 * s;
+      trunk.castShadow = true;
+      tree.add(trunk);
+
+      const leafMat = deciduousMats[matIdx % deciduousMats.length];
+      const c1 = new THREE.Mesh(new THREE.DodecahedronGeometry(1.6 * s, 1), leafMat);
+      c1.position.set(0, 3.2 * s, 0);
+      c1.castShadow = true;
+
+      const c2 = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2 * s, 1), leafMat);
+      c2.position.set(0.55 * s, 4.0 * s, -0.35 * s);
+      c2.castShadow = true;
+
+      const c3 = new THREE.Mesh(new THREE.DodecahedronGeometry(1.1 * s, 1), leafMat);
+      c3.position.set(-0.45 * s, 3.8 * s, 0.45 * s);
+      c3.castShadow = true;
+
+      tree.add(c1, c2, c3);
+      envGroup.add(tree);
+      return tree;
+    };
+
+    // Helper: Low-poly Ground Boulder
+    const addBoulder = (x, z, s = 1.0) => {
+      const mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), boulderMat);
+      mesh.position.set(x, s * 0.55, z);
+      mesh.rotation.set(Math.random() * 2, Math.random() * 2, Math.random() * 2);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      envGroup.add(mesh);
+    };
+
+    // Populate Natural Groves:
+    // Left Woodland (behind switch lever)
+    addPineTree(-14, 22, 1.2);
+    addDeciduousTree(-18, 16, 1.1, 0);
+    addPineTree(-12, 6, 0.95);
+    addDeciduousTree(-16, -4, 1.3, 2);
+    addPineTree(-20, -14, 1.15);
+    addPineTree(-14, -22, 1.0);
+    addDeciduousTree(-19, -32, 1.2, 3);
+    addPineTree(-15, -42, 1.25);
+    addPineTree(-22, -50, 1.4);
+    addDeciduousTree(-26, -26, 1.0, 1);
+    addPineTree(-24, 8, 1.3);
+    addDeciduousTree(-28, 28, 1.4, 3);
+
+    // Right Woodland (beyond the spur line)
+    addPineTree(24, 20, 1.1);
+    addDeciduousTree(22, 10, 1.2, 1);
+    addPineTree(26, -2, 1.0);
+    addDeciduousTree(29, -12, 1.3, 3);
+    addPineTree(32, -22, 1.15);
+    addPineTree(30, -34, 1.25);
+    addDeciduousTree(35, -44, 1.1, 2);
+    addPineTree(28, -52, 1.35);
+    addPineTree(22, -60, 1.4);
+    addDeciduousTree(38, -28, 1.0, 0);
+
+    // Distant Backdrop Forest (North behind workers)
+    addPineTree(-6, -65, 1.5);
+    addDeciduousTree(2, -68, 1.4, 2);
+    addPineTree(12, -66, 1.6);
+    addPineTree(-18, -64, 1.3);
+    addDeciduousTree(20, -62, 1.2, 3);
+    addPineTree(-28, -58, 1.4);
+
+    // Ground Boulders along right-of-way
+    addBoulder(-7, 14, 1.1);
+    addBoulder(-8, -6, 1.3);
+    addBoulder(-6, -28, 1.2);
+    addBoulder(8, 8, 0.9);
+    addBoulder(20, -6, 1.5);
+    addBoulder(22, -28, 1.4);
+    addBoulder(14, -48, 1.6);
+    addBoulder(-10, -48, 1.3);
+
+    // Telegraph Utility Poles & Wire Cables along Left Rail (X: -4.4)
+    const poleZList = [24, 12, 0, -12, -24, -36];
+    const wirePts = [];
+
+    poleZList.forEach((pz) => {
+      const pole = new THREE.Group();
+      pole.position.set(-4.5, 0, pz);
+
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 5.8, 8), poleMat);
+      shaft.position.y = 2.9;
+      shaft.castShadow = true;
+      pole.add(shaft);
+
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.12, 0.12), poleMat);
+      arm.position.y = 5.2;
+      arm.castShadow = true;
+      pole.add(arm);
+
+      const insL = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.14, 8), insulatorMat);
+      insL.position.set(-0.7, 5.32, 0);
+      const insR = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.14, 8), insulatorMat);
+      insR.position.set(0.7, 5.32, 0);
+      pole.add(insL, insR);
+
+      envGroup.add(pole);
+      wirePts.push(new THREE.Vector3(-4.5 - 0.7, 5.34, pz));
+    });
+
+    if (wirePts.length > 1) {
+      const wireCurve = new THREE.CatmullRomCurve3(wirePts);
+      const wireGeo = new THREE.BufferGeometry().setFromPoints(wireCurve.getPoints(60));
+      const wireLine = new THREE.Line(wireGeo, wireMat);
+      envGroup.add(wireLine);
+    }
+
     // Subtle Railroad Grid on Base Ballast
     const gridHelper = new THREE.GridHelper(160, 40, '#283042', '#1A202E');
     gridHelper.position.y = 0.03;
@@ -366,23 +538,119 @@ export default function TrolleyProblem3DLab() {
     checkRailL.position.set(-0.85, 0.72, -9.5);
     tracksGroup.add(checkRailL);
 
-    // Loop Track geometry (connects spur back to main line behind straight victims)
-    const loopCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(16.5, 0.72, -36),
-      new THREE.Vector3(19, 0.72, -48),
-      new THREE.Vector3(9, 0.72, -56),
-      new THREE.Vector3(-4, 0.72, -52),
-      new THREE.Vector3(0, 0.72, -44),
-    ]);
-    const loopGeo = new THREE.TubeGeometry(loopCurve, 50, 0.09, 8, false);
-    const loopMeshL = new THREE.Mesh(loopGeo, railHeadMat);
-    const loopMeshR = loopMeshL.clone();
-    loopMeshR.position.x += 0.8;
-    loopMeshL.position.x -= 0.8;
+    // 6b. Refined Loop Track System (Displayed ONLY for 'loop' dilemma scenario)
     const loopGroup = new THREE.Group();
-    loopGroup.add(loopMeshL, loopMeshR);
     loopGroup.name = 'LoopTracks';
+    loopGroup.visible = false; // Hidden by default for standard switch, footbridge, autonomous
     tracksGroup.add(loopGroup);
+    loopGroupRef.current = loopGroup;
+
+    // Smooth Catmull-Rom spline curving from the spur end around behind the 5 straight workers
+    const loopControlPoints = [
+      new THREE.Vector3(15.2, 0, -38),
+      new THREE.Vector3(17.8, 0, -44),
+      new THREE.Vector3(16.2, 0, -52),
+      new THREE.Vector3(8.5, 0, -58),
+      new THREE.Vector3(-1.5, 0, -56),
+      new THREE.Vector3(-4.8, 0, -50),
+      new THREE.Vector3(0, 0, -44),
+    ];
+    const loopSpline = new THREE.CatmullRomCurve3(loopControlPoints, false, 'catmullrom', 0.5);
+
+    // Build curved ballast bed and wooden sleepers along the loop spline
+    const loopSampleCount = 38;
+    const loopSleepersGeo = new THREE.BoxGeometry(3.3, 0.22, 0.52);
+    const loopTiePlateGeo = new THREE.BoxGeometry(0.36, 0.04, 0.42);
+    const loopBallastGeo = new THREE.BoxGeometry(4.4, 0.32, 1.4);
+
+    const railPointsL = [];
+    const railPointsR = [];
+
+    for (let i = 0; i <= loopSampleCount; i++) {
+      const t = i / loopSampleCount;
+      const pt = loopSpline.getPoint(t);
+      const tangent = loopSpline.getTangent(t);
+
+      // Normal vector in horizontal XZ plane
+      const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+      const yawAngle = Math.atan2(tangent.x, tangent.z);
+
+      // 1. Curved ballast segment
+      const curvedBallast = new THREE.Mesh(loopBallastGeo, ballastMat);
+      curvedBallast.position.set(pt.x, 0.16, pt.z);
+      curvedBallast.rotation.y = yawAngle;
+      curvedBallast.receiveShadow = true;
+      loopGroup.add(curvedBallast);
+
+      // 2. Wooden Sleeper
+      const curvedSleeper = new THREE.Mesh(loopSleepersGeo, sleeperMat);
+      curvedSleeper.position.set(pt.x, 0.43, pt.z);
+      curvedSleeper.rotation.y = yawAngle;
+      curvedSleeper.castShadow = true;
+      curvedSleeper.receiveShadow = true;
+      loopGroup.add(curvedSleeper);
+
+      // Tie plates under rails
+      const plateL = new THREE.Mesh(loopTiePlateGeo, tiePlateMat);
+      plateL.position.set(pt.x + normal.x * 1.1, 0.55, pt.z + normal.z * 1.1);
+      plateL.rotation.y = yawAngle;
+      const plateR = new THREE.Mesh(loopTiePlateGeo, tiePlateMat);
+      plateR.position.set(pt.x - normal.x * 1.1, 0.55, pt.z - normal.z * 1.1);
+      plateR.rotation.y = yawAngle;
+      loopGroup.add(plateL, plateR);
+
+      // Rail coordinate sampling
+      railPointsL.push(new THREE.Vector3(pt.x + normal.x * 1.1, 0.72, pt.z + normal.z * 1.1));
+      railPointsR.push(new THREE.Vector3(pt.x - normal.x * 1.1, 0.72, pt.z - normal.z * 1.1));
+    }
+
+    // Continuous smooth steel rails along the curve
+    const railCurveL = new THREE.CatmullRomCurve3(railPointsL, false, 'catmullrom', 0.5);
+    const railCurveR = new THREE.CatmullRomCurve3(railPointsR, false, 'catmullrom', 0.5);
+    const railGeoL = new THREE.TubeGeometry(railCurveL, 64, 0.08, 8, false);
+    const railGeoR = new THREE.TubeGeometry(railCurveR, 64, 0.08, 8, false);
+    const loopRailMeshL = new THREE.Mesh(railGeoL, railHeadMat);
+    const loopRailMeshR = new THREE.Mesh(railGeoR, railHeadMat);
+    loopRailMeshL.castShadow = true;
+    loopRailMeshR.castShadow = true;
+    loopGroup.add(loopRailMeshL, loopRailMeshR);
+
+    // 6c. Standard Buffer Stop / Bumper (Displayed for non-loop normal railway lines)
+    const bufferStopGroup = new THREE.Group();
+    bufferStopGroup.position.set(16.8, 0, -42.5);
+    bufferStopGroup.rotation.y = -0.38;
+    tracksGroup.add(bufferStopGroup);
+    bufferStopRef.current = bufferStopGroup;
+
+    // Buffer Beam (Dark iron with red hazard warning plate)
+    const bumperBeamGeo = new THREE.BoxGeometry(3.0, 0.45, 0.4);
+    const bumperBeamMat = new THREE.MeshStandardMaterial({ color: '#8B1E1E', metalness: 0.7, roughness: 0.4 });
+    const bumperBeam = new THREE.Mesh(bumperBeamGeo, bumperBeamMat);
+    bumperBeam.position.set(0, 1.2, 0);
+    bumperBeam.castShadow = true;
+    bufferStopGroup.add(bumperBeam);
+
+    // Buffer Warning Circles
+    const diskGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.05, 16);
+    const diskMat = new THREE.MeshStandardMaterial({ color: '#EF4444', emissive: '#7F1D1D', roughness: 0.3 });
+    const diskL = new THREE.Mesh(diskGeo, diskMat);
+    diskL.rotation.x = Math.PI / 2;
+    diskL.position.set(-1.0, 1.2, 0.22);
+    const diskR = new THREE.Mesh(diskGeo, diskMat);
+    diskR.rotation.x = Math.PI / 2;
+    diskR.position.set(1.0, 1.2, 0.22);
+    bufferStopGroup.add(diskL, diskR);
+
+    // Heavy steel support struts
+    const strutGeo = new THREE.BoxGeometry(0.2, 1.4, 0.2);
+    const strutMat = new THREE.MeshStandardMaterial({ color: '#1F2937', metalness: 0.9, roughness: 0.3 });
+    const strutL = new THREE.Mesh(strutGeo, strutMat);
+    strutL.position.set(-1.1, 0.7, -0.4);
+    strutL.rotation.x = -0.35;
+    const strutR = new THREE.Mesh(strutGeo, strutMat);
+    strutR.position.set(1.1, 0.7, -0.4);
+    strutR.rotation.x = -0.35;
+    bufferStopGroup.add(strutL, strutR);
 
     // 7. Mechanical Switch Turnout Mechanism & Signal Lantern
     const junctionGroup = new THREE.Group();
@@ -821,6 +1089,14 @@ export default function TrolleyProblem3DLab() {
         footbridgeMeshRef.current.visible = state.scenarioKey === 'footbridge';
       }
 
+      // Loop Track & Buffer Stop visibility based on scenario
+      if (loopGroupRef.current) {
+        loopGroupRef.current.visible = state.scenarioKey === 'loop';
+      }
+      if (bufferStopRef.current) {
+        bufferStopRef.current.visible = state.scenarioKey !== 'loop';
+      }
+
       // Bystander Physics in Footbridge Dilemma
       if (bystanderGroupRef.current) {
         bystanderGroupRef.current.visible = state.scenarioKey === 'footbridge';
@@ -839,7 +1115,7 @@ export default function TrolleyProblem3DLab() {
             }
             bystanderGroupRef.current.position.set(0, state.bystanderPosY, state.bystanderPosZ);
           } else {
-            bystanderGroupRef.current.position.set(0, 5.8, 14);
+            bystanderGroupRef.current.position.set(0, 5.8, 10);
             bystanderGroupRef.current.rotation.set(0, 0, 0);
           }
         }
@@ -1073,7 +1349,7 @@ export default function TrolleyProblem3DLab() {
           const targetZ = radius * Math.sin(phi) * Math.cos(theta);
 
           cameraRef.current.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), delta * 5);
-          cameraRef.current.lookAt(2, 1.2, -6);
+          cameraRef.current.lookAt(2, 1.2, -10);
         }
 
         // Apply screen shake on collision
@@ -1151,6 +1427,13 @@ export default function TrolleyProblem3DLab() {
    */
   const handleSelectScenario = (key) => {
     setSelectedScenarioKey(key);
+    animStateRef.current.scenarioKey = key;
+    if (loopGroupRef.current) {
+      loopGroupRef.current.visible = key === 'loop';
+    }
+    if (bufferStopRef.current) {
+      bufferStopRef.current.visible = key !== 'loop';
+    }
     setIsSwitchPulled(false);
     handleResetSimulation();
   };
