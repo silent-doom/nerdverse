@@ -111,7 +111,12 @@ export default function TrolleyProblem3DLab() {
   const rendererRef = useRef(null);
   const trolleyGroupRef = useRef(null);
   const switchBladeRef = useRef(null);
+  const switchPointLRef = useRef(null);
+  const switchPointRRef = useRef(null);
+  const throwRodRef = useRef(null);
+  const tieBarRef = useRef(null);
   const leverRodRef = useRef(null);
+  const switchMastRef = useRef(null);
   const signalLampRef = useRef(null);
   const victimsGroupRef = useRef(null);
   const footbridgeMeshRef = useRef(null);
@@ -120,6 +125,7 @@ export default function TrolleyProblem3DLab() {
   const steamParticlesRef = useRef(null);
   const loopGroupRef = useRef(null);
   const bufferStopRef = useRef(null);
+  const turnoutSplineRef = useRef(null);
 
   // Victim physics records array
   const victimRecordsRef = useRef([]);
@@ -131,7 +137,7 @@ export default function TrolleyProblem3DLab() {
     simState: 'IDLE',
     speed: 1,
     cameraView: 'overview',
-    cameraAngle: { theta: 0.40, phi: 0.94, radius: 64 },
+    cameraAngle: { theta: 0.35, phi: 0.88, radius: 48 },
     isDragging: false,
     dragStart: { x: 0, y: 0 },
     shakeIntensity: 0,
@@ -396,13 +402,13 @@ export default function TrolleyProblem3DLab() {
     addBoulder(14, -48, 1.6);
     addBoulder(-10, -48, 1.3);
 
-    // Telegraph Utility Poles & Wire Cables along Left Rail (X: -4.4)
-    const poleZList = [24, 12, 0, -12, -24, -36];
+    // Telegraph Utility Poles & Wire Cables along Left Rail (X: -5.4)
+    const poleZList = [24, 12, 4, -8, -22, -36];
     const wirePts = [];
 
     poleZList.forEach((pz) => {
       const pole = new THREE.Group();
-      pole.position.set(-4.5, 0, pz);
+      pole.position.set(-5.4, 0, pz);
 
       const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 5.8, 8), poleMat);
       shaft.position.y = 2.9;
@@ -421,7 +427,7 @@ export default function TrolleyProblem3DLab() {
       pole.add(insL, insR);
 
       envGroup.add(pole);
-      wirePts.push(new THREE.Vector3(-4.5 - 0.7, 5.34, pz));
+      wirePts.push(new THREE.Vector3(-5.4 - 0.7, 5.34, pz));
     });
 
     if (wirePts.length > 1) {
@@ -526,38 +532,205 @@ export default function TrolleyProblem3DLab() {
     // Approach main track (Z: 28 down to junction at Z: 0)
     buildTrackSection(0, 14, 28);
 
-    // Straight line continuation track (Z: 0 down to Z: -44)
-    buildTrackSection(0, -22, 44);
+    // 6. Smooth Engineered Turnout Geometry (Transition Spiral / Easement Curve)
+    const turnoutControlPoints = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0.20, 0, -4.0),
+      new THREE.Vector3(0.92, 0, -10.0),  // Frog crossing zone
+      new THREE.Vector3(2.35, 0, -16.5), // Clearance point past straight line
+      new THREE.Vector3(5.1, 0, -24.0),
+      new THREE.Vector3(8.8, 0, -31.0),  // Siding body passing solitary worker
+      new THREE.Vector3(13.2, 0, -38.0),
+      new THREE.Vector3(17.2, 0, -44.0), // Terminal siding buffer / loop connection
+    ];
+    const turnoutSpline = new THREE.CatmullRomCurve3(turnoutControlPoints, false, 'catmullrom', 0.5);
+    turnoutSplineRef.current = turnoutSpline;
 
-    // Diverging Spur Track (angles to the right, starts at junction Z: 0)
-    buildTrackSection(8.4, -20.5, 46, -0.38);
+    // 6a. Turnout Zone Shared Ballast Bed (Z: 0 to Z: -14)
+    const turnoutBallastA = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.32, 4.8), ballastMat);
+    turnoutBallastA.position.set(0.12, 0.16, -2.4);
+    turnoutBallastA.receiveShadow = true;
+    const turnoutBallastB = new THREE.Mesh(new THREE.BoxGeometry(6.0, 0.32, 5.0), ballastMat);
+    turnoutBallastB.position.set(0.55, 0.16, -7.2);
+    turnoutBallastB.receiveShadow = true;
+    const turnoutBallastC = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.32, 4.8), ballastMat);
+    turnoutBallastC.position.set(1.2, 0.16, -12.0);
+    turnoutBallastC.receiveShadow = true;
+    tracksGroup.add(turnoutBallastA, turnoutBallastB, turnoutBallastC);
 
-    // Check Rails (Guard Rails) at Turnout Frog (Z: -7 to -12)
-    const checkRailGeo = new THREE.BoxGeometry(0.08, 0.14, 4.5);
-    const checkRailL = new THREE.Mesh(checkRailGeo, railHeadMat);
-    checkRailL.position.set(-0.85, 0.72, -9.5);
-    tracksGroup.add(checkRailL);
+    // 6b. Turnout Zone Timber Ties (Z: 0 to -14)
+    const tiePlateGeo = new THREE.BoxGeometry(0.36, 0.04, 0.42);
+    const slidePlateGeo = new THREE.BoxGeometry(2.4, 0.035, 0.38);
+    const slidePlateMat = new THREE.MeshStandardMaterial({ color: '#4B5563', metalness: 0.95, roughness: 0.25 });
 
-    // 6b. Refined Loop Track System (Displayed ONLY for 'loop' dilemma scenario)
+    const turnoutZSteps = [
+      0, -1.15, -2.30, -3.45, -4.60, -5.75, -6.90, -8.05, -9.20, -10.35, -11.50, -12.65, -13.80,
+    ];
+
+    turnoutZSteps.forEach((zVal) => {
+      const isHeadblock = Math.abs(zVal - -1.15) < 0.2 || Math.abs(zVal - -2.30) < 0.2;
+      const progress = Math.min(Math.abs(zVal) / 44, 1);
+      const xTurnout = turnoutSpline.getPoint(progress).x;
+
+      let tieWidth;
+      let tieCenterX;
+
+      if (isHeadblock) {
+        // Extra long headblock ties extending to X: -3.8 to support switch stand
+        tieWidth = 5.8 + xTurnout;
+        tieCenterX = -1.2 + xTurnout / 2;
+      } else {
+        tieWidth = 3.4 + xTurnout;
+        tieCenterX = xTurnout / 2;
+      }
+
+      const tieGeo = new THREE.BoxGeometry(tieWidth, 0.22, 0.52);
+      const tieMesh = new THREE.Mesh(tieGeo, sleeperMat);
+      tieMesh.position.set(tieCenterX, 0.43, zVal);
+      tieMesh.receiveShadow = true;
+      tieMesh.castShadow = true;
+      tracksGroup.add(tieMesh);
+
+      // Steel tie plates under straight track
+      const plateMainL = new THREE.Mesh(tiePlateGeo, tiePlateMat);
+      plateMainL.position.set(-1.1, 0.55, zVal);
+      const plateMainR = new THREE.Mesh(tiePlateGeo, tiePlateMat);
+      plateMainR.position.set(1.1, 0.55, zVal);
+      tracksGroup.add(plateMainL, plateMainR);
+
+      // Steel tie plates under turnout track if separated
+      if (xTurnout > 0.4) {
+        const plateSpurL = new THREE.Mesh(tiePlateGeo, tiePlateMat);
+        plateSpurL.position.set(xTurnout - 1.1, 0.55, zVal);
+        const plateSpurR = new THREE.Mesh(tiePlateGeo, tiePlateMat);
+        plateSpurR.position.set(xTurnout + 1.1, 0.55, zVal);
+        tracksGroup.add(plateSpurL, plateSpurR);
+      }
+
+      // Polished steel slide plates (switch chairs) between Z: -1.0 and Z: -7.5
+      if (zVal >= -7.2 && zVal <= -1.0) {
+        const slideChair = new THREE.Mesh(slidePlateGeo, slidePlateMat);
+        slideChair.position.set(0, 0.55, zVal);
+        tracksGroup.add(slideChair);
+      }
+    });
+
+    // 6c. Straight Track Continuation Beyond Turnout Zone (Z: -14 to -44)
+    buildTrackSection(0, -29, 30);
+
+    // Straight rails through turnout zone (Z: 0 to -14)
+    const straightZoneHeadL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 14), railHeadMat);
+    straightZoneHeadL.position.set(-1.1, 0.72, -7);
+    straightZoneHeadL.castShadow = true;
+    const straightZoneWebL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 14), railHeadMat);
+    straightZoneWebL.position.set(-1.1, 0.58, -7);
+    const straightZoneHeadR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 14), railHeadMat);
+    straightZoneHeadR.position.set(1.1, 0.72, -7);
+    straightZoneHeadR.castShadow = true;
+    const straightZoneWebR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 14), railHeadMat);
+    straightZoneWebR.position.set(1.1, 0.58, -7);
+    tracksGroup.add(straightZoneHeadL, straightZoneWebL, straightZoneHeadR, straightZoneWebR);
+
+    // 6d. Turnout Curved Siding Beyond Frog (Z: -14 to -44)
+    const sidingSampleCount = 28;
+    const sidingSleeperGeo = new THREE.BoxGeometry(3.3, 0.22, 0.52);
+    const sidingBallastGeo = new THREE.BoxGeometry(4.4, 0.32, 1.35);
+
+    for (let i = 0; i <= sidingSampleCount; i++) {
+      const t = 0.32 + (i / sidingSampleCount) * 0.68;
+      const pt = turnoutSpline.getPoint(t);
+      const tangent = turnoutSpline.getTangent(t);
+      const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+      const yawAngle = Math.atan2(tangent.x, tangent.z);
+
+      // Curved ballast segment
+      const curvedBallast = new THREE.Mesh(sidingBallastGeo, ballastMat);
+      curvedBallast.position.set(pt.x, 0.16, pt.z);
+      curvedBallast.rotation.y = yawAngle;
+      curvedBallast.receiveShadow = true;
+      tracksGroup.add(curvedBallast);
+
+      // Angled Sleeper
+      const curvedSleeper = new THREE.Mesh(sidingSleeperGeo, sleeperMat);
+      curvedSleeper.position.set(pt.x, 0.43, pt.z);
+      curvedSleeper.rotation.y = yawAngle;
+      curvedSleeper.receiveShadow = true;
+      curvedSleeper.castShadow = true;
+      tracksGroup.add(curvedSleeper);
+
+      // Tie plates
+      const plateL = new THREE.Mesh(tiePlateGeo, tiePlateMat);
+      plateL.position.set(pt.x + normal.x * 1.1, 0.55, pt.z + normal.z * 1.1);
+      plateL.rotation.y = yawAngle;
+      const plateR = new THREE.Mesh(tiePlateGeo, tiePlateMat);
+      plateR.position.set(pt.x - normal.x * 1.1, 0.55, pt.z - normal.z * 1.1);
+      plateR.rotation.y = yawAngle;
+      tracksGroup.add(plateL, plateR);
+    }
+
+    // 6e. Dual Smooth Continuous Polished Steel Rails Along Turnout Curve
+    const turnoutRailPointsL = [];
+    const turnoutRailPointsR = [];
+    const railSampleTotal = 75;
+
+    for (let i = 0; i <= railSampleTotal; i++) {
+      const t = i / railSampleTotal;
+      const pt = turnoutSpline.getPoint(t);
+      const tangent = turnoutSpline.getTangent(t);
+      const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+
+      turnoutRailPointsL.push(new THREE.Vector3(pt.x + normal.x * 1.1, 0.72, pt.z + normal.z * 1.1));
+      turnoutRailPointsR.push(new THREE.Vector3(pt.x - normal.x * 1.1, 0.72, pt.z - normal.z * 1.1));
+    }
+
+    const turnoutRailCurveL = new THREE.CatmullRomCurve3(turnoutRailPointsL, false, 'catmullrom', 0.5);
+    const turnoutRailCurveR = new THREE.CatmullRomCurve3(turnoutRailPointsR, false, 'catmullrom', 0.5);
+    const turnoutRailGeoL = new THREE.TubeGeometry(turnoutRailCurveL, 85, 0.08, 8, false);
+    const turnoutRailGeoR = new THREE.TubeGeometry(turnoutRailCurveR, 85, 0.08, 8, false);
+    const turnoutRailMeshL = new THREE.Mesh(turnoutRailGeoL, railHeadMat);
+    const turnoutRailMeshR = new THREE.Mesh(turnoutRailGeoR, railHeadMat);
+    turnoutRailMeshL.castShadow = true;
+    turnoutRailMeshR.castShadow = true;
+    tracksGroup.add(turnoutRailMeshL, turnoutRailMeshR);
+
+    // 6f. Turnout Frog (V-crossing) & Flared Guard Check Rails (Z: -8 to -12)
+    const frogPointGeo = new THREE.BoxGeometry(0.24, 0.16, 2.8);
+    const frogPoint = new THREE.Mesh(frogPointGeo, railHeadMat);
+    frogPoint.position.set(0.92, 0.72, -10.0);
+    tracksGroup.add(frogPoint);
+
+    // Guard Check Rail on straight outer rail
+    const checkRailGeo = new THREE.BoxGeometry(0.08, 0.14, 4.2);
+    const checkRailStraight = new THREE.Mesh(checkRailGeo, railHeadMat);
+    checkRailStraight.position.set(-0.85, 0.72, -10.0);
+    tracksGroup.add(checkRailStraight);
+
+    // Guard Check Rail on turnout outer rail
+    const checkRailTurnoutPt = turnoutSpline.getPoint(10.0 / 44);
+    const checkRailTurnout = new THREE.Mesh(checkRailGeo, railHeadMat);
+    checkRailTurnout.position.set(checkRailTurnoutPt.x + 0.85, 0.72, -10.0);
+    checkRailTurnout.rotation.y = 0.12;
+    tracksGroup.add(checkRailTurnout);
+
+    // 6g. Refined Loop Track System (Displayed ONLY for 'loop' dilemma scenario)
     const loopGroup = new THREE.Group();
     loopGroup.name = 'LoopTracks';
-    loopGroup.visible = false; // Hidden by default for standard switch, footbridge, autonomous
+    loopGroup.visible = false;
     tracksGroup.add(loopGroup);
     loopGroupRef.current = loopGroup;
 
-    // Smooth Catmull-Rom spline curving from the spur end around behind the 5 straight workers
+    const loopTerminalPt = turnoutSpline.getPoint(1.0);
     const loopControlPoints = [
-      new THREE.Vector3(15.2, 0, -38),
-      new THREE.Vector3(17.8, 0, -44),
-      new THREE.Vector3(16.2, 0, -52),
-      new THREE.Vector3(8.5, 0, -58),
-      new THREE.Vector3(-1.5, 0, -56),
-      new THREE.Vector3(-4.8, 0, -50),
-      new THREE.Vector3(0, 0, -44),
+      loopTerminalPt,
+      new THREE.Vector3(18.2, 0, -47.0),
+      new THREE.Vector3(16.5, 0, -53.5),
+      new THREE.Vector3(8.5, 0, -58.0),
+      new THREE.Vector3(-1.5, 0, -56.0),
+      new THREE.Vector3(-4.8, 0, -50.0),
+      new THREE.Vector3(0, 0, -44.0),
     ];
     const loopSpline = new THREE.CatmullRomCurve3(loopControlPoints, false, 'catmullrom', 0.5);
 
-    // Build curved ballast bed and wooden sleepers along the loop spline
     const loopSampleCount = 38;
     const loopSleepersGeo = new THREE.BoxGeometry(3.3, 0.22, 0.52);
     const loopTiePlateGeo = new THREE.BoxGeometry(0.36, 0.04, 0.42);
@@ -571,18 +744,15 @@ export default function TrolleyProblem3DLab() {
       const pt = loopSpline.getPoint(t);
       const tangent = loopSpline.getTangent(t);
 
-      // Normal vector in horizontal XZ plane
       const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
       const yawAngle = Math.atan2(tangent.x, tangent.z);
 
-      // 1. Curved ballast segment
       const curvedBallast = new THREE.Mesh(loopBallastGeo, ballastMat);
       curvedBallast.position.set(pt.x, 0.16, pt.z);
       curvedBallast.rotation.y = yawAngle;
       curvedBallast.receiveShadow = true;
       loopGroup.add(curvedBallast);
 
-      // 2. Wooden Sleeper
       const curvedSleeper = new THREE.Mesh(loopSleepersGeo, sleeperMat);
       curvedSleeper.position.set(pt.x, 0.43, pt.z);
       curvedSleeper.rotation.y = yawAngle;
@@ -590,7 +760,6 @@ export default function TrolleyProblem3DLab() {
       curvedSleeper.receiveShadow = true;
       loopGroup.add(curvedSleeper);
 
-      // Tie plates under rails
       const plateL = new THREE.Mesh(loopTiePlateGeo, tiePlateMat);
       plateL.position.set(pt.x + normal.x * 1.1, 0.55, pt.z + normal.z * 1.1);
       plateL.rotation.y = yawAngle;
@@ -599,12 +768,10 @@ export default function TrolleyProblem3DLab() {
       plateR.rotation.y = yawAngle;
       loopGroup.add(plateL, plateR);
 
-      // Rail coordinate sampling
       railPointsL.push(new THREE.Vector3(pt.x + normal.x * 1.1, 0.72, pt.z + normal.z * 1.1));
       railPointsR.push(new THREE.Vector3(pt.x - normal.x * 1.1, 0.72, pt.z - normal.z * 1.1));
     }
 
-    // Continuous smooth steel rails along the curve
     const railCurveL = new THREE.CatmullRomCurve3(railPointsL, false, 'catmullrom', 0.5);
     const railCurveR = new THREE.CatmullRomCurve3(railPointsR, false, 'catmullrom', 0.5);
     const railGeoL = new THREE.TubeGeometry(railCurveL, 64, 0.08, 8, false);
@@ -615,10 +782,13 @@ export default function TrolleyProblem3DLab() {
     loopRailMeshR.castShadow = true;
     loopGroup.add(loopRailMeshL, loopRailMeshR);
 
-    // 6c. Standard Buffer Stop / Bumper (Displayed for non-loop normal railway lines)
+    // 6h. Standard Buffer Stop / Bumper (Displayed for non-loop normal railway lines)
     const bufferStopGroup = new THREE.Group();
-    bufferStopGroup.position.set(16.8, 0, -42.5);
-    bufferStopGroup.rotation.y = -0.38;
+    const bumperPos = turnoutSpline.getPoint(1.0);
+    const bumperTangent = turnoutSpline.getTangent(1.0);
+    const bumperAngle = Math.atan2(-bumperTangent.x, -bumperTangent.z);
+    bufferStopGroup.position.set(bumperPos.x, 0, bumperPos.z);
+    bufferStopGroup.rotation.y = bumperAngle;
     tracksGroup.add(bufferStopGroup);
     bufferStopRef.current = bufferStopGroup;
 
@@ -652,66 +822,203 @@ export default function TrolleyProblem3DLab() {
     strutR.rotation.x = -0.35;
     bufferStopGroup.add(strutL, strutR);
 
-    // 7. Mechanical Switch Turnout Mechanism & Signal Lantern
+    // 7. Mechanical Ground-Throw Switch Stand, Weighted Lever & Rotating Signal Mast
     const junctionGroup = new THREE.Group();
     junctionGroup.position.set(0, 0, 0);
     scene.add(junctionGroup);
 
-    // Moving Switch Point Blade (swings to connect straight or spur)
-    const bladeGeo = new THREE.BoxGeometry(0.12, 0.28, 7.8);
-    const bladeMesh = new THREE.Mesh(bladeGeo, railHeadMat);
-    bladeMesh.position.set(0.65, 0.65, -3.8);
-    bladeMesh.castShadow = true;
-    junctionGroup.add(bladeMesh);
-    switchBladeRef.current = bladeMesh;
+    // Cast-iron Switch Stand Base (Firmly mounted onto the extended headblock ties at X: -2.8, Z: -1.72)
+    const standMat = new THREE.MeshStandardMaterial({ color: '#1A1E29', metalness: 0.88, roughness: 0.32 });
+    const standBaseGeo = new THREE.BoxGeometry(1.2, 0.14, 1.4);
+    const standBase = new THREE.Mesh(standBaseGeo, standMat);
+    standBase.position.set(-2.8, 0.54, -1.72);
+    standBase.castShadow = true;
+    standBase.receiveShadow = true;
+    junctionGroup.add(standBase);
 
-    // Switch Tie Bar connecting the movable points
-    const tieBarGeo = new THREE.BoxGeometry(1.6, 0.08, 0.14);
-    const tieBar = new THREE.Mesh(tieBarGeo, tiePlateMat);
-    tieBar.position.set(0, 0.58, -1.2);
-    junctionGroup.add(tieBar);
+    // 4 Corner Hex Bolt Fasteners
+    const hexBoltGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.08, 6);
+    const hexBoltMat = new THREE.MeshStandardMaterial({ color: '#64748B', metalness: 0.9, roughness: 0.2 });
+    [[-0.45, -0.55], [-0.45, 0.55], [0.45, -0.55], [0.45, 0.55]].forEach(([bx, bz]) => {
+      const bolt = new THREE.Mesh(hexBoltGeo, hexBoltMat);
+      bolt.position.set(-2.8 + bx, 0.63, -1.72 + bz);
+      junctionGroup.add(bolt);
+    });
 
-    // Switch Stand & Lever
-    const leverStandGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.85, 10);
-    const leverStandMat = new THREE.MeshStandardMaterial({ color: '#2B3042', metalness: 0.85, roughness: 0.35 });
-    const leverStand = new THREE.Mesh(leverStandGeo, leverStandMat);
-    leverStand.position.set(-2.8, 0.45, 0);
-    leverStand.castShadow = true;
-    junctionGroup.add(leverStand);
+    // Cast Gearbox Housing Pedestal
+    const pedestalGeo = new THREE.BoxGeometry(0.55, 0.38, 0.65);
+    const pedestal = new THREE.Mesh(pedestalGeo, standMat);
+    pedestal.position.set(-2.8, 0.74, -1.72);
+    pedestal.castShadow = true;
+    junctionGroup.add(pedestal);
 
-    // Lever Rod with Polished Brass Handle
-    const leverRodGeo = new THREE.CylinderGeometry(0.06, 0.06, 2.4, 8);
-    const leverRodMat = new THREE.MeshStandardMaterial({ color: '#C59332', metalness: 0.95, roughness: 0.15 });
-    const leverRod = new THREE.Mesh(leverRodGeo, leverRodMat);
-    leverRod.position.set(0, 0.95, 0);
-    leverRod.rotation.z = -0.38; // Default straight position
-    leverStand.add(leverRod);
-    leverRodRef.current = leverRod;
+    // Quadrant Notched Guide Arc (Sector plate guide where lever locks into detents)
+    const quadrantGeo = new THREE.TorusGeometry(0.52, 0.035, 8, 20, Math.PI * 0.75);
+    const quadrantMat = new THREE.MeshStandardMaterial({ color: '#334155', metalness: 0.92, roughness: 0.25 });
+    const quadrantMesh = new THREE.Mesh(quadrantGeo, quadrantMat);
+    quadrantMesh.rotation.y = Math.PI / 2;
+    quadrantMesh.rotation.z = -Math.PI * 0.375;
+    quadrantMesh.position.set(-2.8, 0.82, -1.72);
+    junctionGroup.add(quadrantMesh);
 
-    const leverHandleGeo = new THREE.SphereGeometry(0.22, 14, 14);
-    const leverHandleMat = new THREE.MeshStandardMaterial({ color: '#F59E0B', roughness: 0.25, metalness: 0.8 });
-    const leverHandle = new THREE.Mesh(leverHandleGeo, leverHandleMat);
-    leverHandle.position.set(0, 1.2, 0);
-    leverRod.add(leverHandle);
+    // Ground-Throw Weighted Switch Lever Assembly (Pivots across quadrant arc)
+    const leverPivotGroup = new THREE.Group();
+    leverPivotGroup.position.set(-2.8, 0.82, -1.72);
+    leverPivotGroup.rotation.z = -0.72; // Default straight position
+    junctionGroup.add(leverPivotGroup);
+    leverRodRef.current = leverPivotGroup;
 
-    // Signal Lantern (Green = Diverted, Red = Straight/Danger)
-    const lanternGeo = new THREE.BoxGeometry(0.55, 0.75, 0.55);
-    const lanternMat = new THREE.MeshStandardMaterial({ color: '#161922', metalness: 0.85 });
-    const lantern = new THREE.Mesh(lanternGeo, lanternMat);
-    lantern.position.set(-2.8, 2.1, 0);
-    lantern.castShadow = true;
-    junctionGroup.add(lantern);
+    // Lever Shaft
+    const leverArmGeo = new THREE.CylinderGeometry(0.04, 0.045, 1.75, 8);
+    const leverArmMat = new THREE.MeshStandardMaterial({ color: '#2B3042', metalness: 0.92, roughness: 0.25 });
+    const leverArm = new THREE.Mesh(leverArmGeo, leverArmMat);
+    leverArm.position.set(0, 0.78, 0);
+    leverArm.castShadow = true;
+    leverPivotGroup.add(leverArm);
 
-    const signalLightGeo = new THREE.SphereGeometry(0.2, 14, 14);
-    const signalLightMat = new THREE.MeshStandardMaterial({
+    // Heavy Cast Iron Counterweight Teardrop / Ball (Provides tactile authentic heft)
+    const counterweightGeo = new THREE.SphereGeometry(0.18, 14, 14);
+    const counterweightMat = new THREE.MeshStandardMaterial({ color: '#161922', metalness: 0.9, roughness: 0.3 });
+    const counterweight = new THREE.Mesh(counterweightGeo, counterweightMat);
+    counterweight.position.set(0, 1.15, 0);
+    counterweight.castShadow = true;
+    leverPivotGroup.add(counterweight);
+
+    // Safety Amber Fluted Grip Handle with Polished Brass Collar
+    const handleGeo = new THREE.CylinderGeometry(0.055, 0.048, 0.45, 12);
+    const handleMat = new THREE.MeshStandardMaterial({ color: '#F59E0B', roughness: 0.28, metalness: 0.65 });
+    const handle = new THREE.Mesh(handleGeo, handleMat);
+    handle.position.set(0, 1.62, 0);
+    leverPivotGroup.add(handle);
+
+    const handleCollarGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.06, 12);
+    const handleCollarMat = new THREE.MeshStandardMaterial({ color: '#EAB308', metalness: 0.95, roughness: 0.15 });
+    const collar = new THREE.Mesh(handleCollarGeo, handleCollarMat);
+    collar.position.set(0, 1.4, 0);
+    leverPivotGroup.add(collar);
+
+    // Mechanical Horizontal Throw Rod (Bridle Linkage running across ballast from stand to switch points)
+    const throwRodGroup = new THREE.Group();
+    throwRodGroup.position.set(0, 0.52, -1.4);
+    junctionGroup.add(throwRodGroup);
+    throwRodRef.current = throwRodGroup;
+
+    const rodGeo = new THREE.CylinderGeometry(0.035, 0.035, 2.7, 8);
+    const rodMat = new THREE.MeshStandardMaterial({ color: '#475569', metalness: 0.92, roughness: 0.3 });
+    const throwRodMesh = new THREE.Mesh(rodGeo, rodMat);
+    throwRodMesh.rotation.z = Math.PI / 2;
+    throwRodMesh.position.set(-1.45, 0, 0);
+    throwRodMesh.castShadow = true;
+    throwRodGroup.add(throwRodMesh);
+
+    // Switch Tie-Bar connecting the movable point blades
+    const tieBarMesh = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.06, 0.12), tiePlateMat);
+    tieBarMesh.position.set(0, 0.04, 0);
+    tieBarMesh.castShadow = true;
+    throwRodGroup.add(tieBarMesh);
+    tieBarRef.current = tieBarMesh;
+
+    // Movable Tapered Switch Point Blades (Sliding on steel slide plates)
+    const pointBladeGeo = new THREE.BoxGeometry(0.09, 0.24, 6.4);
+    const switchBladeL = new THREE.Mesh(pointBladeGeo, railHeadMat);
+    switchBladeL.position.set(-0.98, 0.65, -4.6);
+    switchBladeL.castShadow = true;
+    junctionGroup.add(switchBladeL);
+    switchPointLRef.current = switchBladeL;
+    switchBladeRef.current = switchBladeL;
+
+    const switchBladeR = new THREE.Mesh(pointBladeGeo, railHeadMat);
+    switchBladeR.position.set(0.98, 0.65, -4.6);
+    switchBladeR.castShadow = true;
+    junctionGroup.add(switchBladeR);
+    switchPointRRef.current = switchBladeR;
+
+    // Rotating Vertical Signal Mast & 4-Lens Railroad Switch Lantern
+    const switchMastGroup = new THREE.Group();
+    switchMastGroup.position.set(-2.8, 0.85, -1.72);
+    junctionGroup.add(switchMastGroup);
+    switchMastRef.current = switchMastGroup;
+
+    // Vertical Spindle Mast
+    const mastShaftGeo = new THREE.CylinderGeometry(0.038, 0.038, 1.85, 10);
+    const mastShaftMat = new THREE.MeshStandardMaterial({ color: '#1E232E', metalness: 0.9, roughness: 0.3 });
+    const mastShaft = new THREE.Mesh(mastShaftGeo, mastShaftMat);
+    mastShaft.position.set(0, 0.92, 0);
+    mastShaft.castShadow = true;
+    switchMastGroup.add(mastShaft);
+
+    // Railroad Day-Target Banners
+    // 1. Red Circular Stop/Straight Disc facing approaching trains (Z direction)
+    const dayTargetDiscGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.025, 18);
+    const dayTargetDiscMat = new THREE.MeshStandardMaterial({ color: '#DC2626', roughness: 0.35, metalness: 0.1 });
+    const dayTargetDisc = new THREE.Mesh(dayTargetDiscGeo, dayTargetDiscMat);
+    dayTargetDisc.rotation.x = Math.PI / 2;
+    dayTargetDisc.position.set(0, 1.45, 0);
+    dayTargetDisc.castShadow = true;
+    switchMastGroup.add(dayTargetDisc);
+
+    // 2. Green Turnout Arrow/Chevron Banner facing at 90 degrees (X direction)
+    const arrowTargetGeo = new THREE.BoxGeometry(0.55, 0.28, 0.025);
+    const arrowTargetMat = new THREE.MeshStandardMaterial({ color: '#10B981', roughness: 0.35, metalness: 0.1 });
+    const arrowTarget = new THREE.Mesh(arrowTargetGeo, arrowTargetMat);
+    arrowTarget.rotation.y = Math.PI / 2;
+    arrowTarget.position.set(0, 1.45, 0);
+    arrowTarget.castShadow = true;
+    switchMastGroup.add(arrowTarget);
+
+    // Authentic 4-Lens Cast Railroad Switch Lantern Housing
+    const lanternBodyGeo = new THREE.BoxGeometry(0.44, 0.50, 0.44);
+    const lanternBodyMat = new THREE.MeshStandardMaterial({ color: '#0F1219', metalness: 0.88, roughness: 0.35 });
+    const lanternBody = new THREE.Mesh(lanternBodyGeo, lanternBodyMat);
+    lanternBody.position.set(0, 2.05, 0);
+    lanternBody.castShadow = true;
+    switchMastGroup.add(lanternBody);
+
+    // Lantern Conical Ventilation Chimney Cap
+    const cowlGeo = new THREE.ConeGeometry(0.24, 0.22, 10);
+    const cowl = new THREE.Mesh(cowlGeo, lanternBodyMat);
+    cowl.position.set(0, 2.38, 0);
+    switchMastGroup.add(cowl);
+
+    // 4 Optical Glass Bullseye Lenses:
+    const redLensMat = new THREE.MeshStandardMaterial({
       color: '#EF4444',
       emissive: '#EF4444',
-      emissiveIntensity: 3.0,
+      emissiveIntensity: 3.5,
+      roughness: 0.2,
     });
-    const signalLight = new THREE.Mesh(signalLightGeo, signalLightMat);
-    signalLight.position.set(0, 0, 0.28);
-    lantern.add(signalLight);
-    signalLampRef.current = signalLight;
+    const greenLensMat = new THREE.MeshStandardMaterial({
+      color: '#10B981',
+      emissive: '#10B981',
+      emissiveIntensity: 3.5,
+      roughness: 0.2,
+    });
+
+    const lensGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.04, 14);
+
+    // Front/Back Red Lenses
+    const lensRedFront = new THREE.Mesh(lensGeo, redLensMat);
+    lensRedFront.rotation.x = Math.PI / 2;
+    lensRedFront.position.set(0, 2.05, 0.23);
+    const lensRedBack = new THREE.Mesh(lensGeo, redLensMat);
+    lensRedBack.rotation.x = Math.PI / 2;
+    lensRedBack.position.set(0, 2.05, -0.23);
+    switchMastGroup.add(lensRedFront, lensRedBack);
+
+    // Left/Right Green Lenses (90 degrees)
+    const lensGreenL = new THREE.Mesh(lensGeo, greenLensMat);
+    lensGreenL.rotation.z = Math.PI / 2;
+    lensGreenL.position.set(0.23, 2.05, 0);
+    const lensGreenR = new THREE.Mesh(lensGeo, greenLensMat);
+    lensGreenR.rotation.z = Math.PI / 2;
+    lensGreenR.position.set(-0.23, 2.05, 0);
+    switchMastGroup.add(lensGreenL, lensGreenR);
+
+    // Internal Lamp PointLight projecting warm optical illumination
+    const lanternGlow = new THREE.PointLight('#EF4444', 3.5, 10, 1.5);
+    lanternGlow.position.set(0, 2.05, 0.25);
+    switchMastGroup.add(lanternGlow);
+    signalLampRef.current = lanternGlow;
 
     // 8. Overhead Footbridge (Thomson 1976 Dilemma)
     const footbridgeGroup = new THREE.Group();
@@ -839,8 +1146,9 @@ export default function TrolleyProblem3DLab() {
       );
     }
 
-    // Populate 1 Solitary Worker on Diverging Spur Track (around X: 11.2, Z: -26.5)
-    createFigurine(11.2, -26.5, 'SpurWorker', '#3B82F6', 'spur', 0);
+    // Populate 1 Solitary Worker on Diverging Spur Track (Centered on the smooth turnout curve)
+    const spurWorkerPt = turnoutSpline.getPoint(0.64);
+    createFigurine(spurWorkerPt.x, spurWorkerPt.z, 'SpurWorker', '#3B82F6', 'spur', 0);
 
     // 10. Load 3D Locomotive Train Engine (GLTF with Procedural Fallback)
     const trolleyGroup = new THREE.Group();
@@ -1109,18 +1417,13 @@ export default function TrolleyProblem3DLab() {
       lastTime = now;
       const state = animStateRef.current;
 
-      // Animate Switch Blade & Lever Rod based on isSwitchPulled
-      if (switchBladeRef.current) {
-        const targetBladeRot = state.isSwitchPulled ? -0.22 : 0;
-        switchBladeRef.current.rotation.y = THREE.MathUtils.lerp(
-          switchBladeRef.current.rotation.y,
-          targetBladeRot,
-          delta * 8
-        );
-      }
+      // Animate Switch Mechanism: Lever, Spindle Mast, Throw Rod Linkage & Point Blades
+      const isDiverted = state.isSwitchPulled;
+      const targetLeverAngle = isDiverted ? 0.72 : -0.72;
+      const targetMastAngle = isDiverted ? Math.PI / 2 : 0;
+      const targetSlide = isDiverted ? 0.28 : 0;
 
       if (leverRodRef.current) {
-        const targetLeverAngle = state.isSwitchPulled ? 0.38 : -0.38;
         leverRodRef.current.rotation.z = THREE.MathUtils.lerp(
           leverRodRef.current.rotation.z,
           targetLeverAngle,
@@ -1128,10 +1431,41 @@ export default function TrolleyProblem3DLab() {
         );
       }
 
+      if (switchMastRef.current) {
+        switchMastRef.current.rotation.y = THREE.MathUtils.lerp(
+          switchMastRef.current.rotation.y,
+          targetMastAngle,
+          delta * 8
+        );
+      }
+
+      if (throwRodRef.current) {
+        throwRodRef.current.position.x = THREE.MathUtils.lerp(
+          throwRodRef.current.position.x,
+          targetSlide,
+          delta * 8
+        );
+      }
+
+      if (switchPointLRef.current) {
+        switchPointLRef.current.position.x = THREE.MathUtils.lerp(
+          switchPointLRef.current.position.x,
+          -0.98 + targetSlide,
+          delta * 8
+        );
+      }
+
+      if (switchPointRRef.current) {
+        switchPointRRef.current.position.x = THREE.MathUtils.lerp(
+          switchPointRRef.current.position.x,
+          0.98 + targetSlide,
+          delta * 8
+        );
+      }
+
       if (signalLampRef.current) {
-        const targetColor = state.isSwitchPulled ? '#10B981' : '#EF4444';
-        signalLampRef.current.material.color.set(targetColor);
-        signalLampRef.current.material.emissive.set(targetColor);
+        const targetColor = isDiverted ? '#10B981' : '#EF4444';
+        signalLampRef.current.color.set(targetColor);
       }
 
       // Footbridge Visibility based on scenario
@@ -1201,16 +1535,19 @@ export default function TrolleyProblem3DLab() {
           if (state.isSwitchPulled) {
             if (posZ > 0) {
               posX = 0;
-            } else if (posZ > -32) {
-              const u = Math.abs(posZ) / 32;
-              posX = u * 13.5;
-              rotY = -0.38;
-            } else {
-              // Collides with heavy loop worker and stops
-              posX = 13.5;
-              posZ = -32;
-              state.simState = 'RESOLVED';
-              setSimState('RESOLVED');
+              rotY = 0;
+            } else if (turnoutSplineRef.current) {
+              const u = Math.min(Math.abs(posZ) / 44, 0.65);
+              const curvePt = turnoutSplineRef.current.getPoint(u);
+              const curveTan = turnoutSplineRef.current.getTangent(u);
+              posX = curvePt.x;
+              posZ = curvePt.z;
+              rotY = Math.atan2(-curveTan.x, -curveTan.z);
+
+              if (u >= 0.64) {
+                state.simState = 'RESOLVED';
+                setSimState('RESOLVED');
+              }
             }
           }
         } else {
@@ -1219,11 +1556,14 @@ export default function TrolleyProblem3DLab() {
             if (posZ > 0) {
               posX = 0;
               rotY = 0;
-            } else {
-              // Diverge onto spur track
-              const spurDist = -posZ;
-              posX = spurDist * 0.42;
-              rotY = -0.38;
+            } else if (turnoutSplineRef.current) {
+              // Smoothly follow the engineered turnout easement curve
+              const u = Math.min(Math.abs(posZ) / 44, 1.0);
+              const curvePt = turnoutSplineRef.current.getPoint(u);
+              const curveTan = turnoutSplineRef.current.getTangent(u);
+              posX = curvePt.x;
+              posZ = curvePt.z;
+              rotY = Math.atan2(-curveTan.x, -curveTan.z);
             }
           } else {
             // Straight main line
@@ -1388,18 +1728,18 @@ export default function TrolleyProblem3DLab() {
           cameraRef.current.position.lerp(chaseTarget, delta * 6);
           cameraRef.current.lookAt(tPos.x, tPos.y + 1.8, tPos.z - 18);
         } else if (state.cameraView === 'lever') {
-          const leverCamPos = new THREE.Vector3(-7.5, 4.8, 5);
+          const leverCamPos = new THREE.Vector3(-5.6, 3.4, 1.4);
           cameraRef.current.position.lerp(leverCamPos, delta * 6);
-          cameraRef.current.lookAt(2, 1.2, -10);
+          cameraRef.current.lookAt(-2.2, 1.2, -1.72);
         } else {
-          // Standard Overview with smooth orbit
+          // Standard Overview with smooth orbit centered on the central dilemma
           const { theta, phi, radius } = state.cameraAngle;
-          const targetX = radius * Math.sin(phi) * Math.sin(theta);
-          const targetY = radius * Math.cos(phi);
-          const targetZ = radius * Math.sin(phi) * Math.cos(theta);
+          const targetX = 3.5 + radius * Math.sin(phi) * Math.sin(theta);
+          const targetY = 1.0 + radius * Math.cos(phi);
+          const targetZ = -22.0 + radius * Math.sin(phi) * Math.cos(theta);
 
           cameraRef.current.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), delta * 5);
-          cameraRef.current.lookAt(2, 1.2, -10);
+          cameraRef.current.lookAt(3.5, 1.0, -22.0);
         }
 
         // Apply screen shake on collision
