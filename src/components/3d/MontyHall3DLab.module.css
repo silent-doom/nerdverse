@@ -59,77 +59,61 @@
 .domainSection {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.65rem;
 }
 
 .domainLabel {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-text-tertiary, #6B7280);
+  color: var(--color-text-tertiary, #9CA3AF);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-family: var(--font-mono, monospace);
 }
 
 .domainTabs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .domainTab {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
-  padding: 0.85rem 1rem;
-  border-radius: var(--radius-md, 8px);
-  background: rgba(19, 21, 28, 0.65);
-  border: 1px solid var(--color-border-subtle, #21232C);
-  color: var(--color-text-secondary, #9CA3AF);
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: 9999px;
+  background: rgba(22, 27, 38, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #D1D5DB;
+  font-size: 0.8125rem;
+  font-weight: 600;
   cursor: pointer;
-  text-align: left;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .domainTab:hover {
-  background: rgba(27, 30, 42, 0.85);
-  border-color: rgba(245, 158, 11, 0.35);
-  color: #F3F4F6;
-  transform: translateY(-1px);
+  background: rgba(35, 43, 62, 0.85);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #FFFFFF;
 }
 
 .domainTabActive {
-  background: rgba(245, 158, 11, 0.12) !important;
-  border-color: var(--color-accent-amber, #F59E0B) !important;
-  color: #F9FAFB !important;
-  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12);
+  background: rgba(245, 158, 11, 0.16) !important;
+  border-color: #F59E0B !important;
+  color: #FCD34D !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
 }
 
-.domainTabTitle {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #FFFFFF;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.domainTabCategory {
-  font-size: 0.6875rem;
-  font-family: var(--font-mono, monospace);
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #D1D5DB;
-}
-
-.domainTabDesc {
-  font-size: 0.75rem;
+.domainContextDesc {
+  font-size: 0.8125rem;
   color: #9CA3AF;
-  line-height: 1.35;
+  line-height: 1.45;
+  padding: 0.5rem 0.85rem;
+  background: rgba(14, 18, 26, 0.6);
+  border-radius: 8px;
+  border-left: 3px solid #F59E0B;
 }
 
 /* Experiment Mode Sub-Navigation */
@@ -183,7 +167,7 @@
 .canvasWrapper {
   position: relative;
   width: 100%;
-  height: 480px;
+  height: 380px;
   background: radial-gradient(ellipse at 50% 30%, #151924 0%, #080A0E 100%);
   cursor: grab;
 }

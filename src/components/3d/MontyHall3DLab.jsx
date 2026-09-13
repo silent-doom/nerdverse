@@ -753,7 +753,7 @@ export default function MontyHall3DLab() {
 
       {/* Practical Domain Selector */}
       <div className={styles.domainSection}>
-        <div className={styles.domainLabel}>Select Decision Scenario (Practical Context)</div>
+        <div className={styles.domainLabel}>Select Scenario (Practical Context)</div>
         <div className={styles.domainTabs}>
           {Object.values(DOMAINS).map((d) => (
             <button
@@ -765,14 +765,13 @@ export default function MontyHall3DLab() {
                 resetRound();
               }}
             >
-              <div className={styles.domainTabTitle}>
-                <span>{d.prizeIcon}</span>
-                <span>{d.title}</span>
-              </div>
-              <span className={styles.domainTabCategory}>{d.category}</span>
-              <p className={styles.domainTabDesc}>{d.description}</p>
+              <span>{d.prizeIcon}</span>
+              <span>{d.title}</span>
             </button>
           ))}
+        </div>
+        <div className={styles.domainContextDesc}>
+          <strong>{domain.title}</strong>: {domain.description} Target: <span style={{ color: '#10B981', fontWeight: 700 }}>{domain.prizeName}</span>. Elimination: <span style={{ color: '#EF4444' }}>{domain.dudName}</span>.
         </div>
       </div>
 
@@ -872,19 +871,19 @@ export default function MontyHall3DLab() {
                 <div className={styles.statusTextMain}>
                   {gameState === 'choose' && (
                     <>
-                      <span>Step 1: Make Initial Selection</span>
-                      <span className={styles.taglineBadge}>Prior = 33.3%</span>
+                      <span>Step 1: Pick a Door</span>
+                      <span className={styles.taglineBadge}>Initial Odds: 33.3%</span>
                     </>
                   )}
                   {gameState === 'switch_or_stay' && (
                     <>
-                      <span>Step 2: {domain.hostTitle} Reveals a Dud!</span>
-                      <span className={styles.taglineBadge}>Host Action: Asymmetric Filter</span>
+                      <span>Step 2: {domain.hostTitle} Eliminates a Dud!</span>
+                      <span className={styles.taglineBadge}>Asymmetric Filter</span>
                     </>
                   )}
                   {gameState === 'finished' && (
                     <>
-                      <span>Outcome: {gameResult === 'win' ? '🎉 Target Captured!' : '❌ Selected Dud.'}</span>
+                      <span>{gameResult === 'win' ? `🎉 Captured ${domain.prizeName}!` : `❌ Revealed ${domain.dudName}`}</span>
                       <span className={styles.taglineBadge}>
                         {didSwitch ? 'Switched (66.7% Strategy)' : 'Stayed (33.3% Strategy)'}
                       </span>
@@ -893,11 +892,11 @@ export default function MontyHall3DLab() {
                 </div>
                 <div className={styles.statusTextSub}>
                   {gameState === 'choose' &&
-                    `You stand before 3 doors. Exactly one conceals the ${domain.prizeName}. Pick your initial bet.`}
+                    `Exactly one door conceals the ${domain.prizeName}. Click any door in 3D or below to place your bet.`}
                   {gameState === 'switch_or_stay' &&
-                    `The ${domain.hostTitle} ${domain.hostAction} behind Door ${hostRevealed + 1}. Because the host knew where the dud was, the remaining unchosen door now carries 66.7% probability mass. Do you switch?`}
+                    `The host opened Door 0${hostRevealed + 1} revealing ${domain.dudIcon} ${domain.dudName}. Because the host intentionally avoids the prize, the remaining unchosen door now holds 66.7% probability!`}
                   {gameState === 'finished' &&
-                    `${gameResult === 'win' ? 'Success!' : 'Loss.'} ${domain.utilitarianBenefit} In repeating this decision over thousands of iterations, switching systematically maximizes net expected utility.`}
+                    `${gameResult === 'win' ? 'Success!' : 'Loss.'} ${domain.utilitarianBenefit}`}
                 </div>
               </div>
 

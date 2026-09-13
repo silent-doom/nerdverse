@@ -34,10 +34,10 @@ describe('MontyHall3DLab', () => {
     render(<MontyHall3DLab />);
 
     expect(screen.getByText(/The Monty Hall Problem & Practical Information Asymmetry/i)).toBeInTheDocument();
-    expect(screen.getByText('Classic TV Stage (1975)')).toBeInTheDocument();
-    expect(screen.getByText('Venture Capital Allocation')).toBeInTheDocument();
-    expect(screen.getByText('Clinical Diagnostic Triage')).toBeInTheDocument();
-    expect(screen.getByText('Distributed Fault Isolation')).toBeInTheDocument();
+    expect(screen.getAllByText(/Classic TV Stage \(1975\)/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Venture Capital Allocation/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Clinical Diagnostic Triage/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Distributed Fault Isolation/i).length).toBeGreaterThan(0);
   });
 
   it('allows switching domains and updates contextual assets', () => {
