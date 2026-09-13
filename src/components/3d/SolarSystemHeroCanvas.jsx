@@ -16,8 +16,11 @@ const PLANET_DATA = [
     orbitRadius: 5.2,
     radius: 0.38,
     speed: 1.6,
+    spinSpeed: 0.002, // 58.6-day slow rotation
     color: 0xa8a29e,
     tilt: 0.03,
+    moonsList: 'None (0)',
+    moons: [],
     desc: 'Smallest terrestrial planet; experiences dramatic 600°C swings between blisteringly hot day and frozen night.',
   },
   {
@@ -30,8 +33,11 @@ const PLANET_DATA = [
     orbitRadius: 7.6,
     radius: 0.62,
     speed: 1.18,
+    spinSpeed: -0.001, // 243-day slow retrograde rotation
     color: 0xfde047,
     tilt: 3.1, // retrograde
+    moonsList: 'None (0)',
+    moons: [],
     desc: 'Runaway greenhouse atmosphere shrouded in opaque sulfuric acid clouds, with surface temperatures hot enough to melt lead.',
   },
   {
@@ -44,9 +50,13 @@ const PLANET_DATA = [
     orbitRadius: 10.4,
     radius: 0.70,
     speed: 1.0,
+    spinSpeed: 0.018, // 24-hour rotation
     color: 0x3b82f6,
     tilt: 0.41,
-    hasMoon: true,
+    moonsList: 'Moon / Luna (1)',
+    moons: [
+      { name: 'Luna', radius: 0.20, dist: 1.4, speed: 0.045, color: 0xd1d5db },
+    ],
     desc: 'The Pale Blue Dot; supports liquid water oceans, an active dynamic magnetosphere, and a thriving biosphere.',
   },
   {
@@ -59,8 +69,14 @@ const PLANET_DATA = [
     orbitRadius: 13.5,
     radius: 0.48,
     speed: 0.8,
+    spinSpeed: 0.017, // 24.6-hour rotation
     color: 0xef4444,
     tilt: 0.44,
+    moonsList: 'Phobos & Deimos (2)',
+    moons: [
+      { name: 'Phobos', radius: 0.09, dist: 0.9, speed: 0.075, color: 0x9ca3af },
+      { name: 'Deimos', radius: 0.07, dist: 1.35, speed: 0.045, color: 0x6b7280 },
+    ],
     desc: 'The Red Planet; home to Olympus Mons, massive volcanic shields, and frozen polar carbon dioxide/water ice caps.',
   },
   {
@@ -73,9 +89,16 @@ const PLANET_DATA = [
     orbitRadius: 22.0,
     radius: 1.55,
     speed: 0.44,
+    spinSpeed: 0.042, // Rapid 9.9-hour rotation (fastest in solar system)
     color: 0xf59e0b,
     tilt: 0.05,
     isJovian: true,
+    moonsList: 'Io, Europa, Ganymede (95 total)',
+    moons: [
+      { name: 'Io', radius: 0.18, dist: 2.4, speed: 0.060, color: 0xfbbf24 },
+      { name: 'Europa', radius: 0.16, dist: 3.2, speed: 0.044, color: 0xe0f2fe },
+      { name: 'Ganymede', radius: 0.24, dist: 4.1, speed: 0.032, color: 0x94a3b8 },
+    ],
     desc: 'Largest planet in the solar system; features dynamic alternating zonal cloud belts and the centuries-old Great Red Spot storm.',
   },
   {
@@ -88,9 +111,15 @@ const PLANET_DATA = [
     orbitRadius: 28.5,
     radius: 1.30,
     speed: 0.32,
+    spinSpeed: 0.038, // 10.7-hour fast rotation
     color: 0xfef08a,
     tilt: 0.47,
     hasRings: true,
+    moonsList: 'Titan & Enceladus (146 total)',
+    moons: [
+      { name: 'Enceladus', radius: 0.12, dist: 3.1, speed: 0.055, color: 0xf8fafc },
+      { name: 'Titan', radius: 0.24, dist: 4.4, speed: 0.034, color: 0xf59e0b },
+    ],
     desc: 'Spectacular planetary ring system spanning 282,000 km, composed of billions of water-ice particles and silicates.',
   },
   {
@@ -103,8 +132,14 @@ const PLANET_DATA = [
     orbitRadius: 34.5,
     radius: 0.95,
     speed: 0.22,
+    spinSpeed: -0.022, // 17.2-hour retrograde rotation on 98° tilted side
     color: 0x67e8f9,
     tilt: 1.71, // 98 deg tilt
+    moonsList: 'Titania & Oberon (28 total)',
+    moons: [
+      { name: 'Titania', radius: 0.16, dist: 1.8, speed: 0.045, color: 0xcbd5e1 },
+      { name: 'Oberon', radius: 0.15, dist: 2.5, speed: 0.032, color: 0x94a3b8 },
+    ],
     desc: 'Ice giant tilted 98° on its side, rolling through space around the Sun like a colossal cosmic billiard ball.',
   },
   {
@@ -117,8 +152,14 @@ const PLANET_DATA = [
     orbitRadius: 40.5,
     radius: 0.90,
     speed: 0.17,
+    spinSpeed: 0.024, // 16.1-hour rotation
     color: 0x3b82f6,
     tilt: 0.49,
+    moonsList: 'Triton & Proteus (16 total)',
+    moons: [
+      { name: 'Proteus', radius: 0.11, dist: 1.6, speed: 0.052, color: 0x64748b },
+      { name: 'Triton', radius: 0.22, dist: 2.4, speed: -0.036, color: 0xfbcfe8 }, // retrograde orbit!
+    ],
     desc: 'Most distant major planet; deep ultramarine methane atmosphere whipped by supersonic winds exceeding 2,100 km/h.',
   },
 ];
@@ -478,8 +519,9 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
     const interactiveHitboxes = [];
 
     PLANET_DATA.forEach((data) => {
-      const planetPivot = new THREE.Group();
-      scene.add(planetPivot);
+      // Planet System Group that orbits the Sun at orbitRadius
+      const planetGroup = new THREE.Group();
+      scene.add(planetGroup);
 
       // Keplerian Orbit Ring Path
       const orbitCurve = new THREE.EllipseCurve(
@@ -503,7 +545,7 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
       scene.add(orbitLine);
       orbitLines.push(orbitLine);
 
-      // Planet Sphere Mesh with Emissive Celestial Tint
+      // Planet Sphere Mesh with Emissive Celestial Tint (Axial tilt aligned)
       const pGeo = new THREE.SphereGeometry(data.radius, 32, 32);
       const pTex = createPlanetTexture(data.name.toLowerCase());
       const pMat = new THREE.MeshStandardMaterial({
@@ -511,47 +553,15 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
         roughness: data.isJovian ? 0.4 : 0.75,
         metalness: 0.1,
         emissive: new THREE.Color(data.color),
-        emissiveIntensity: 0.22,
+        emissiveIntensity: 0.18,
       });
       const pMesh = new THREE.Mesh(pGeo, pMat);
       pMesh.rotation.z = data.tilt;
+      planetGroup.add(pMesh);
 
-      // Position along orbital plane
-      const initialAngle = Math.random() * Math.PI * 2;
-      pMesh.position.set(
-        Math.cos(initialAngle) * data.orbitRadius,
-        0,
-        Math.sin(initialAngle) * data.orbitRadius
-      );
-      planetPivot.add(pMesh);
-
-      // Subtle Luminous Orbital Beacon Ring so distant planets (Uranus, Neptune) pop clearly
-      const beaconGeo = new THREE.RingGeometry(data.radius * 1.3, data.radius * 1.55, 32);
-      beaconGeo.rotateX(Math.PI / 2);
-      const beaconMat = new THREE.MeshBasicMaterial({
-        color: data.color,
-        transparent: true,
-        opacity: 0.45,
-        side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
-      });
-      const beaconMesh = new THREE.Mesh(beaconGeo, beaconMat);
-      pMesh.add(beaconMesh);
-
-      // Special Case: Earth's Moon (Luna)
-      let moonMesh = null;
-      if (data.hasMoon) {
-        const moonGeo = new THREE.SphereGeometry(0.2, 16, 16);
-        const moonMat = new THREE.MeshStandardMaterial({ color: 0xD1D5DB, roughness: 0.8 });
-        moonMesh = new THREE.Mesh(moonGeo, moonMat);
-        moonMesh.position.set(1.4, 0, 0);
-        pMesh.add(moonMesh);
-      }
-
-      // Special Case: Saturn's Concentric Ring System
+      // Scientifically accurate: ONLY Saturn has a spectacular planetary ring system!
       if (data.hasRings) {
         const ringGeo = new THREE.RingGeometry(data.radius * 1.35, data.radius * 2.8, 64);
-        // Align ring with equator
         ringGeo.rotateX(Math.PI / 2);
         const ringTex = createSaturnRingTexture();
         const ringMat = new THREE.MeshStandardMaterial({
@@ -565,20 +575,72 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
         pMesh.add(ringMesh);
       }
 
-      // Invisible Raycasting Hitbox for effortless hover detection even on small worlds
-      const hitRadius = Math.max(data.radius * 2.5, 1.4);
+      // Moon System (Earth, Mars, Jupiter, Saturn, Uranus, Neptune)
+      const moonObjects = [];
+      if (data.moons && data.moons.length > 0) {
+        const moonSystemPivot = new THREE.Group();
+        // For Uranus, match moons to its severe 98° axial tilt
+        if (data.name === 'Uranus') {
+          moonSystemPivot.rotation.z = data.tilt;
+        }
+        planetGroup.add(moonSystemPivot);
+
+        data.moons.forEach((m) => {
+          // Subtle moon orbit trajectory ring
+          const mOrbitCurve = new THREE.EllipseCurve(0, 0, m.dist, m.dist, 0, 2 * Math.PI, false, 0);
+          const mPoints = mOrbitCurve.getPoints(48);
+          const mOrbitGeo = new THREE.BufferGeometry().setFromPoints(
+            mPoints.map((pt) => new THREE.Vector3(pt.x, 0, pt.y))
+          );
+          const mOrbitMat = new THREE.LineBasicMaterial({
+            color: 0xCBD5E1,
+            transparent: true,
+            opacity: 0.14,
+          });
+          const mOrbitLine = new THREE.Line(mOrbitGeo, mOrbitMat);
+          moonSystemPivot.add(mOrbitLine);
+
+          // Moon Sphere Mesh
+          const mGeo = new THREE.SphereGeometry(m.radius, 16, 16);
+          const mMat = new THREE.MeshStandardMaterial({
+            color: m.color,
+            roughness: 0.8,
+            metalness: 0.05,
+          });
+          const mMesh = new THREE.Mesh(mGeo, mMat);
+          const mInitAngle = Math.random() * Math.PI * 2;
+          mMesh.position.set(Math.cos(mInitAngle) * m.dist, 0, Math.sin(mInitAngle) * m.dist);
+          moonSystemPivot.add(mMesh);
+
+          moonObjects.push({
+            ...m,
+            angle: mInitAngle,
+            mesh: mMesh,
+          });
+        });
+      }
+
+      // Invisible Raycasting Hitbox for effortless hover detection
+      const hitRadius = Math.max(data.radius * 2.2, 1.4);
       const hitGeo = new THREE.SphereGeometry(hitRadius, 12, 12);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitMesh = new THREE.Mesh(hitGeo, hitMat);
-      hitMesh.userData = { planetData: data, planetMesh: pMesh, orbitLine: orbitLine };
-      pMesh.add(hitMesh);
+      hitMesh.userData = { planetData: data, planetMesh: pMesh, orbitLine: orbitLine, group: planetGroup };
+      planetGroup.add(hitMesh);
       interactiveHitboxes.push(hitMesh);
+
+      const initialAngle = Math.random() * Math.PI * 2;
+      planetGroup.position.set(
+        Math.cos(initialAngle) * data.orbitRadius,
+        0,
+        Math.sin(initialAngle) * data.orbitRadius
+      );
 
       planets.push({
         ...data,
-        pivot: planetPivot,
+        group: planetGroup,
         mesh: pMesh,
-        moon: moonMesh,
+        moons: moonObjects,
         angle: initialAngle,
         orbitLine,
       });
@@ -751,16 +813,22 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
 
       // Planets orbital & axial rotation
       planets.forEach((p) => {
+        // Orbit around the Sun
         p.angle += (p.speed * 0.008 * speed);
-        p.mesh.position.x = Math.cos(p.angle) * p.orbitRadius;
-        p.mesh.position.z = Math.sin(p.angle) * p.orbitRadius;
-        p.mesh.rotation.y += 0.015;
+        p.group.position.x = Math.cos(p.angle) * p.orbitRadius;
+        p.group.position.z = Math.sin(p.angle) * p.orbitRadius;
 
-        // Earth Moon orbit
-        if (p.moon) {
-          moonAngle += 0.04 * speed;
-          p.moon.position.x = Math.cos(moonAngle) * 1.5;
-          p.moon.position.z = Math.sin(moonAngle) * 1.5;
+        // Realistic axial day/night spin
+        const spinFactor = animStateRef.current.isPaused ? 0 : (speed === 0 ? 0 : Math.max(speed, 0.4));
+        p.mesh.rotation.y += (p.spinSpeed || 0.015) * spinFactor;
+
+        // Moons revolving around parent planet
+        if (p.moons && p.moons.length > 0) {
+          p.moons.forEach((m) => {
+            m.angle += m.speed * (animStateRef.current.isPaused ? 0 : speed);
+            m.mesh.position.x = Math.cos(m.angle) * m.dist;
+            m.mesh.position.z = Math.sin(m.angle) * m.dist;
+          });
         }
       });
 
@@ -901,6 +969,8 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
             <span className={styles.hudValue}>{hoveredPlanet.period}</span>
             <span className={styles.hudLabel}>Velocity:</span>
             <span className={styles.hudValue}>{hoveredPlanet.velocity}</span>
+            <span className={styles.hudLabel}>Moons:</span>
+            <span className={styles.hudValue}>{hoveredPlanet.moonsList}</span>
             <span className={styles.hudLabel}>Click:</span>
             <span className={styles.hudValue} style={{ color: '#E5A93C' }}>Focus Camera</span>
           </div>
@@ -931,6 +1001,10 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
               <span className={styles.focusLabel}>Orbital Period</span>
               <span className={styles.focusVal}>{focusedPlanet.period}</span>
             </div>
+            <div>
+              <span className={styles.focusLabel}>Known Moons</span>
+              <span className={styles.focusVal}>{focusedPlanet.moonsList}</span>
+            </div>
           </div>
           <button className={styles.focusCloseBtn} onClick={handleResetCamera}>
             ← Back to Solar System View
@@ -956,9 +1030,9 @@ export default function SolarSystemHeroCanvas({ onInteractionStateChange, isText
 
         <div className={styles.divider} />
 
-        {/* Speed Multipliers */}
+        {/* Speed Multipliers (Balanced observation pacing, removed 20x) */}
         <div className={styles.speedGroup}>
-          {[1, 5, 20].map((multiplier) => (
+          {[0.5, 1, 2, 5].map((multiplier) => (
             <button
               key={multiplier}
               className={`${styles.speedBtn} ${speedMultiplier === multiplier ? styles.speedBtnActive : ''}`}

@@ -46,9 +46,10 @@ describe('SolarSystemHeroCanvas', () => {
     render(<SolarSystemHeroCanvas />);
     expect(screen.getByText(/3D Orrery: Drag to rotate/i)).toBeInTheDocument();
     expect(screen.getByText('⏸ Pause')).toBeInTheDocument();
+    expect(screen.getByText('0.5×')).toBeInTheDocument();
     expect(screen.getByText('1×')).toBeInTheDocument();
+    expect(screen.getByText('2×')).toBeInTheDocument();
     expect(screen.getByText('5×')).toBeInTheDocument();
-    expect(screen.getByText('20×')).toBeInTheDocument();
     expect(screen.getByText('Orbits')).toBeInTheDocument();
     expect(screen.getByText('↺ Reset View')).toBeInTheDocument();
   });
