@@ -855,7 +855,7 @@ export default function TrolleyProblem3DLab() {
         const model = gltf.scene;
         model.scale.set(1.2, 1.2, 1.2);
         model.position.set(0, 0.05, 0);
-        model.rotation.y = Math.PI; // Face cowcatcher forward along negative Z!
+        model.rotation.y = 0; // In Blender model, +Y is forward, mapped to -Z in Three.js when rotation.y = 0! Face front down the track!
         model.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
