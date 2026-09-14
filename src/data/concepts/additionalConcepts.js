@@ -502,7 +502,7 @@ Recognizing that identity is an evolving, continuous pattern allows us to:
     difficulty: 'beginner',
     readTime: 5,
     summary: "When prophecy fails: why the human mind fiercely distorts reality to protect its ego from contradictory evidence. Discover Leon Festinger's infiltrations of a doomsday cult and the evolutionary roots of self-justification.",
-    interactiveType: null,
+    interactiveType: 'CognitiveDissonance',
     content: `## When Prophecy Fails: The Great Flood of 1954
 
 In late 1954, a social psychologist at the University of Minnesota named Leon Festinger infiltrated a doomsday cult called *The Seekers*. Led by a Chicago housewife named Dorothy Martin (known in literature as Marian Keech), the cult believed that extraterrestrials from the planet Clarion had transmitted a terrifying warning: on December 21, 1954, a cataclysmic flood would swallow the North American continent. Only true believers who cast off all metal zippers and waited on a hilltop at midnight would be rescued by a flying saucer.

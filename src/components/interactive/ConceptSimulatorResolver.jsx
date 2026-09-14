@@ -14,6 +14,7 @@ const MaxwellsDemon3DLab = dynamic(() => import('@/components/3d/MaxwellsDemon3D
 const FermiParadox3DLab = dynamic(() => import('@/components/3d/FermiParadox3DLab'), { ssr: false });
 const LaplacesDemon3DLab = dynamic(() => import('@/components/3d/LaplacesDemon3DLab'), { ssr: false });
 const ShipOfTheseus3DLab = dynamic(() => import('@/components/3d/ShipOfTheseus3DLab'), { ssr: false });
+const CognitiveDissonance3DLab = dynamic(() => import('@/components/3d/CognitiveDissonance3DLab'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type }) {
   switch (type) {
@@ -41,6 +42,8 @@ export default function ConceptSimulatorResolver({ type }) {
       return <LaplacesDemon3DLab />;
     case 'ShipOfTheseus':
       return <ShipOfTheseus3DLab />;
+    case 'CognitiveDissonance':
+      return <CognitiveDissonance3DLab />;
     default:
       return null;
   }

@@ -188,6 +188,21 @@ const SEED_TELEMETRY = {
       { id: 'seed-8', metrics: { choice: 'shipA', replacementPct: 90 }, value: 100 },
     ],
   },
+  'cognitive-dissonance': {
+    theoreticalTarget: 7.8, // Festinger 1959 $1 insufficient justification subjective rating
+    unit: 'Rating (-5 to +10)',
+    label: 'Subconscious Task Enjoyment Rating',
+    runs: [
+      { id: 'seed-1', metrics: { condition: '$1-bribe', dissonanceScore: 92, taskRating: 7.8 }, value: 7.8 },
+      { id: 'seed-2', metrics: { condition: '$20-bribe', dissonanceScore: 12, taskRating: -4.5 }, value: -4.5 },
+      { id: 'seed-3', metrics: { condition: '$1-bribe', dissonanceScore: 88, taskRating: 7.2 }, value: 7.2 },
+      { id: 'seed-4', metrics: { condition: 'control-$0', dissonanceScore: 0, taskRating: -5.0 }, value: -5.0 },
+      { id: 'seed-5', metrics: { condition: '$1-bribe', dissonanceScore: 95, taskRating: 8.4 }, value: 8.4 },
+      { id: 'seed-6', metrics: { condition: '$20-bribe', dissonanceScore: 15, taskRating: -4.2 }, value: -4.2 },
+      { id: 'seed-7', metrics: { condition: '$1-bribe', dissonanceScore: 90, taskRating: 7.6 }, value: 7.6 },
+      { id: 'seed-8', metrics: { condition: 'cult-prophecy', dissonanceScore: 98, taskRating: 9.5 }, value: 9.5 },
+    ],
+  },
 };
 
 // Generic fallback for any other concept

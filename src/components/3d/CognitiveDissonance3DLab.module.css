@@ -1,0 +1,560 @@
+.labContainer {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg-primary, #08090c);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text-primary, #f9fafb);
+  user-select: none;
+  margin-bottom: var(--space-8, 32px);
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(520px, 64vh, 680px);
+  cursor: grab;
+  background: radial-gradient(circle at 50% 30%, #0d1322 0%, #060810 100%);
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* ── Top Floating Header & Dual Telemetry Badges ── */
+.topHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitleBox {
+  background: rgba(14, 15, 20, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.labBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
+  margin-bottom: 2px;
+}
+
+.labTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-primary, #f9fafb);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.statsCluster {
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  background: rgba(14, 15, 20, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.statPillCrisis {
+  border-color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+}
+
+.statPillHarmonious {
+  border-color: #10b981;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+}
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #9ca3af);
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-brand-light, #e5a93c);
+  font-family: var(--font-mono, monospace);
+}
+
+.statValueCrisis {
+  color: #ef4444;
+}
+
+.statValueHarmonious {
+  color: #10b981;
+}
+
+/* ── Mode Switcher Tab Bar ── */
+.modeTabs {
+  position: absolute;
+  top: 86px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  background: rgba(14, 15, 20, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-default, #21232c);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.modeTab {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.modeTab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.modeTabActive {
+  background: var(--color-brand-light, #e5a93c);
+  color: #08090c;
+  font-weight: 700;
+}
+
+.modeTabActive:hover {
+  background: #f0b754;
+  color: #08090c;
+}
+
+/* ── Floating In-Canvas Labels ── */
+.inCanvasBadges {
+  position: absolute;
+  top: 140px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
+  gap: 8px;
+}
+
+.inCanvasBadge {
+  background: rgba(14, 17, 24, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badgeHighlightLeft {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.badgeHighlightCenter {
+  color: #e5a93c;
+  border-color: rgba(229, 169, 60, 0.35);
+}
+
+.badgeHighlightRight {
+  color: #ec4899;
+  border-color: rgba(236, 72, 153, 0.35);
+}
+
+/* ── Floating Telemetry Overlay ── */
+.statusFloatingOverlay {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 10;
+  background: rgba(14, 15, 20, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #9ca3af);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulse 1.8s infinite;
+}
+
+.pulseDotCrisis {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 12px #ef4444;
+  animation: pulseFast 0.8s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+@keyframes pulseFast {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.4; }
+}
+
+/* ── Control Console Panel ── */
+.controlPanel {
+  background: rgba(10, 11, 15, 0.98);
+  border-top: 1px solid var(--color-border-default, #21232c);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.controlRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.sliderCard {
+  background: rgba(18, 20, 28, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sliderLabel {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.sliderValue {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-brand-light, #e5a93c);
+}
+
+.rangeInput {
+  width: 100%;
+  accent-color: var(--color-brand-light, #e5a93c);
+  cursor: pointer;
+}
+
+.sliderDesc {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* ── Preset Bribe / Condition Buttons ── */
+.presetContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.presetLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.presetBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.presetBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.presetBtnActive {
+  background: rgba(229, 169, 60, 0.15);
+  border-color: var(--color-brand-light, #e5a93c);
+  color: var(--color-brand-light, #e5a93c);
+  font-weight: 700;
+}
+
+/* ── Mind Warping Explanation Box ── */
+.mindWarpBox {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mindFormula {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.03em;
+}
+
+.mindExplain {
+  font-size: 12px;
+  color: #cbd5e1;
+  flex: 1;
+  min-width: 220px;
+  line-height: 1.4;
+}
+
+/* ── 3-Card Pedagogical Grid ── */
+.pedagogyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  background: rgba(12, 14, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.pedagogyCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pedagogyStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-brand-light, #e5a93c);
+  letter-spacing: 0.04em;
+}
+
+.pedagogyTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.pedagogyText {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* ── Philosophical Insight Card ── */
+.insightCard {
+  background: rgba(14, 15, 22, 0.7);
+  border-left: 3px solid var(--color-brand-light, #e5a93c);
+  padding: 12px 18px;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d1d5db;
+}
+
+.insightCard strong {
+  color: var(--color-brand-light, #e5a93c);
+}
+
+/* ── Buttons & Action Bar ── */
+.actionBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.actionBtnGroup {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.primaryBtn {
+  background: var(--color-brand-light, #e5a93c);
+  color: #08090c;
+  border: none;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(229, 169, 60, 0.3);
+}
+
+.primaryBtn:hover {
+  background: #f0b754;
+  transform: translateY(-1px);
+}
+
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1d5db;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 9px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.actionFeedback {
+  font-size: 12px;
+  color: #10b981;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 440px;
+  }
+  .topHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .modeTabs {
+    position: static;
+    margin: 12px 16px 0;
+    overflow-x: auto;
+  }
+  .controlRow {
+    grid-template-columns: 1fr;
+  }
+  .actionBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actionBtnGroup {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .primaryBtn, .secondaryBtn {
+    flex: 1;
+    justify-content: center;
+  }
+}
