@@ -217,7 +217,7 @@ export default function StPetersburg3DLab() {
     pedestal.receiveShadow = true;
     coinHolder.add(pedestal);
 
-    const coinGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.24, 36);
+    const coinGeo = new THREE.CylinderGeometry(0.85, 0.85, 0.12, 36);
     const coinMat = new THREE.MeshStandardMaterial({
       color: 0xf59e0b,
       emissive: 0xd97706,
@@ -226,7 +226,7 @@ export default function StPetersburg3DLab() {
       roughness: 0.15,
     });
     const coinMesh = new THREE.Mesh(coinGeo, coinMat);
-    coinMesh.position.y = 0.6;
+    coinMesh.position.y = 0.53;
     coinMesh.castShadow = true;
     coinHolder.add(coinMesh);
 
@@ -297,15 +297,13 @@ export default function StPetersburg3DLab() {
 
         // Upward parabolic vault
         const jumpHeight = Math.sin(three.flipProgress * Math.PI) * 4.8;
-        coinToFlip.position.y = 0.6 + jumpHeight;
+        coinToFlip.position.y = 0.53 + jumpHeight;
+        coinToFlip.rotation.x += 0.45;
+        coinToFlip.rotation.z += 0.25;
 
-        // Rapid coin rotation
-        coinToFlip.rotation.x += 0.38;
-        coinToFlip.rotation.z += 0.14;
-
-        if (three.flipProgress >= 1.0) {
+        if (three.flipProgress >= 1) {
           three.isAnimatingFlip = false;
-          coinToFlip.position.y = 0.6;
+          coinToFlip.position.y = 0.53;
           coinToFlip.rotation.set(
             three.flipTargetOutcome === 'HEADS' ? 0 : Math.PI,
             0,
@@ -332,58 +330,60 @@ export default function StPetersburg3DLab() {
 
   return (
     <div className={styles.labContainer} data-testid="st-petersburg-3d-lab">
-      {/* 3D WebGL Canvas */}
-      <div ref={mountRef} className={styles.canvasWrapper} />
+      {/* 3D WebGL Canvas Viewport with Scoped Overlays */}
+      <div className={styles.canvasContainer}>
+        <div ref={mountRef} className={styles.canvasWrapper} />
 
-      {/* Top Floating Header */}
-      <div className={styles.topHeader}>
-        <div className={styles.headerTitleBox}>
-          <div className={styles.labBadge}>
-            <Icon name="trophy" size={13} color="#f59e0b" />
-            <span>Geometric Progression Casino</span>
+        {/* Top Floating Header */}
+        <div className={styles.topHeader}>
+          <div className={styles.headerTitleBox}>
+            <div className={styles.labBadge}>
+              <Icon name="trophy" size={13} color="#f59e0b" />
+              <span>Geometric Progression Casino</span>
+            </div>
+            <h2 className={styles.labTitle}>St. Petersburg Paradox 3D Lab</h2>
           </div>
-          <h2 className={styles.labTitle}>St. Petersburg Paradox 3D Lab</h2>
+
+          <div className={styles.payoutDisplay}>
+            <span className={styles.payoutLabel}>Current Round Payout</span>
+            <span className={styles.payoutValue}>${payout.toLocaleString()}</span>
+          </div>
         </div>
 
-        <div className={styles.payoutDisplay}>
-          <span className={styles.payoutLabel}>Current Round Payout</span>
-          <span className={styles.payoutValue}>${payout.toLocaleString()}</span>
+        {/* Streak HUD */}
+        <div className={styles.streakHud}>
+          <span className={styles.streakLabel}>Consecutive Heads Streak</span>
+          <span className={styles.streakValue}>{streak} FLIPS (2^{streak + 1})</span>
         </div>
-      </div>
 
-      {/* Streak HUD */}
-      <div className={styles.streakHud}>
-        <span className={styles.streakLabel}>Consecutive Heads Streak</span>
-        <span className={styles.streakValue}>{streak} FLIPS (2^{streak + 1})</span>
-      </div>
+        {/* Interactive Action Overlay Inside Viewport */}
+        <div className={styles.coinActionOverlay}>
+          <div className={styles.actionButtonGroup}>
+            {!isGameOver ? (
+              <button
+                className={styles.flipBtn}
+                onClick={flipCoin}
+                disabled={isFlipping}
+              >
+                <Icon name="rotate-ccw" size={16} />
+                <span>{isFlipping ? 'Flipping...' : streak === 0 ? 'Start Game (Flip Coin)' : 'Continue Streak (Flip Again)'}</span>
+              </button>
+            ) : (
+              <button className={styles.flipBtn} onClick={resetGame}>
+                <Icon name="refresh" size={16} />
+                <span>Game Over · Final Payout: ${payout} · Play Again</span>
+              </button>
+            )}
 
-      {/* Interactive Action Overlay */}
-      <div className={styles.coinActionOverlay}>
-        <div className={styles.actionButtonGroup}>
-          {!isGameOver ? (
             <button
-              className={styles.flipBtn}
-              onClick={flipCoin}
+              className={styles.secondaryActionBtn}
+              onClick={runBatchSimulation}
               disabled={isFlipping}
             >
-              <Icon name="rotate-ccw" size={16} />
-              <span>{isFlipping ? 'Flipping...' : streak === 0 ? 'Start Game (Flip Coin)' : 'Continue Streak (Flip Again)'}</span>
+              <Icon name="zap" size={14} color="#e5a93c" />
+              <span>Run 1,000-Trial Monte Carlo</span>
             </button>
-          ) : (
-            <button className={styles.flipBtn} onClick={resetGame}>
-              <Icon name="refresh" size={16} />
-              <span>Game Over · Final Payout: ${payout} · Play Again</span>
-            </button>
-          )}
-
-          <button
-            className={styles.secondaryActionBtn}
-            onClick={runBatchSimulation}
-            disabled={isFlipping}
-          >
-            <Icon name="zap" size={14} color="#e5a93c" />
-            <span>Run 1,000-Trial Monte Carlo</span>
-          </button>
+          </div>
         </div>
       </div>
 

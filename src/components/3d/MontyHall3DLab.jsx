@@ -477,8 +477,9 @@ export default function MontyHall3DLab() {
       const carAnchor = new THREE.Group();
       prizeMesh.add(carAnchor);
 
-      // Goat / Farm Paddock Anchor
+      // Goat / Farm Paddock Anchor (Shifted back so nose never pokes past door)
       const dudMesh = new THREE.Group();
+      dudMesh.position.set(0, 0, -0.22);
       
       // Grounded Earthy Pasture Disk (Generous diameter matching the door)
       const goatPaddock = new THREE.Mesh(
@@ -527,8 +528,8 @@ export default function MontyHall3DLab() {
       itemMeshes.forEach((item) => {
         const carClone = gltf.scene.clone(true);
         // Substantial supercar proportions filling the doorway width & height generously
-        carClone.scale.set(1.50, 1.50, 1.50);
-        carClone.position.set(0, 0.15, 0.08);
+        carClone.scale.set(1.48, 1.48, 1.48);
+        carClone.position.set(0, 0.15, 0.0);
         // Point front of car outward toward player at dynamic 3/4 showroom hero angle
         carClone.rotation.y = Math.PI - 0.28;
         carClone.traverse((child) => {
@@ -545,11 +546,11 @@ export default function MontyHall3DLab() {
     gltfLoader.load('/models/goat.glb', (gltf) => {
       itemMeshes.forEach((item, idx) => {
         const goatClone = gltf.scene.clone(true);
-        // Majestic life-sized goat standing proud and prominently filling the doorway
-        goatClone.scale.set(1.72, 1.72, 1.72);
-        goatClone.position.set(0, 0.12, 0.08);
+        // Realistic life-sized sculpted goat safely centered inside the booth
+        goatClone.scale.set(1.52, 1.52, 1.52);
+        goatClone.position.set(0, 0.12, 0.0);
         // Face directly outward toward the player with a subtle natural angle per door
-        goatClone.rotation.y = Math.PI + (idx === 0 ? 0.12 : idx === 2 ? -0.12 : 0.0);
+        goatClone.rotation.y = Math.PI + (idx === 0 ? 0.10 : idx === 2 ? -0.10 : 0.0);
         goatClone.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
