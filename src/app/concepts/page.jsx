@@ -16,7 +16,15 @@ export default async function ConceptsPage({ searchParams }) {
   const activeCategory = params?.category;
   const activeDifficulty = params?.difficulty;
 
-  let allConcepts = getAllPublishedConcepts();
+  const allPublished = getAllPublishedConcepts();
+
+  // Compute concept counts per category dynamically
+  const categoryCounts = allPublished.reduce((acc, c) => {
+    acc[c.category] = (acc[c.category] || 0) + 1;
+    return acc;
+  }, {});
+
+  let allConcepts = allPublished;
 
   if (activeCategory) {
     allConcepts = allConcepts.filter((c) => c.category === activeCategory);
@@ -42,23 +50,57 @@ export default async function ConceptsPage({ searchParams }) {
 
       {/* Filter Toolbar */}
       <div className={styles.filtersBar}>
+        <div className={styles.filterBarHeader}>
+          <div className={styles.filterBarTitleBox}>
+            <span className={styles.filterBarLabel}>Scientific Disciplines</span>
+            <span className={styles.filterBarCounter}>
+              Showing <strong>{allConcepts.length}</strong> of {allPublished.length} concepts
+            </span>
+          </div>
+          {activeCategory && (
+            <Link
+              href={`/concepts${activeDifficulty ? `?difficulty=${activeDifficulty}` : ''}`}
+              className={styles.clearFilterBtn}
+            >
+              <Icon name="x" size={12} />
+              <span>Reset Filter</span>
+            </Link>
+          )}
+        </div>
+
         <div className={styles.categoryFilters}>
           <Link
-            href="/concepts"
+            href={`/concepts${activeDifficulty ? `?difficulty=${activeDifficulty}` : ''}`}
             className={`${styles.filterChip} ${!activeCategory ? styles.filterChipActive : ''}`}
           >
-            All Disciplines ({getAllPublishedConcepts().length})
+            <div className={styles.chipContent}>
+              <span className={styles.chipIcon}>
+                <Icon name="layers" size={14} />
+              </span>
+              <span>All Disciplines</span>
+            </div>
+            <span className={styles.chipCount}>{allPublished.length}</span>
           </Link>
-          {CATEGORIES.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/concepts?category=${cat.id}${activeDifficulty ? `&difficulty=${activeDifficulty}` : ''}`}
-              className={`${styles.filterChip} ${activeCategory === cat.id ? styles.filterChipActive : ''}`}
-            >
-              <Icon name={cat.iconName} size={14} />
-              <span>{cat.name}</span>
-            </Link>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const count = categoryCounts[cat.id] || 0;
+            const isActive = activeCategory === cat.id;
+
+            return (
+              <Link
+                key={cat.id}
+                href={`/concepts?category=${cat.id}${activeDifficulty ? `&difficulty=${activeDifficulty}` : ''}`}
+                className={`${styles.filterChip} ${isActive ? styles.filterChipActive : ''}`}
+              >
+                <div className={styles.chipContent}>
+                  <span className={styles.chipIcon}>
+                    <Icon name={cat.iconName} size={14} />
+                  </span>
+                  <span>{cat.name}</span>
+                </div>
+                <span className={styles.chipCount}>{count}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
