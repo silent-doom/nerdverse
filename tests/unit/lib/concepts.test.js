@@ -113,9 +113,9 @@ describe('Concept Data Layer', () => {
       });
     });
 
-    it('returns all 5 MVP concepts', () => {
+    it('returns all published concepts', () => {
       const published = getAllPublishedConcepts();
-      expect(published.length).toBe(5);
+      expect(published.length).toBeGreaterThanOrEqual(5);
     });
   });
 

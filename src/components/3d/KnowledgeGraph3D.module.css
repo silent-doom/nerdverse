@@ -426,6 +426,35 @@
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
 }
 
+.articleCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.15);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.articleCtaBtn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3);
+}
+
 .abstractBox {
   display: flex;
   flex-direction: column;

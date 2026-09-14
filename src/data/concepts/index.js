@@ -5,7 +5,9 @@
  * and associated interactive component type.
  */
 
-export const concepts = [
+import { additionalConcepts } from './additionalConcepts';
+
+const coreConcepts = [
   {
     id: '1',
     title: "Murphy's Law",
@@ -452,6 +454,8 @@ From a welfare-maximizing standpoint, this asymmetric regret is purely irrationa
     featured: true,
   },
 ];
+
+export const concepts = [...coreConcepts, ...additionalConcepts];
 
 export function getConceptBySlug(slug) {
   return concepts.find((c) => c.slug === slug);

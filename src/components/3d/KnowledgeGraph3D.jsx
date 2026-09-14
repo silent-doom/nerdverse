@@ -827,9 +827,9 @@ export default function KnowledgeGraph3D() {
               </div>
             </div>
 
-            {/* Direct Interactive 3D Lab CTA Button */}
-            {selectedNode.hasInteractiveLab && (
-              <div className={styles.labCtaContainer}>
+            {/* Direct Interactive 3D Lab or Concept Deep Dive CTA Button */}
+            <div className={styles.labCtaContainer}>
+              {selectedNode.hasInteractiveLab ? (
                 <Link
                   href={selectedNode.interactivePath}
                   className={styles.labCtaBtn}
@@ -837,8 +837,16 @@ export default function KnowledgeGraph3D() {
                   <Icon name="zap" size={18} color="#0B0F19" />
                   <span>Launch 3D Interactive Lab</span>
                 </Link>
-              </div>
-            )}
+              ) : (
+                <Link
+                  href={`/concepts/${selectedNode.slug}`}
+                  className={styles.articleCtaBtn}
+                >
+                  <Icon name="layers" size={16} color="#38BDF8" />
+                  <span>Read Concept Deep Dive</span>
+                </Link>
+              )}
+            </div>
 
             {/* Core Abstract & Conundrum */}
             <div className={styles.abstractBox}>
