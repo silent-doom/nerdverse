@@ -1,89 +1,44 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import styles from './MontyHall3DLab.module.css';
 import Icon from '@/components/common/Icon';
 
 /**
- * Practical Decision Domains for Monty Hall
- * Framing probability under real-world asymmetric information filters.
+ * Real-world practical context applications of Bayesian information concentration
  */
-const DOMAINS = {
-  classic: {
-    id: 'classic',
-    title: 'Classic TV Stage (1975)',
-    category: 'Game Theory',
-    description: 'Monty Hall opens an unchosen dud door revealing a goat. Should you switch to the remaining door?',
-    prizeName: 'Luxury Sports Car',
-    prizeIcon: '🏎️',
-    prizeDetail: 'Asset value: $120,000 utility',
-    dudName: 'Booby Prize Goat',
-    dudIcon: '🐐',
-    dudDetail: 'Asset value: $0 nominal utility',
-    hostTitle: 'Host Monty Hall',
-    hostAction: 'knowingly unveils a goat from the unchosen doors',
-    utilitarianBenefit: 'Doubling expected consumer utility from 1/3 ($40,000) to 2/3 ($80,000).',
-    hostDescription: 'The host has complete knowledge of the prize location and is constrained to reveal a goat, filtering asymmetric information directly into the unchosen survivor.',
-  },
-  vc: {
+const PRACTICAL_APPLICATIONS = [
+  {
     id: 'vc',
-    title: 'Venture Capital Allocation',
-    category: 'Financial Asymmetry',
-    description: 'You place initial seed checks across 3 startups. Lead auditor eliminates a known zombie company. Do you concentrate capital?',
-    prizeName: 'Decacorn Outlier',
-    prizeIcon: '🦄',
-    prizeDetail: '100x return ($500M fund returner)',
-    dudName: 'Zombie Startup (Write-off)',
-    dudIcon: '📉',
-    dudDetail: '0x return ($0 capital recovery)',
-    hostTitle: 'Syndicate Auditor',
-    hostAction: 'performs forensic audit and liquidates a zero-traction startup',
-    utilitarianBenefit: 'Maximizing capital efficiency and expected portfolio fund return by 200%.',
-    hostDescription: 'The auditor eliminates a confirmed zombie among your unselected bets. The probability mass of the entire non-invested batch collapses onto the remaining candidate.',
+    title: 'Venture Capital Portfolio Strategy',
+    icon: '🦄',
+    category: 'Power-Law Finance',
+    description:
+      'You invest initial seed checks across parallel startups. A lead syndicate audit discovers and liquidates a zero-traction failure among your unselected bets. Because the audit selectively pruned a known dud from the non-invested batch, concentrating follow-on capital on the surviving candidate doubles the probability of capturing the 100x decacorn.',
+    takeaway: 'Doubles portfolio fund return probability from 33.3% to 66.7%.',
   },
-  medical: {
+  {
     id: 'medical',
     title: 'Clinical Diagnostic Triage',
-    category: 'Epidemiology',
-    description: 'Three differential pathogen hypotheses. Initial symptom match points to Pathogen A. An emergency biomarker assay rules out Pathogen B. Should therapy pivot?',
-    prizeName: 'Curative Targeted Rx',
-    prizeIcon: '🎯',
-    prizeDetail: '100% Patient Remission & Preserved QALYs',
-    dudName: 'Ineffective Screen (Benign)',
-    dudIcon: '⚠️',
-    dudDetail: 'Refractory infection / disease progression',
-    hostTitle: 'Differential Assay',
-    hostAction: 'rules out a benign false-positive from the unselected diagnoses',
-    utilitarianBenefit: 'Minimizing preventable mortality and maximizing Quality-Adjusted Life Years (QALYs).',
-    hostDescription: 'The biomarker assay specifically eliminates an unchosen candidate known to be negative. Preserving the original guess yields only 1/3 efficacy, whereas switching achieves 2/3 cure probability.',
+    icon: '🎯',
+    category: 'Acute Epidemiology',
+    description:
+      'An emergency patient presents with acute distress with 3 viable differential pathogen hypotheses. Initial empiric therapy targets Pathogen 1. An emergency biomarker assay rules out Pathogen 3. Under Bayesian probability rules, Pathogen 2 now carries a 66.7% probability of being the true causative agent. Pivoting therapy preserves Quality-Adjusted Life Years (QALYs).',
+    takeaway: 'Minimizes preventable morbidity and diagnostic inertia.',
   },
-  cloud: {
+  {
     id: 'cloud',
-    title: 'Distributed Fault Isolation',
-    category: 'Site Reliability',
-    description: 'Outage alarm triggers on 3 microservice clusters. SRE flags Cluster A. Automated eBPF telemetry proves Cluster B is healthy. Where should the failover route?',
-    prizeName: 'Root-Cause Cascade Fault',
-    prizeIcon: '⚡',
-    prizeDetail: 'Immediate mitigation clears Sev-0 incident',
-    dudName: 'Healthy Resilient Pod',
-    dudIcon: '🛡️',
-    dudDetail: 'Zero packet drop / normal latency',
-    hostTitle: 'eBPF Kernel Observer',
-    hostAction: 'confirms zero anomaly metrics on one uninspected cluster',
-    utilitarianBenefit: 'Minimizing cumulative downtime Downturn and SLA violation penalties.',
-    hostDescription: 'Automated telemetry eliminates a healthy candidate pod. Concentrating remediation on the remaining uninspected cluster doubles resolution velocity.',
+    title: 'Distributed Systems & Incident Response',
+    icon: '⚡',
+    category: 'Site Reliability Engineering',
+    description:
+      'During a high-severity cloud outage, 3 upstream clusters are candidate root causes. An on-call SRE routes triage scripts to Cluster 1. Automated eBPF kernel tracing proves Cluster 3 has zero packet loss. Redirecting remediation resources to Cluster 2 yields twice the likelihood of clearing the outage cascade.',
+    takeaway: 'Cuts expected downtime and SLA breach penalties by 50%.',
   },
-};
+];
 
 export default function MontyHall3DLab() {
-  // Domain selection
-  const [selectedDomain, setSelectedDomain] = useState('classic');
-  const domain = DOMAINS[selectedDomain];
-
-  // Active sub-mode: 'stage' | 'montecarlo' | 'grid100' | 'bayes'
-  const [activeMode, setActiveMode] = useState('stage');
-
   // Game State: 'choose' | 'switch_or_stay' | 'finished'
   const [gameState, setGameState] = useState('choose');
   const [carDoor, setCarDoor] = useState(() => Math.floor(Math.random() * 3));
@@ -93,33 +48,23 @@ export default function MontyHall3DLab() {
   const [gameResult, setGameResult] = useState(null); // 'win' | 'lose'
   const [didSwitch, setDidSwitch] = useState(false);
 
-  // Empirical Stats (Live Session)
+  // Live Session Stats
   const [sessionStats, setSessionStats] = useState({
-    stayWins: 8,
-    stayTotal: 24,
-    switchWins: 32,
-    switchTotal: 48,
+    stayWins: 6,
+    stayTotal: 18,
+    switchWins: 24,
+    switchTotal: 36,
   });
 
-  // Monte Carlo Batch Simulation State
-  const [monteHistory, setMonteHistory] = useState([
-    { trial: 10, stayRate: 30.0, switchRate: 70.0 },
-    { trial: 50, stayRate: 32.0, switchRate: 68.0 },
-    { trial: 100, stayRate: 34.0, switchRate: 66.0 },
-    { trial: 250, stayRate: 33.2, switchRate: 66.8 },
-    { trial: 500, stayRate: 33.4, switchRate: 66.6 },
-  ]);
+  // Automated Quick Simulation State
   const [isSimulatingBatch, setIsSimulatingBatch] = useState(false);
-  const [batchCount, setBatchCount] = useState(500);
+  const [batchFeedback, setBatchFeedback] = useState(null);
 
-  // 100-Door Intuition Grid State
-  const [grid100Doors, setGrid100Doors] = useState(() => Array.from({ length: 100 }, (_, i) => i));
-  const [grid100Prize, setGrid100Prize] = useState(() => Math.floor(Math.random() * 100));
+  // Optional 100-Door Accordion Toggle
+  const [show100Doors, setShow100Doors] = useState(false);
   const [grid100Pick, setGrid100Pick] = useState(null);
-  const [grid100Swept, setGrid100Swept] = useState(new Set());
   const [grid100Survivor, setGrid100Survivor] = useState(null);
-  const [grid100Step, setGrid100Step] = useState('pick'); // 'pick' | 'decide' | 'revealed'
-  const [grid100Result, setGrid100Result] = useState(null);
+  const [grid100Prize] = useState(() => Math.floor(Math.random() * 100));
 
   // Camera preset
   const [cameraPreset, setCameraPreset] = useState('front');
@@ -135,7 +80,7 @@ export default function MontyHall3DLab() {
   const confettiSystemRef = useRef(null);
   const isDraggingRef = useRef(false);
   const prevMousePos = useRef({ x: 0, y: 0 });
-  const cameraAnglesRef = useRef({ theta: 0, phi: 0.15, radius: 11 });
+  const cameraAnglesRef = useRef({ theta: 0, phi: 0.12, radius: 10.5 });
 
   // Door Hinge Animation Targets (radians)
   const doorAnglesTarget = useRef([0, 0, 0]);
@@ -159,54 +104,58 @@ export default function MontyHall3DLab() {
   }, [gameState, hostRevealed]);
 
   // Handle Initial Door Selection
-  const handleSelectInitialDoor = useCallback((doorIdx) => {
-    if (gameState !== 'choose') return;
-    setPlayerPick(doorIdx);
+  const handleSelectInitialDoor = useCallback(
+    (doorIdx) => {
+      if (gameState !== 'choose') return;
+      setPlayerPick(doorIdx);
 
-    // Host picks a door that is neither player's pick NOR the car door
-    const remainingDoors = [0, 1, 2].filter((d) => d !== doorIdx && d !== carDoor);
-    const hostChoice = remainingDoors[Math.floor(Math.random() * remainingDoors.length)];
+      // Host picks a door that is neither player's pick NOR the car door
+      const remainingDoors = [0, 1, 2].filter((d) => d !== doorIdx && d !== carDoor);
+      const hostChoice = remainingDoors[Math.floor(Math.random() * remainingDoors.length)];
 
-    setHostRevealed(hostChoice);
-    setGameState('switch_or_stay');
-  }, [gameState, carDoor]);
+      setHostRevealed(hostChoice);
+      setGameState('switch_or_stay');
+    },
+    [gameState, carDoor]
+  );
 
   // Handle Final Choice: Stay or Switch
-  const handleMakeFinalChoice = useCallback((willSwitch) => {
-    if (gameState !== 'switch_or_stay') return;
-    setDidSwitch(willSwitch);
+  const handleMakeFinalChoice = useCallback(
+    (willSwitch) => {
+      if (gameState !== 'switch_or_stay') return;
+      setDidSwitch(willSwitch);
 
-    const chosenDoor = willSwitch
-      ? [0, 1, 2].find((d) => d !== playerPick && d !== hostRevealed)
-      : playerPick;
+      const chosenDoor = willSwitch
+        ? [0, 1, 2].find((d) => d !== playerPick && d !== hostRevealed)
+        : playerPick;
 
-    setFinalChoice(chosenDoor);
-    const won = chosenDoor === carDoor;
-    setGameResult(won ? 'win' : 'lose');
-    setGameState('finished');
+      setFinalChoice(chosenDoor);
+      const won = chosenDoor === carDoor;
+      setGameResult(won ? 'win' : 'lose');
+      setGameState('finished');
 
-    // Trigger celebration particles if won
-    if (won && confettiSystemRef.current) {
-      confettiSystemRef.current.visible = true;
-    }
-
-    // Update Session Stats
-    setSessionStats((prev) => {
-      if (willSwitch) {
-        return {
-          ...prev,
-          switchWins: prev.switchWins + (won ? 1 : 0),
-          switchTotal: prev.switchTotal + 1,
-        };
-      } else {
-        return {
-          ...prev,
-          stayWins: prev.stayWins + (won ? 1 : 0),
-          stayTotal: prev.stayTotal + 1,
-        };
+      if (won && confettiSystemRef.current) {
+        confettiSystemRef.current.visible = true;
       }
-    });
-  }, [gameState, playerPick, hostRevealed, carDoor]);
+
+      setSessionStats((prev) => {
+        if (willSwitch) {
+          return {
+            ...prev,
+            switchWins: prev.switchWins + (won ? 1 : 0),
+            switchTotal: prev.switchTotal + 1,
+          };
+        } else {
+          return {
+            ...prev,
+            stayWins: prev.stayWins + (won ? 1 : 0),
+            stayTotal: prev.stayTotal + 1,
+          };
+        }
+      });
+    },
+    [gameState, playerPick, hostRevealed, carDoor]
+  );
 
   // Reset Single Game Round
   const resetRound = useCallback(() => {
@@ -224,8 +173,8 @@ export default function MontyHall3DLab() {
     }
   }, []);
 
-  // Monte Carlo Batch Engine
-  const runMonteCarloBatch = useCallback((runs = 1000) => {
+  // Run 1,000 Automated Trials Instantly
+  const runQuickSimulation = useCallback((runs = 1000) => {
     setIsSimulatingBatch(true);
     setTimeout(() => {
       let switchWins = 0;
@@ -242,92 +191,59 @@ export default function MontyHall3DLab() {
         if (switchedPick === prize) switchWins++;
       }
 
-      const stayPct = Number(((stayWins / runs) * 100).toFixed(1));
-      const switchPct = Number(((switchWins / runs) * 100).toFixed(1));
+      setSessionStats((prev) => ({
+        stayWins: prev.stayWins + stayWins,
+        stayTotal: prev.stayTotal + runs,
+        switchWins: prev.switchWins + switchWins,
+        switchTotal: prev.switchTotal + runs,
+      }));
 
-      setMonteHistory((prev) => [
-        ...prev.slice(-6),
-        { trial: runs, stayRate: stayPct, switchRate: switchPct },
-      ]);
+      const switchPct = ((switchWins / runs) * 100).toFixed(1);
+      const stayPct = ((stayWins / runs) * 100).toFixed(1);
+      setBatchFeedback(
+        `Ran ${runs.toLocaleString()} simulated rounds: Switching won ${switchPct}% (${switchWins.toLocaleString()}) vs Staying ${stayPct}% (${stayWins.toLocaleString()}).`
+      );
       setIsSimulatingBatch(false);
-    }, 250);
+    }, 200);
   }, []);
 
-  // 100-Door Extreme Intuition Handlers
-  const handle100DoorPick = useCallback((idx) => {
-    if (grid100Step !== 'pick') return;
-    setGrid100Pick(idx);
-
-    // Host sweeps 98 duds away, leaving either the prize or one remaining dud
-    const allDoors = Array.from({ length: 100 }, (_, i) => i);
-    let survivor;
-
-    if (idx === grid100Prize) {
-      // Picked prize: survivor is random remaining door
-      const possibleSurvivors = allDoors.filter((d) => d !== idx);
-      survivor = possibleSurvivors[Math.floor(Math.random() * possibleSurvivors.length)];
-    } else {
-      // Picked goat: host must leave the actual prize
-      survivor = grid100Prize;
-    }
-
-    const swept = new Set(allDoors.filter((d) => d !== idx && d !== survivor));
-    setGrid100Swept(swept);
-    setGrid100Survivor(survivor);
-    setGrid100Step('decide');
-  }, [grid100Step, grid100Prize]);
-
-  const handle100FinalChoice = useCallback((willSwitch) => {
-    if (grid100Step !== 'decide') return;
-    const finalPick = willSwitch ? grid100Survivor : grid100Pick;
-    const won = finalPick === grid100Prize;
-    setGrid100Result(won ? 'win' : 'lose');
-    setGrid100Step('revealed');
-  }, [grid100Step, grid100Survivor, grid100Pick, grid100Prize]);
-
-  const reset100Grid = useCallback(() => {
-    setGrid100Prize(Math.floor(Math.random() * 100));
-    setGrid100Pick(null);
-    setGrid100Swept(new Set());
-    setGrid100Survivor(null);
-    setGrid100Step('pick');
-    setGrid100Result(null);
-  }, []);
-
-  // Set Camera View
+  // Camera presets
   const handleSetCameraPreset = useCallback((preset) => {
     setCameraPreset(preset);
-    if (!cameraRef.current) return;
-
     if (preset === 'front') {
       cameraAnglesRef.current = { theta: 0, phi: 0.12, radius: 10.5 };
-    } else if (preset === 'wide') {
-      cameraAnglesRef.current = { theta: 0.35, phi: 0.3, radius: 13.5 };
-    } else if (preset === 'closeup') {
-      cameraAnglesRef.current = { theta: 0, phi: 0.05, radius: 7.5 };
+    } else if (preset === 'studio') {
+      cameraAnglesRef.current = { theta: 0.35, phi: 0.28, radius: 12.5 };
     }
   }, []);
 
-  // Three.js Stage Setup & Animation Loop
+  // 100-Door demo click
+  const handle100DoorClick = useCallback(
+    (idx) => {
+      setGrid100Pick(idx);
+      const survivor = idx === grid100Prize ? (idx === 0 ? 1 : 0) : grid100Prize;
+      setGrid100Survivor(survivor);
+    },
+    [grid100Prize]
+  );
+
+  // Three.js Scene Setup & Animation Loop
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
 
     const width = container.clientWidth || 800;
-    const height = container.clientHeight || 480;
+    const height = container.clientHeight || 380;
 
-    // Scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
     scene.background = new THREE.Color(0x0a0c10);
     scene.fog = new THREE.FogExp2(0x0a0c10, 0.04);
 
-    // Camera
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     cameraRef.current = camera;
-    camera.position.set(0, 2.2, 10.5);
+    camera.position.set(0, 2.0, 10.5);
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     rendererRef.current = renderer;
     renderer.setSize(width, height);
@@ -346,8 +262,6 @@ export default function MontyHall3DLab() {
     mainSpot.angle = Math.PI / 4;
     mainSpot.penumbra = 0.6;
     mainSpot.castShadow = true;
-    mainSpot.shadow.mapSize.width = 1024;
-    mainSpot.shadow.mapSize.height = 1024;
     scene.add(mainSpot);
 
     const blueRimLight = new THREE.DirectionalLight(0x3b82f6, 1.8);
@@ -358,52 +272,19 @@ export default function MontyHall3DLab() {
     amberRimLight.position.set(6, 5, -4);
     scene.add(amberRimLight);
 
-    // Floor Stage
-    const floorGeo = new THREE.PlaneGeometry(32, 24);
-    const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x10131a,
-      roughness: 0.45,
-      metalness: 0.65,
-    });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
+    // Stage Floor
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(32, 24),
+      new THREE.MeshStandardMaterial({ color: 0x10131a, roughness: 0.45, metalness: 0.65 })
+    );
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -0.01;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Grid Overlay on Stage Floor
     const gridHelper = new THREE.GridHelper(24, 24, 0xf59e0b, 0x1f2639);
     gridHelper.position.y = 0.005;
     scene.add(gridHelper);
-
-    // Stage Backwall
-    const wallGeo = new THREE.PlaneGeometry(32, 12);
-    const wallMat = new THREE.MeshStandardMaterial({
-      color: 0x0c0e14,
-      roughness: 0.9,
-      metalness: 0.1,
-    });
-    const backwall = new THREE.Mesh(wallGeo, wallMat);
-    backwall.position.set(0, 5, -4);
-    scene.add(backwall);
-
-    // Overhead Studio Truss
-    const trussGeo = new THREE.BoxGeometry(16, 0.35, 0.35);
-    const trussMat = new THREE.MeshStandardMaterial({ color: 0x272c3d, metalness: 0.8, roughness: 0.3 });
-    const truss = new THREE.Mesh(trussGeo, trussMat);
-    truss.position.set(0, 5.8, 0);
-    scene.add(truss);
-
-    // Spotlights on Truss for each door
-    [-3.8, 0, 3.8].forEach((xPos) => {
-      const spotLight = new THREE.SpotLight(0xfff8db, 2.5);
-      spotLight.position.set(xPos, 5.7, 0);
-      spotLight.target.position.set(xPos, 1.5, -2);
-      spotLight.angle = 0.45;
-      spotLight.penumbra = 0.5;
-      scene.add(spotLight);
-      scene.add(spotLight.target);
-    });
 
     // 3 Door Stations
     const doorXPositions = [-3.8, 0, 3.8];
@@ -414,13 +295,7 @@ export default function MontyHall3DLab() {
       const doorStationGroup = new THREE.Group();
       doorStationGroup.position.set(xPos, 0, -2);
 
-      // Door Frame (Left, Right, Top)
-      const frameMat = new THREE.MeshStandardMaterial({
-        color: 0x1e2433,
-        metalness: 0.7,
-        roughness: 0.35,
-      });
-
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e2433, metalness: 0.7, roughness: 0.35 });
       const frameL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.6, 0.3), frameMat);
       frameL.position.set(-1.18, 1.8, 0);
       frameL.castShadow = true;
@@ -436,14 +311,11 @@ export default function MontyHall3DLab() {
       frameT.castShadow = true;
       doorStationGroup.add(frameT);
 
-      // Door Number Neon Sign
-      const signMat = new THREE.MeshStandardMaterial({
-        color: 0xf59e0b,
-        emissive: 0xf59e0b,
-        emissiveIntensity: 0.8,
-        roughness: 0.2,
-      });
-      const signPlacard = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.45, 0.08), signMat);
+      // Neon Number Placard
+      const signPlacard = new THREE.Mesh(
+        new THREE.BoxGeometry(0.7, 0.45, 0.08),
+        new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b, emissiveIntensity: 0.8 })
+      );
       signPlacard.position.set(0, 4.05, 0.1);
       doorStationGroup.add(signPlacard);
 
@@ -452,22 +324,20 @@ export default function MontyHall3DLab() {
       hingePivot.position.set(-1.08, 1.8, 0);
 
       // Door Panel
-      const doorPanelGeo = new THREE.BoxGeometry(2.16, 3.48, 0.12);
-      const doorMat = new THREE.MeshStandardMaterial({
-        color: 0x222a3d,
-        roughness: 0.4,
-        metalness: 0.5,
-      });
-      const doorPanel = new THREE.Mesh(doorPanelGeo, doorMat);
-      doorPanel.position.set(1.08, 0, 0); // Offset so pivot is on the left edge
+      const doorPanel = new THREE.Mesh(
+        new THREE.BoxGeometry(2.16, 3.48, 0.12),
+        new THREE.MeshStandardMaterial({ color: 0x222a3d, roughness: 0.4, metalness: 0.5 })
+      );
+      doorPanel.position.set(1.08, 0, 0);
       doorPanel.castShadow = true;
       doorPanel.receiveShadow = true;
       doorPanel.userData = { doorIndex: idx };
       hingePivot.add(doorPanel);
 
-      // Door Handle (Brass metallic)
-      const handleMat = new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.9, roughness: 0.2 });
-      const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.4, 12), handleMat);
+      const handle = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03, 0.03, 0.4, 12),
+        new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.9, roughness: 0.2 })
+      );
       handle.position.set(1.9, 0, 0.14);
       handle.castShadow = true;
       hingePivot.add(handle);
@@ -476,18 +346,19 @@ export default function MontyHall3DLab() {
       scene.add(doorStationGroup);
       doorMeshes.push({ group: doorStationGroup, pivot: hingePivot, panel: doorPanel });
 
-      // Stage items behind the door (Prize vs Dud)
+      // Behind Door Item (Sports Car vs Goat)
       const itemGroup = new THREE.Group();
       itemGroup.position.set(xPos, 0, -2.4);
 
-      // Platform pedestal
-      const pedGeo = new THREE.CylinderGeometry(0.85, 0.95, 0.25, 24);
-      const pedMat = new THREE.MeshStandardMaterial({ color: 0x151924, metalness: 0.8, roughness: 0.3 });
-      const ped = new THREE.Mesh(pedGeo, pedMat);
+      // Pedestal
+      const ped = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.85, 0.95, 0.25, 24),
+        new THREE.MeshStandardMaterial({ color: 0x151924, metalness: 0.8, roughness: 0.3 })
+      );
       ped.position.y = 0.125;
       itemGroup.add(ped);
 
-      // Car / Grand Trophy Placeholder (Detailed Cyber Shape)
+      // Sports Car Prize
       const prizeMesh = new THREE.Group();
       const carBody = new THREE.Mesh(
         new THREE.BoxGeometry(1.6, 0.45, 0.85),
@@ -504,28 +375,16 @@ export default function MontyHall3DLab() {
       carCockpit.position.set(-0.15, 0.85, 0);
       prizeMesh.add(carCockpit);
 
-      // Wheels
-      [-0.55, 0.55].forEach((wx) => {
-        [-0.45, 0.45].forEach((wz) => {
-          const wheel = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.18, 0.18, 0.14, 16),
-            new THREE.MeshStandardMaterial({ color: 0x090a0f, roughness: 0.8 })
-          );
-          wheel.rotation.x = Math.PI / 2;
-          wheel.position.set(wx, 0.3, wz);
-          prizeMesh.add(wheel);
-        });
-      });
-
-      // Neon Underglow Ring for prize
-      const ringGeo = new THREE.RingGeometry(0.7, 0.82, 32);
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
+      // Underglow
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(0.7, 0.82, 32),
+        new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide })
+      );
       ring.rotation.x = -Math.PI / 2;
       ring.position.y = 0.01;
       prizeMesh.add(ring);
 
-      // Dud / Goat Placeholder (Hazard Dud Crate / Silo)
+      // Goat / Dud Box
       const dudMesh = new THREE.Group();
       const dudBody = new THREE.Mesh(
         new THREE.BoxGeometry(0.8, 0.8, 0.8),
@@ -552,7 +411,7 @@ export default function MontyHall3DLab() {
     doorsMeshRef.current = doorMeshes;
     itemsMeshRef.current = itemMeshes;
 
-    // Victory Confetti Particles
+    // Confetti Particles
     const confettiCount = 180;
     const confettiGeo = new THREE.BufferGeometry();
     const confettiPositions = new Float32Array(confettiCount * 3);
@@ -563,7 +422,6 @@ export default function MontyHall3DLab() {
       confettiPositions[i * 3 + 1] = Math.random() * 6 + 1;
       confettiPositions[i * 3 + 2] = (Math.random() - 0.5) * 4 - 2;
 
-      // Emerald, Gold, Cyan colors
       const col = Math.random() > 0.5 ? new THREE.Color(0x10b981) : new THREE.Color(0xf59e0b);
       confettiColors[i * 3] = col.r;
       confettiColors[i * 3 + 1] = col.g;
@@ -573,12 +431,7 @@ export default function MontyHall3DLab() {
     confettiGeo.setAttribute('position', new THREE.BufferAttribute(confettiPositions, 3));
     confettiGeo.setAttribute('color', new THREE.BufferAttribute(confettiColors, 3));
 
-    const confettiMat = new THREE.PointsMaterial({
-      size: 0.18,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.9,
-    });
+    const confettiMat = new THREE.PointsMaterial({ size: 0.18, vertexColors: true, transparent: true, opacity: 0.9 });
     const confettiSystem = new THREE.Points(confettiGeo, confettiMat);
     confettiSystem.visible = false;
     scene.add(confettiSystem);
@@ -605,7 +458,7 @@ export default function MontyHall3DLab() {
       }
     };
 
-    // Camera Orbit Mouse Drag Handlers
+    // Camera Orbit Mouse Drag
     const onPointerDown = (e) => {
       isDraggingRef.current = true;
       prevMousePos.current = { x: e.clientX, y: e.clientY };
@@ -630,7 +483,6 @@ export default function MontyHall3DLab() {
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
 
-    // Resize Handler
     const onResize = () => {
       if (!container || !renderer || !camera) return;
       const nw = container.clientWidth;
@@ -641,7 +493,7 @@ export default function MontyHall3DLab() {
     };
     window.addEventListener('resize', onResize);
 
-    // Main Animation Loop
+    // Animation Loop
     let lastTime = performance.now();
 
     const animate = (now) => {
@@ -650,14 +502,12 @@ export default function MontyHall3DLab() {
       const delta = Math.min((currentTime - lastTime) / 1000, 0.1);
       lastTime = currentTime;
 
-      // Camera positioning via spherical coordinates
       const { theta, phi, radius } = cameraAnglesRef.current;
       camera.position.x = radius * Math.sin(theta) * Math.cos(phi);
       camera.position.y = radius * Math.sin(phi) + 1.8;
       camera.position.z = radius * Math.cos(theta) * Math.cos(phi);
       camera.lookAt(0, 1.8, -2);
 
-      // Smooth Door Hinge Interpolation
       for (let i = 0; i < 3; i++) {
         doorAnglesCurrent.current[i] = THREE.MathUtils.lerp(
           doorAnglesCurrent.current[i],
@@ -669,7 +519,6 @@ export default function MontyHall3DLab() {
         }
       }
 
-      // Animate Confetti if visible
       if (confettiSystemRef.current && confettiSystemRef.current.visible) {
         const positions = confettiSystemRef.current.geometry.attributes.position.array;
         for (let i = 1; i < positions.length; i += 3) {
@@ -695,7 +544,7 @@ export default function MontyHall3DLab() {
     };
   }, [handleSelectInitialDoor]);
 
-  // Sync Item Visibilities (Prize vs Dud behind doors) with state
+  // Sync Item Visibilities
   useEffect(() => {
     if (!itemsMeshRef.current || itemsMeshRef.current.length < 3) return;
 
@@ -704,19 +553,18 @@ export default function MontyHall3DLab() {
       item.prizeMesh.visible = isCar;
       item.dudMesh.visible = !isCar;
 
-      // Highlight selected door panel with accent color
       if (doorsMeshRef.current[idx]) {
         const panel = doorsMeshRef.current[idx].panel;
         if (idx === playerPick) {
-          panel.material.color.setHex(0xf59e0b); // Amber for initial selection
+          panel.material.color.setHex(0xf59e0b);
           panel.material.emissive.setHex(0xf59e0b);
           panel.material.emissiveIntensity = 0.35;
         } else if (idx === hostRevealed) {
-          panel.material.color.setHex(0xef4444); // Red for host revealed dud
+          panel.material.color.setHex(0xef4444);
           panel.material.emissive.setHex(0xef4444);
           panel.material.emissiveIntensity = 0.2;
         } else if (gameState === 'finished' && idx === carDoor) {
-          panel.material.color.setHex(0x10b981); // Emerald winner
+          panel.material.color.setHex(0x10b981);
           panel.material.emissive.setHex(0x10b981);
           panel.material.emissiveIntensity = 0.4;
         } else {
@@ -729,558 +577,302 @@ export default function MontyHall3DLab() {
   }, [carDoor, playerPick, hostRevealed, gameState]);
 
   // Win Rates Calculation
-  const stayRate = sessionStats.stayTotal > 0
-    ? ((sessionStats.stayWins / sessionStats.stayTotal) * 100).toFixed(1)
-    : '0.0';
-  const switchRate = sessionStats.switchTotal > 0
-    ? ((sessionStats.switchWins / sessionStats.switchTotal) * 100).toFixed(1)
-    : '0.0';
+  const stayRate =
+    sessionStats.stayTotal > 0 ? ((sessionStats.stayWins / sessionStats.stayTotal) * 100).toFixed(1) : '0.0';
+  const switchRate =
+    sessionStats.switchTotal > 0 ? ((sessionStats.switchWins / sessionStats.switchTotal) * 100).toFixed(1) : '0.0';
 
   return (
     <div className={styles.container}>
-      {/* Header */}
+      {/* Simple Header with Clear Pretext */}
       <div className={styles.header}>
         <div className={styles.tagline}>
-          <span>Empirical Bayesian Decision Engine</span>
-          <span className={styles.taglineBadge}>Consequence Calculus</span>
+          <span>Bayesian Probability Laboratory</span>
+          <span className={styles.taglineBadge}>Interactive 3D Stage</span>
         </div>
-        <h2 className={styles.title}>The Monty Hall Problem & Practical Information Asymmetry</h2>
+        <h2 className={styles.title}>The Monty Hall Problem</h2>
         <p className={styles.subtitle}>
-          A mathematical demonstration of how host-filtered information concentrates unobserved probability mass.
-          Explore classic game theory alongside high-stakes venture capital, clinical medicine, and distributed systems.
+          Behind one door is a brand-new sports car; behind the other two are goats. You pick a door.
+          The host reveals a goat behind one of the other doors. <strong>Should you switch?</strong>
         </p>
       </div>
 
-      {/* Practical Domain Selector */}
-      <div className={styles.domainSection}>
-        <div className={styles.domainLabel}>Select Scenario (Practical Context)</div>
-        <div className={styles.domainTabs}>
-          {Object.values(DOMAINS).map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              className={`${styles.domainTab} ${selectedDomain === d.id ? styles.domainTabActive : ''}`}
-              onClick={() => {
-                setSelectedDomain(d.id);
-                resetRound();
-              }}
-            >
-              <span>{d.prizeIcon}</span>
-              <span>{d.title}</span>
-            </button>
-          ))}
-        </div>
-        <div className={styles.domainContextDesc}>
-          <strong>{domain.title}</strong>: {domain.description} Target: <span style={{ color: '#10B981', fontWeight: 700 }}>{domain.prizeName}</span>. Elimination: <span style={{ color: '#EF4444' }}>{domain.dudName}</span>.
-        </div>
-      </div>
+      {/* 3D Stage Card */}
+      <div className={styles.stageCard}>
+        <div className={styles.canvasWrapper}>
+          <div ref={mountRef} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }} />
 
-      {/* Navigation for Modes */}
-      <div className={styles.modeNav}>
-        <button
-          type="button"
-          className={`${styles.modeBtn} ${activeMode === 'stage' ? styles.modeBtnActive : ''}`}
-          onClick={() => setActiveMode('stage')}
-        >
-          <Icon name="play" size={14} />
-          <span>3D Interactive Stage</span>
-        </button>
-        <button
-          type="button"
-          className={`${styles.modeBtn} ${activeMode === 'montecarlo' ? styles.modeBtnActive : ''}`}
-          onClick={() => setActiveMode('montecarlo')}
-        >
-          <Icon name="zap" size={14} />
-          <span>Monte Carlo Batch Engine (10k Runs)</span>
-        </button>
-        <button
-          type="button"
-          className={`${styles.modeBtn} ${activeMode === 'grid100' ? styles.modeBtnActive : ''}`}
-          onClick={() => setActiveMode('grid100')}
-        >
-          <Icon name="grid" size={14} />
-          <span>100-Door Extreme Intuition</span>
-        </button>
-        <button
-          type="button"
-          className={`${styles.modeBtn} ${activeMode === 'bayes' ? styles.modeBtnActive : ''}`}
-          onClick={() => setActiveMode('bayes')}
-        >
-          <Icon name="activity" size={14} />
-          <span>Bayesian Waterfall & Math Proof</span>
-        </button>
-      </div>
-
-      {/* MODE 1: 3D Interactive Stage */}
-      {activeMode === 'stage' && (
-        <div className={styles.stageCard}>
-          {/* Canvas Wrapper */}
-          <div className={styles.canvasWrapper}>
-            <div ref={mountRef} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }} />
-
-            {/* Stage Overlay Top */}
-            <div className={styles.stageOverlayTop}>
-              <div className={styles.contextBanner}>
-                <div className={styles.contextPrize}>
-                  <span>Target: {domain.prizeName}</span>
-                </div>
-                <div className={styles.contextDud}>
-                  <span>Elimination: {domain.dudName}</span>
-                </div>
+          {/* Top Overlays */}
+          <div className={styles.stageOverlayTop}>
+            <div className={styles.contextBanner}>
+              <div className={styles.contextPrize}>
+                <span>🏎️ Target: Sports Car ($120k)</span>
               </div>
-
-              {/* Camera Presets */}
-              <div className={styles.camControls}>
-                <button
-                  type="button"
-                  className={`${styles.camBtn} ${cameraPreset === 'front' ? styles.camBtnActive : ''}`}
-                  onClick={() => handleSetCameraPreset('front')}
-                >
-                  Front
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.camBtn} ${cameraPreset === 'wide' ? styles.camBtnActive : ''}`}
-                  onClick={() => handleSetCameraPreset('wide')}
-                >
-                  Studio
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.camBtn} ${cameraPreset === 'closeup' ? styles.camBtnActive : ''}`}
-                  onClick={() => handleSetCameraPreset('closeup')}
-                >
-                  Focus
-                </button>
+              <div className={styles.contextDud}>
+                <span>🐐 Dud: Booby Prize Goat ($0)</span>
               </div>
             </div>
 
-            {/* Stage Overlay Bottom */}
-            <div className={styles.stageOverlayBottom}>
-              <div className={styles.hintBadge}>
-                Drag in 3D to rotate camera • Click any door to choose
-              </div>
+            <div className={styles.camControls}>
+              <button
+                type="button"
+                className={`${styles.camBtn} ${cameraPreset === 'front' ? styles.camBtnActive : ''}`}
+                onClick={() => handleSetCameraPreset('front')}
+              >
+                Front View
+              </button>
+              <button
+                type="button"
+                className={`${styles.camBtn} ${cameraPreset === 'studio' ? styles.camBtnActive : ''}`}
+                onClick={() => handleSetCameraPreset('studio')}
+              >
+                Free Angle
+              </button>
             </div>
           </div>
 
-          {/* Interactive Decision Console */}
-          <div className={styles.decisionConsole}>
-            {/* Status Narrative */}
-            <div className={styles.statusMessage}>
-              <div>
-                <div className={styles.statusTextMain}>
-                  {gameState === 'choose' && (
-                    <>
-                      <span>Step 1: Pick a Door</span>
-                      <span className={styles.taglineBadge}>Initial Odds: 33.3%</span>
-                    </>
-                  )}
-                  {gameState === 'switch_or_stay' && (
-                    <>
-                      <span>Step 2: {domain.hostTitle} Eliminates a Dud!</span>
-                      <span className={styles.taglineBadge}>Asymmetric Filter</span>
-                    </>
-                  )}
-                  {gameState === 'finished' && (
-                    <>
-                      <span>{gameResult === 'win' ? `🎉 Captured ${domain.prizeName}!` : `❌ Revealed ${domain.dudName}`}</span>
-                      <span className={styles.taglineBadge}>
-                        {didSwitch ? 'Switched (66.7% Strategy)' : 'Stayed (33.3% Strategy)'}
-                      </span>
-                    </>
-                  )}
-                </div>
-                <div className={styles.statusTextSub}>
-                  {gameState === 'choose' &&
-                    `Exactly one door conceals the ${domain.prizeName}. Click any door in 3D or below to place your bet.`}
-                  {gameState === 'switch_or_stay' &&
-                    `The host opened Door 0${hostRevealed + 1} revealing ${domain.dudIcon} ${domain.dudName}. Because the host intentionally avoids the prize, the remaining unchosen door now holds 66.7% probability!`}
-                  {gameState === 'finished' &&
-                    `${gameResult === 'win' ? 'Success!' : 'Loss.'} ${domain.utilitarianBenefit}`}
-                </div>
-              </div>
+          <div className={styles.stageOverlayBottom}>
+            <div className={styles.hintBadge}>Drag in 3D to rotate camera • Click any door to choose</div>
+          </div>
+        </div>
 
-              {gameState === 'finished' && (
-                <button type="button" className={styles.resetBtn} onClick={resetRound}>
-                  <Icon name="refresh" size={14} />
-                  <span>Next Round</span>
-                </button>
-              )}
-            </div>
-
-            {/* 3 Door Buttons Selector */}
-            <div className={styles.doorButtonsGrid}>
-              {[0, 1, 2].map((dIdx) => {
-                const isSelected = playerPick === dIdx;
-                const isRevealed = hostRevealed === dIdx;
-                const isWinner = gameState === 'finished' && carDoor === dIdx;
-
-                let statusLabel = 'Unopened';
-                if (isSelected) statusLabel = 'Your Initial Pick';
-                if (isRevealed) statusLabel = `${domain.dudName} (Revealed)`;
-                if (isWinner) statusLabel = `★ ${domain.prizeName} ★`;
-
-                return (
-                  <button
-                    key={dIdx}
-                    type="button"
-                    disabled={gameState !== 'choose' || isRevealed}
-                    className={`${styles.doorSelectorBtn} ${isSelected ? styles.doorSelectorSelected : ''} ${
-                      isRevealed ? styles.doorSelectorRevealed : ''
-                    } ${isWinner ? styles.doorSelectorWinner : ''}`}
-                    onClick={() => handleSelectInitialDoor(dIdx)}
-                  >
-                    <span className={styles.doorBtnNum}>DOOR 0{dIdx + 1}</span>
-                    <span className={styles.doorBtnLabel}>
-                      {isRevealed ? domain.dudIcon : isWinner ? domain.prizeIcon : '🚪'}
+        {/* Streamlined Decision Console */}
+        <div className={styles.decisionConsole}>
+          {/* Status Message */}
+          <div className={styles.statusMessage}>
+            <div>
+              <div className={styles.statusTextMain}>
+                {gameState === 'choose' && (
+                  <>
+                    <span>Step 1: Pick a Door</span>
+                    <span className={styles.taglineBadge}>Initial Odds: 1/3 (33.3%)</span>
+                  </>
+                )}
+                {gameState === 'switch_or_stay' && (
+                  <>
+                    <span>Step 2: Monty Reveals a Goat!</span>
+                    <span className={styles.taglineBadge}>Host Action: Asymmetric Filter</span>
+                  </>
+                )}
+                {gameState === 'finished' && (
+                  <>
+                    <span>{gameResult === 'win' ? '🎉 You Won the Sports Car!' : '❌ You Got a Goat.'}</span>
+                    <span className={styles.taglineBadge}>
+                      {didSwitch ? 'Switched (66.7% Strategy)' : 'Stayed (33.3% Strategy)'}
                     </span>
-                    <span className={styles.doorBtnStatus}>{statusLabel}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Switch vs Stay Prompt Action Box */}
-            {gameState === 'switch_or_stay' && (
-              <div className={styles.actionChoiceBox}>
-                <div className={styles.actionChoiceHeader}>
-                  <span className={styles.actionChoiceTitle}>
-                    Strategic Dilemma: Preserve Original Pick or Switch?
-                  </span>
-                  <span className={styles.taglineBadge}>Utilitarian Expected Value: +100% Boost</span>
-                </div>
-                <div className={styles.actionButtonsRow}>
-                  <button
-                    type="button"
-                    className={styles.switchActionBtn}
-                    onClick={() => handleMakeFinalChoice(true)}
-                  >
-                    <Icon name="shuffle" size={16} />
-                    <span>Switch to Other Door (P = 66.7%)</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.stayActionBtn}
-                    onClick={() => handleMakeFinalChoice(false)}
-                  >
-                    <Icon name="anchor" size={16} />
-                    <span>Stay with Door 0{playerPick + 1} (P = 33.3%)</span>
-                  </button>
-                </div>
+                  </>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* MODE 2: High-Speed Monte Carlo Simulation */}
-      {activeMode === 'montecarlo' && (
-        <div className={styles.monteCarloCard}>
-          <div className={styles.monteHeader}>
-            <div>
-              <div className={styles.monteTitle}>
-                <Icon name="trending-up" size={18} color="#F59E0B" />
-                <span>Paul Erdős Monte Carlo Batch Verifier</span>
+              <div className={styles.statusTextSub}>
+                {gameState === 'choose' &&
+                  'Choose Door 1, 2, or 3 below (or click directly on the door in the 3D stage above):'}
+                {gameState === 'switch_or_stay' &&
+                  `Monty opened Door 0${hostRevealed + 1} showing a goat. Because Monty never reveals the car, the remaining unchosen door now holds 66.7% probability mass! Do you switch?`}
+                {gameState === 'finished' &&
+                  (gameResult === 'win'
+                    ? 'Target captured! Switching gives you a 2-to-1 advantage over repeated trials.'
+                    : 'A tough break! Even with 2/3 odds, 1 in 3 trials lose. Over time, switching wins twice as often.')}
               </div>
-              <p className={styles.statusTextSub}>
-                When the legendary mathematician Paul Erdős was first presented with the Monty Hall problem, he refused to believe switching doubled odds until shown a Monte Carlo computer simulation.
-              </p>
             </div>
-            <div className={styles.batchControls}>
-              <button
-                type="button"
-                className={styles.batchBtn}
-                disabled={isSimulatingBatch}
-                onClick={() => runMonteCarloBatch(50)}
-              >
-                +50 Trials
-              </button>
-              <button
-                type="button"
-                className={styles.batchBtn}
-                disabled={isSimulatingBatch}
-                onClick={() => runMonteCarloBatch(500)}
-              >
-                +500 Trials
-              </button>
-              <button
-                type="button"
-                className={styles.batchBtn}
-                disabled={isSimulatingBatch}
-                onClick={() => runMonteCarloBatch(5000)}
-              >
-                +5,000 Trials
-              </button>
-            </div>
-          </div>
 
-          {/* SVG Convergence Line Chart */}
-          <div className={styles.chartContainer}>
-            <svg width="100%" height="100%" viewBox="0 0 600 220" preserveAspectRatio="none">
-              {/* Grid lines */}
-              <line x1="0" y1="73.3" x2="600" y2="73.3" stroke="rgba(16, 185, 129, 0.35)" strokeDasharray="4 4" strokeWidth="1.5" />
-              <text x="12" y="68" fill="#10B981" fontSize="10" fontFamily="monospace">66.7% Theoretical Switch Limit (2/3)</text>
-
-              <line x1="0" y1="146.7" x2="600" y2="146.7" stroke="rgba(239, 68, 68, 0.35)" strokeDasharray="4 4" strokeWidth="1.5" />
-              <text x="12" y="142" fill="#EF4444" fontSize="10" fontFamily="monospace">33.3% Theoretical Stay Limit (1/3)</text>
-
-              {/* Data points lines */}
-              {monteHistory.length > 1 && (
-                <>
-                  {/* Switch Rate Polyline */}
-                  <polyline
-                    fill="none"
-                    stroke="#10B981"
-                    strokeWidth="3"
-                    points={monteHistory
-                      .map((pt, i) => {
-                        const x = (i / (monteHistory.length - 1)) * 560 + 20;
-                        const y = 220 - (pt.switchRate / 100) * 220;
-                        return `${x},${y}`;
-                      })
-                      .join(' ')}
-                  />
-
-                  {/* Stay Rate Polyline */}
-                  <polyline
-                    fill="none"
-                    stroke="#EF4444"
-                    strokeWidth="3"
-                    points={monteHistory
-                      .map((pt, i) => {
-                        const x = (i / (monteHistory.length - 1)) * 560 + 20;
-                        const y = 220 - (pt.stayRate / 100) * 220;
-                        return `${x},${y}`;
-                      })
-                      .join(' ')}
-                  />
-
-                  {/* Points */}
-                  {monteHistory.map((pt, i) => {
-                    const x = (i / (monteHistory.length - 1)) * 560 + 20;
-                    const ySwitch = 220 - (pt.switchRate / 100) * 220;
-                    const yStay = 220 - (pt.stayRate / 100) * 220;
-                    return (
-                      <g key={i}>
-                        <circle cx={x} cy={ySwitch} r="4" fill="#10B981" />
-                        <circle cx={x} cy={yStay} r="4" fill="#EF4444" />
-                      </g>
-                    );
-                  })}
-                </>
-              )}
-            </svg>
-          </div>
-
-          <div className={styles.statsGrid}>
-            <div className={`${styles.statCard} ${styles.statCardHighlight}`}>
-              <div className={styles.statLabel}>Switch Win Rate (Empirical)</div>
-              <div className={`${styles.statValue} ${styles.statValueGreen}`}>
-                {monteHistory[monteHistory.length - 1]?.switchRate}%
-              </div>
-              <div className={styles.statSub}>Target: 66.67% Expected Utility</div>
-            </div>
-            <div className={styles.statCard}>
-              <div className={styles.statLabel}>Stay Win Rate (Empirical)</div>
-              <div className={styles.statValue}>
-                {monteHistory[monteHistory.length - 1]?.stayRate}%
-              </div>
-              <div className={styles.statSub}>Target: 33.33% Expected Utility</div>
-            </div>
-            <div className={styles.statCard}>
-              <div className={styles.statLabel}>Total Batch Executions</div>
-              <div className={styles.statValue}>
-                {monteHistory.reduce((acc, h) => acc + h.trial, 0).toLocaleString()}
-              </div>
-              <div className={styles.statSub}>Simulated Independent Trials</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODE 3: 100-Door Extreme Intuition */}
-      {activeMode === 'grid100' && (
-        <div className={styles.grid100Card}>
-          <div className={styles.monteHeader}>
-            <div>
-              <div className={styles.grid100Title}>
-                The 100-Door Extreme Intuition Clarifier
-              </div>
-              <p className={styles.statusTextSub}>
-                Why does switching feel counter-intuitive? Because 3 doors feels close to 50/50.
-                Imagine 100 doors: You pick 1 door (1% chance). The host opens 98 doors showing duds, leaving only 1 other door intact.
-                Do you stay with your 1% pick, or switch to the door that survived a 98-door elimination purge?
-              </p>
-            </div>
-            {grid100Step === 'revealed' && (
-              <button type="button" className={styles.resetBtn} onClick={reset100Grid}>
+            {gameState === 'finished' && (
+              <button type="button" className={styles.resetBtn} onClick={resetRound}>
                 <Icon name="refresh" size={14} />
-                <span>Reset 100 Doors</span>
+                <span>Play Again</span>
               </button>
             )}
           </div>
 
-          {grid100Step === 'pick' && (
-            <div className={styles.hintBadge}>
-              Step 1: Click any of the 100 doors to make your initial blind pick (Probability = 1/100 = 1.0%).
-            </div>
-          )}
+          {/* 3 Door Buttons Selector */}
+          <div className={styles.doorButtonsGrid}>
+            {[0, 1, 2].map((dIdx) => {
+              const isSelected = playerPick === dIdx;
+              const isRevealed = hostRevealed === dIdx;
+              const isWinner = gameState === 'finished' && carDoor === dIdx;
 
-          {grid100Step === 'decide' && (
+              let statusLabel = 'Unopened';
+              if (isSelected) statusLabel = 'Your Initial Pick';
+              if (isRevealed) statusLabel = 'Goat (Revealed)';
+              if (isWinner) statusLabel = '★ Sports Car ★';
+
+              return (
+                <button
+                  key={dIdx}
+                  type="button"
+                  disabled={gameState !== 'choose' || isRevealed}
+                  className={`${styles.doorSelectorBtn} ${isSelected ? styles.doorSelectorSelected : ''} ${
+                    isRevealed ? styles.doorSelectorRevealed : ''
+                  } ${isWinner ? styles.doorSelectorWinner : ''}`}
+                  onClick={() => handleSelectInitialDoor(dIdx)}
+                >
+                  <span className={styles.doorBtnNum}>DOOR 0{dIdx + 1}</span>
+                  <span className={styles.doorBtnLabel}>{isRevealed ? '🐐' : isWinner ? '🏎️' : '🚪'}</span>
+                  <span className={styles.doorBtnStatus}>{statusLabel}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Switch vs Stay Action Prompt */}
+          {gameState === 'switch_or_stay' && (
             <div className={styles.actionChoiceBox}>
               <div className={styles.actionChoiceHeader}>
                 <span className={styles.actionChoiceTitle}>
-                  Host eliminated 98 duds! 2 doors remain: Door #{grid100Pick + 1} vs Door #{grid100Survivor + 1}.
+                  The Million-Dollar Question: Switch or Stay?
                 </span>
-                <span className={styles.taglineBadge}>Survivor Probability: 99.0%</span>
+                <span className={styles.taglineBadge}>Switching Yields +100% Expected Gain</span>
               </div>
               <div className={styles.actionButtonsRow}>
                 <button
                   type="button"
                   className={styles.switchActionBtn}
-                  onClick={() => handle100FinalChoice(true)}
+                  onClick={() => handleMakeFinalChoice(true)}
                 >
                   <Icon name="shuffle" size={16} />
-                  <span>Switch to Purge Survivor #{grid100Survivor + 1} (99% Odds)</span>
+                  <span>Switch to Other Door (66.7% Win Chance)</span>
                 </button>
                 <button
                   type="button"
                   className={styles.stayActionBtn}
-                  onClick={() => handle100FinalChoice(false)}
+                  onClick={() => handleMakeFinalChoice(false)}
                 >
                   <Icon name="anchor" size={16} />
-                  <span>Stay with Blind Pick #{grid100Pick + 1} (1% Odds)</span>
+                  <span>Stay with Door 0{playerPick + 1} (33.3% Win Chance)</span>
                 </button>
               </div>
             </div>
           )}
-
-          {grid100Step === 'revealed' && (
-            <div className={styles.statusMessage}>
-              <div className={styles.statusTextMain}>
-                {grid100Result === 'win' ? '🎉 Extraordinary Win!' : '❌ Loss!'}
-                <span className={styles.taglineBadge}>
-                  Actual Target was Door #{grid100Prize + 1}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* 100 Door Grid */}
-          <div className={styles.doors100Grid}>
-            {grid100Doors.map((idx) => {
-              const isPick = grid100Pick === idx;
-              const isSwept = grid100Swept.has(idx);
-              const isSurvivor = grid100Survivor === idx;
-              const isPrize = grid100Step === 'revealed' && grid100Prize === idx;
-
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  disabled={grid100Step !== 'pick'}
-                  className={`${styles.door100Cell} ${isPick ? styles.door100Selected : ''} ${
-                    isSwept ? styles.door100Swept : ''
-                  } ${isSurvivor ? styles.door100Survivor : ''}`}
-                  onClick={() => handle100DoorPick(idx)}
-                >
-                  {isPrize ? '🦄' : isSwept ? '✕' : idx + 1}
-                </button>
-              );
-            })}
-          </div>
         </div>
-      )}
+      </div>
 
-      {/* MODE 4: Bayesian Waterfall & Math Proof */}
-      {activeMode === 'bayes' && (
-        <div className={styles.bayesCard}>
-          <div className={styles.monteTitle}>
-            <Icon name="book" size={18} color="#F59E0B" />
-            <span>Bayesian Formulation of Information Concentration</span>
-          </div>
-          <p className={styles.statusTextSub}>
-            Let $C_i$ denote the state that the prize is behind Door $i$, with uniform prior $P(C_i) = 1/3$.
-            Suppose the player chooses Door 1, and the host (who cannot reveal the prize) opens Door 3 ($O_3$).
-          </p>
-
-          <div className={styles.bayesWaterfall}>
-            <div>
-              <div className={styles.statLabel}>1. Prior Probability Distribution (Before Host Evidence)</div>
-              <div className={styles.bayesBarTrack}>
-                <div className={styles.bayesBarSegment} style={{ width: '33.3%', background: '#3B82F6' }}>
-                  Door 1 (P = 33.3%)
-                </div>
-                <div className={styles.bayesBarSegment} style={{ width: '33.3%', background: '#10B981' }}>
-                  Door 2 (P = 33.3%)
-                </div>
-                <div className={styles.bayesBarSegment} style={{ width: '33.4%', background: '#8B5CF6' }}>
-                  Door 3 (P = 33.3%)
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className={styles.statLabel}>2. Host Evidence Filter: Host Opens Door 3 ($O_3$)</div>
-              <p className={styles.statusTextSub}>
-                • If Prize is at Door 1: Host picks between Door 2 & 3 randomly $\Rightarrow P(O_3 | C_1) = 1/2$.<br />
-                • If Prize is at Door 2: Host has NO CHOICE but to open Door 3 $\Rightarrow P(O_3 | C_2) = 1$.<br />
-                • If Prize is at Door 3: Host is forbidden from opening Door 3 $\Rightarrow P(O_3 | C_3) = 0$.
-              </p>
-            </div>
-
-            <div>
-              <div className={styles.statLabel}>3. Posterior Probability Distribution via Bayes&#39; Theorem</div>
-              <div className={styles.bayesBarTrack}>
-                <div className={styles.bayesBarSegment} style={{ width: '33.3%', background: '#EF4444' }}>
-                  Stay: Door 1 (P = 1/3)
-                </div>
-                <div className={styles.bayesBarSegment} style={{ width: '66.7%', background: '#10B981' }}>
-                  Switch: Door 2 (P = 2/3)
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            borderRadius: '8px',
-            padding: '1rem 1.25rem',
-            fontFamily: 'var(--font-mono, monospace)',
-            fontSize: '0.8125rem',
-            lineHeight: '1.6',
-            color: '#E5E7EB',
-          }}>
-            <strong>Bayesian Equation:</strong><br />
-            P(C_2 | O_3) = [ P(O_3 | C_2) * P(C_2) ] / [ P(O_3 | C_1)*P(C_1) + P(O_3 | C_2)*P(C_2) + P(O_3 | C_3)*P(C_3) ]<br />
-            P(C_2 | O_3) = [ 1 * (1/3) ] / [ (1/2 * 1/3) + (1 * 1/3) + (0 * 1/3) ]<br />
-            P(C_2 | O_3) = (1/3) / (1/6 + 2/6) = (1/3) / (1/2) = <strong>2/3 ≈ 66.67%</strong>
-          </div>
-        </div>
-      )}
-
-      {/* Live Session Scoreboard */}
+      {/* Live Scoreboard & Fast Empirical Batch Test */}
       <div className={styles.statsGrid}>
         <div className={`${styles.statCard} ${styles.statCardHighlight}`}>
-          <div className={styles.statLabel}>Live Session: Switch Win Rate</div>
+          <div className={styles.statLabel}>Switch Win Rate</div>
           <div className={`${styles.statValue} ${styles.statValueGreen}`}>{switchRate}%</div>
           <div className={styles.statSub}>
-            {sessionStats.switchWins} wins / {sessionStats.switchTotal} trials
+            {sessionStats.switchWins} wins / {sessionStats.switchTotal} trials (Target: 66.7%)
           </div>
         </div>
+
         <div className={styles.statCard}>
-          <div className={styles.statLabel}>Live Session: Stay Win Rate</div>
+          <div className={styles.statLabel}>Stay Win Rate</div>
           <div className={styles.statValue}>{stayRate}%</div>
           <div className={styles.statSub}>
-            {sessionStats.stayWins} wins / {sessionStats.stayTotal} trials
+            {sessionStats.stayWins} wins / {sessionStats.stayTotal} trials (Target: 33.3%)
           </div>
         </div>
+
         <div className={styles.statCard}>
-          <div className={styles.statLabel}>Consequence Arbitrage</div>
-          <div className={styles.statValue}>2.00x</div>
-          <div className={styles.statSub}>Multiplicative Advantage of Switching</div>
+          <div className={styles.statLabel}>Empirical Verification</div>
+          <button
+            type="button"
+            className={styles.batchBtn}
+            disabled={isSimulatingBatch}
+            style={{ width: '100%', marginTop: '0.25rem', padding: '0.65rem' }}
+            onClick={() => runQuickSimulation(1000)}
+          >
+            <Icon name="zap" size={14} />
+            <span>{isSimulatingBatch ? 'Simulating...' : 'Run 1,000 Quick Trials'}</span>
+          </button>
+          <div className={styles.statSub}>
+            {batchFeedback || 'Simulate 1,000 rounds to verify convergence'}
+          </div>
         </div>
+      </div>
+
+      {/* Practical Context Section: Real-World Applications */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginTop: '0.5rem' }}>
+        <div className={styles.domainLabel}>Practical Context: Why This Principle Dictates Real-World Decisions</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.85rem' }}>
+          {PRACTICAL_APPLICATIONS.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                background: 'rgba(17, 21, 30, 0.75)',
+                border: '1px solid #1E2536',
+                borderRadius: '10px',
+                padding: '1.15rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: '#F9FAFB' }}>
+                <span style={{ fontSize: '1.25rem' }}>{item.icon}</span>
+                <span>{item.title}</span>
+              </div>
+              <span style={{ fontSize: '0.6875rem', color: '#F59E0B', fontFamily: 'var(--font-mono, monospace)' }}>
+                {item.category}
+              </span>
+              <p style={{ fontSize: '0.8125rem', color: '#9CA3AF', lineHeight: '1.45', margin: 0 }}>
+                {item.description}
+              </p>
+              <div
+                style={{
+                  marginTop: 'auto',
+                  paddingTop: '0.5rem',
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                  fontSize: '0.75rem',
+                  color: '#10B981',
+                  fontWeight: 600,
+                }}
+              >
+                ★ {item.takeaway}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* The 100-Door Extreme Intuition Clarifier */}
+      <div style={{ marginTop: '0.5rem' }}>
+        <button
+          type="button"
+          onClick={() => setShow100Doors(!show100Doors)}
+          style={{
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            color: '#D1D5DB',
+            padding: '0.75rem 1rem',
+            width: '100%',
+            textAlign: 'left',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+          }}
+        >
+          <span>💡 Still feels counter-intuitive? Expand the 100-Door Shortcut</span>
+          <span>{show100Doors ? '▲ Close' : '▼ Expand'}</span>
+        </button>
+
+        {show100Doors && (
+          <div className={styles.grid100Card} style={{ marginTop: '0.75rem' }}>
+            <p className={styles.statusTextSub}>
+              Imagine <strong>100 doors</strong>. You make a blind guess on Door #1 (<strong>1% odds</strong>).
+              Monty sweeps down the stage and opens <strong>98 goat doors</strong>, leaving only Door #1 and Door #77.
+              Do you stay with your 1% guess, or switch to the door that survived a 98-door purge?
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className={styles.batchBtn}
+                onClick={() => handle100DoorClick(Math.floor(Math.random() * 100))}
+              >
+                Pick a Random Door
+              </button>
+              {grid100Pick !== null && (
+                <div style={{ fontSize: '0.8125rem', color: '#10B981', display: 'flex', alignItems: 'center' }}>
+                  You picked Door #{grid100Pick + 1} (1% chance). Monty purged 98 duds, leaving Door #{grid100Survivor + 1} (99% chance)!
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

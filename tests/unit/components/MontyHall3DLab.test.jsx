@@ -30,50 +30,56 @@ describe('MontyHall3DLab', () => {
     });
   });
 
-  it('renders the 3D Monty Hall Lab header and all 4 practical domains', () => {
+  it('renders the Monty Hall Lab with simple, clear pretext', () => {
     render(<MontyHall3DLab />);
 
-    expect(screen.getByText(/The Monty Hall Problem & Practical Information Asymmetry/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Classic TV Stage \(1975\)/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Venture Capital Allocation/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Clinical Diagnostic Triage/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Distributed Fault Isolation/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { level: 2, name: /The Monty Hall Problem/i })).toBeInTheDocument();
+    expect(screen.getByText(/Behind one door is a brand-new sports car; behind the other two are goats/i)).toBeInTheDocument();
   });
 
-  it('allows switching domains and updates contextual assets', () => {
-    render(<MontyHall3DLab />);
-
-    const vcTab = screen.getByText('Venture Capital Allocation');
-    fireEvent.click(vcTab);
-
-    expect(screen.getAllByText(/Decacorn Outlier/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Zombie Startup/i).length).toBeGreaterThan(0);
-  });
-
-  it('switches between interactive modes: Stage, Monte Carlo, 100-Door Grid, and Bayes Proof', () => {
-    render(<MontyHall3DLab />);
-
-    const monteCarloBtn = screen.getByText(/Monte Carlo Batch Engine/i);
-    fireEvent.click(monteCarloBtn);
-    expect(screen.getByText(/Paul Erdős Monte Carlo Batch Verifier/i)).toBeInTheDocument();
-
-    const grid100Btn = screen.getByText(/100-Door Extreme Intuition/i);
-    fireEvent.click(grid100Btn);
-    expect(screen.getByText(/The 100-Door Extreme Intuition Clarifier/i)).toBeInTheDocument();
-
-    const bayesBtn = screen.getByText(/Bayesian Waterfall & Math Proof/i);
-    fireEvent.click(bayesBtn);
-    expect(screen.getByText(/Bayesian Formulation of Information Concentration/i)).toBeInTheDocument();
-  });
-
-  it('progresses through stage door choice and reveals host actions', () => {
+  it('progresses through door choice and reveals host actions', () => {
     render(<MontyHall3DLab />);
 
     const door1Btn = screen.getByText('DOOR 01');
     fireEvent.click(door1Btn);
 
     // Host reveals one of the doors
-    expect(screen.getByText(/Strategic Dilemma: Preserve Original Pick or Switch/i)).toBeInTheDocument();
+    expect(screen.getByText(/The Million-Dollar Question: Switch or Stay/i)).toBeInTheDocument();
     expect(screen.getByText(/Switch to Other Door/i)).toBeInTheDocument();
+    expect(screen.getByText(/Stay with Door 01/i)).toBeInTheDocument();
+  });
+
+  it('allows switching and shows outcome', () => {
+    render(<MontyHall3DLab />);
+
+    fireEvent.click(screen.getByText('DOOR 01'));
+    const switchBtn = screen.getByText(/Switch to Other Door/i);
+    fireEvent.click(switchBtn);
+
+    expect(screen.getByText(/Play Again/i)).toBeInTheDocument();
+  });
+
+  it('displays real-world practical context applications', () => {
+    render(<MontyHall3DLab />);
+
+    expect(screen.getByText('Venture Capital Portfolio Strategy')).toBeInTheDocument();
+    expect(screen.getByText('Clinical Diagnostic Triage')).toBeInTheDocument();
+    expect(screen.getByText('Distributed Systems & Incident Response')).toBeInTheDocument();
+  });
+
+  it('runs automated batch simulation directly from the dashboard', () => {
+    render(<MontyHall3DLab />);
+
+    const runBatchBtn = screen.getByText(/Run 1,000 Quick Trials/i);
+    expect(runBatchBtn).toBeInTheDocument();
+    fireEvent.click(runBatchBtn);
+  });
+
+  it('toggles the 100-door intuition shortcut', () => {
+    render(<MontyHall3DLab />);
+
+    const toggleBtn = screen.getByText(/Expand the 100-Door Shortcut/i);
+    fireEvent.click(toggleBtn);
+    expect(screen.getByText(/Pick a Random Door/i)).toBeInTheDocument();
   });
 });
