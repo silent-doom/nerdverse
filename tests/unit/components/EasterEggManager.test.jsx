@@ -62,6 +62,28 @@ describe('EasterEggManager', () => {
 
     expect(document.body.classList.contains('retro-phosphor-mode')).toBe(true);
     expect(screen.getByText(/Retro 8-Bit Nerd Mode Enabled/i)).toBeInTheDocument();
+    expect(screen.getByText(/RETRO NERD MODE ACTIVE/i)).toBeInTheDocument();
+
+    // Reset via the on-screen reset button
+    const resetBtn = screen.getByText(/Reset \(ESC\)/i);
+    fireEvent.click(resetBtn);
+    expect(document.body.classList.contains('retro-phosphor-mode')).toBe(false);
+  });
+
+  it('resets retro mode when pressing the Escape key', () => {
+    render(<EasterEggManager />);
+
+    // Enable retro mode via console helper
+    act(() => {
+      window.nerdverse.retroMode();
+    });
+    expect(document.body.classList.contains('retro-phosphor-mode')).toBe(true);
+
+    // Press Escape
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    expect(document.body.classList.contains('retro-phosphor-mode')).toBe(false);
   });
 
   it('handles nerdverse:murphy event and allows restoring normal reality', () => {

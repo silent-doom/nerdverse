@@ -17,8 +17,27 @@ const KONAMI_SEQUENCE = [
   'a',
 ];
 
+const FLOATING_ITEMS = [
+  { id: 1, symbol: '👾', left: '6%', delay: '0s', duration: '11s', size: '28px' },
+  { id: 2, symbol: '42', left: '14%', delay: '2s', duration: '14s', size: '24px' },
+  { id: 3, symbol: '★', left: '22%', delay: '1s', duration: '10s', size: '20px' },
+  { id: 4, symbol: 'π', left: '30%', delay: '3.5s', duration: '13s', size: '26px' },
+  { id: 5, symbol: '∞', left: '38%', delay: '0.5s', duration: '12s', size: '26px' },
+  { id: 6, symbol: '🛸', left: '46%', delay: '2.5s', duration: '15s', size: '28px' },
+  { id: 7, symbol: '💾', left: '54%', delay: '1.2s', duration: '11s', size: '22px' },
+  { id: 8, symbol: '🐱', left: '62%', delay: '4s', duration: '13s', size: '26px' },
+  { id: 9, symbol: '⚡', left: '70%', delay: '2s', duration: '10s', size: '22px' },
+  { id: 10, symbol: '♥', left: '78%', delay: '0.8s', duration: '14s', size: '22px' },
+  { id: 11, symbol: '42', left: '86%', delay: '3s', duration: '12s', size: '26px' },
+  { id: 12, symbol: '👾', left: '94%', delay: '1.8s', duration: '13s', size: '24px' },
+  { id: 13, symbol: 'ħ', left: '18%', delay: '5.5s', duration: '14s', size: '22px' },
+  { id: 14, symbol: 'c', left: '50%', delay: '6s', duration: '12s', size: '22px' },
+  { id: 15, symbol: '🍞', left: '82%', delay: '5s', duration: '15s', size: '24px' },
+];
+
 export default function EasterEggManager() {
   const [toast, setToast] = useState(null);
+  const [isRetroActive, setIsRetroActive] = useState(false);
   const [isMurphyActive, setIsMurphyActive] = useState(false);
   const [isQuantumActive, setIsQuantumActive] = useState(false);
   const [quantumState, setQuantumState] = useState(null);
@@ -36,6 +55,29 @@ export default function EasterEggManager() {
   const closeToast = useCallback(() => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast(null);
+  }, []);
+
+  // Reset Retro Mode
+  const resetRetroMode = useCallback(() => {
+    setIsRetroActive(false);
+    document.body.classList.remove('retro-phosphor-mode');
+    showToast(
+      'Retro Mode Disabled',
+      'Normal Reality Restored',
+      'Zero-gravity particles dissipated. Standard continuum normalized.',
+      '🌟'
+    );
+  }, [showToast]);
+
+  // Master Reset for all Easter Eggs (triggered by ESC or resetAll)
+  const resetAllEffects = useCallback(() => {
+    setIsRetroActive(false);
+    document.body.classList.remove('retro-phosphor-mode');
+    setIsMurphyActive(false);
+    document.body.classList.remove('murphy-tilted');
+    document.body.classList.remove('quantum-flipped');
+    setToast(null);
+    setIsQuantumActive(false);
   }, []);
 
   // Trigger Murphy's Law Reality Tilt & Buttered Toast Drop
@@ -102,15 +144,29 @@ export default function EasterEggManager() {
   
   Curious developer detected! Welcome to the NerdVerse Easter Egg Engine.
   Try executing these in your console:
+  • nerdverse.retroMode()          - Toggles 8-bit retro matrix & zero-gravity floating effects
   • nerdverse.quantumFlip()        - Inverts spacetime color frequencies
   • nerdverse.butterToast()        - Tests Murphy's Law kinetics
   • nerdverse.meaningOfLife()      - Consults Deep Thought
   • nerdverse.collapseCat()        - Collapses Schrödinger's superposition
+  • nerdverse.resetAll()           - Restores normal reality immediately
       `,
       'color: #10B981; font-weight: bold; font-family: monospace; font-size: 11px; line-height: 1.2;'
     );
 
     window.nerdverse = {
+      retroMode: () => {
+        setIsRetroActive((prev) => {
+          const next = !prev;
+          if (next) {
+            document.body.classList.add('retro-phosphor-mode');
+          } else {
+            document.body.classList.remove('retro-phosphor-mode');
+          }
+          return next;
+        });
+        return '👾 Retro mode toggled.';
+      },
       quantumFlip: () => {
         document.body.classList.toggle('quantum-flipped');
         const active = document.body.classList.contains('quantum-flipped');
@@ -131,6 +187,10 @@ export default function EasterEggManager() {
         window.dispatchEvent(new CustomEvent('nerdverse:singularity'));
         return '🌌 Singularity initialized.';
       },
+      resetAll: () => {
+        resetAllEffects();
+        return '🌟 Reality normalized. All easter eggs reset.';
+      },
     };
 
     // Custom Event Listeners
@@ -142,21 +202,35 @@ export default function EasterEggManager() {
     window.addEventListener('nerdverse:schrodinger', onSchrodinger);
     window.addEventListener('nerdverse:singularity', onSingularity);
 
-    // Konami Key Listener
+    // Konami Key & ESC Listener
     const onKeyDown = (e) => {
+      // Escape resets all effects instantly
+      if (e.key === 'Escape') {
+        resetAllEffects();
+        return;
+      }
+
       const targetKey = KONAMI_SEQUENCE[konamiIndexRef.current];
       if (e.key.toLowerCase() === targetKey.toLowerCase()) {
         konamiIndexRef.current++;
         if (konamiIndexRef.current === KONAMI_SEQUENCE.length) {
           konamiIndexRef.current = 0;
-          document.body.classList.toggle('retro-phosphor-mode');
-          const isRetro = document.body.classList.contains('retro-phosphor-mode');
-          showToast(
-            'Secret Cheat Code',
-            isRetro ? 'Retro 8-Bit Nerd Mode Enabled!' : 'Normal Reality Restored',
-            'Konami Code confirmed: ↑ ↑ ↓ ↓ ← → ← → B A. "The answer to the universe is 42."',
-            '👾'
-          );
+          setIsRetroActive((prev) => {
+            const next = !prev;
+            if (next) {
+              document.body.classList.add('retro-phosphor-mode');
+              showToast(
+                'Secret Cheat Code',
+                'Retro 8-Bit Nerd Mode Enabled!',
+                'Zero-gravity particles unleashed! Press ESC or click the top banner to reset.',
+                '👾'
+              );
+            } else {
+              document.body.classList.remove('retro-phosphor-mode');
+              showToast('Normal Reality', 'Retro Mode Disabled', 'Standard physics restored.', '🌟');
+            }
+            return next;
+          });
         }
       } else {
         konamiIndexRef.current = 0;
@@ -172,10 +246,49 @@ export default function EasterEggManager() {
       window.removeEventListener('nerdverse:singularity', onSingularity);
       delete window.nerdverse;
     };
-  }, [triggerMurphyLaw, collapseSchrodinger, triggerSingularity, showToast]);
+  }, [triggerMurphyLaw, collapseSchrodinger, triggerSingularity, showToast, resetAllEffects]);
 
   return (
     <>
+      {/* Floating Zero-Gravity Retro Particles when Konami / Retro Mode is Active */}
+      {isRetroActive && (
+        <>
+          {/* Top Reset Banner */}
+          <div className={styles.retroActiveHud}>
+            <span className={styles.retroHudBadge}>
+              <span>👾</span>
+              <span>RETRO NERD MODE ACTIVE</span>
+            </span>
+            <button
+              type="button"
+              className={styles.retroResetBtn}
+              onClick={resetRetroMode}
+              title="Disable retro mode (or press ESC)"
+            >
+              Reset (ESC)
+            </button>
+          </div>
+
+          {/* Floating Zero-Gravity Glyph Particles */}
+          <div className={styles.floatingZeroGravityLayer} aria-hidden="true">
+            {FLOATING_ITEMS.map((item) => (
+              <span
+                key={item.id}
+                className={styles.floatingItem}
+                style={{
+                  left: item.left,
+                  fontSize: item.size,
+                  animationDelay: item.delay,
+                  animationDuration: item.duration,
+                }}
+              >
+                {item.symbol}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
+
       {/* Achievement Toast */}
       {toast && (
         <div className={styles.achievementToast} role="alert">

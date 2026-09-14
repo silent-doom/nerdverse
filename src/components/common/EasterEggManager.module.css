@@ -176,6 +176,94 @@
   transition: filter 0.5s ease;
 }
 
+/* Floating Zero-Gravity Retro Particles Layer */
+.floatingZeroGravityLayer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 99990;
+}
+
+.floatingItem {
+  position: absolute;
+  bottom: -40px;
+  color: #10B981;
+  font-family: var(--font-mono, monospace);
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.4);
+  animation: floatUpward linear infinite;
+  user-select: none;
+}
+
+@keyframes floatUpward {
+  0% {
+    bottom: -50px;
+    transform: translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    bottom: 105vh;
+    transform: translateX(40px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Retro Mode Active HUD & Reset Pill */
+.retroActiveHud {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100002;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(10, 14, 20, 0.94);
+  border: 1px solid #10B981;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.45);
+  border-radius: 9999px;
+  padding: 0.4rem 0.6rem 0.4rem 1rem;
+  animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.retroHudBadge {
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: #10B981;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.retroResetBtn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #F87171;
+  font-size: 0.6875rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.retroResetBtn:hover {
+  background: #EF4444;
+  color: #FFFFFF;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+  transform: scale(1.05);
+}
+
 :global(body.murphy-tilted) {
   transform: rotate(1.8deg);
   transform-origin: center center;
