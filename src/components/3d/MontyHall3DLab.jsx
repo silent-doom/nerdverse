@@ -305,11 +305,97 @@ export default function MontyHall3DLab() {
       doorStationGroup.position.set(xPos, 0, -2);
 
       // Station Spotlight
-      const doorSpot = new THREE.SpotLight(0xffedd5, 2.2, 12, Math.PI / 4, 0.4);
-      doorSpot.position.set(xPos, 5.5, -0.5);
+      const doorSpot = new THREE.SpotLight(0xffedd5, 2.2, 14, Math.PI / 4, 0.4);
+      doorSpot.position.set(0, 5.5, 1.5);
       doorSpot.target = doorStationGroup;
-      scene.add(doorSpot);
+      doorStationGroup.add(doorSpot);
 
+      // --- FULL SOLID 3D ENCLOSURE BOOTH ---
+      // Materials
+      const boothExtMat = new THREE.MeshStandardMaterial({
+        color: 0x11131a,
+        metalness: 0.82,
+        roughness: 0.38,
+      });
+      const boothIntMat = new THREE.MeshStandardMaterial({
+        color: 0x08090d,
+        roughness: 0.95,
+        metalness: 0.05,
+      });
+      const boothTrimMat = new THREE.MeshStandardMaterial({
+        color: 0x1e222e,
+        metalness: 0.9,
+        roughness: 0.25,
+      });
+      const amberTrimMat = new THREE.MeshStandardMaterial({
+        color: 0xe5a93c,
+        metalness: 0.88,
+        roughness: 0.2,
+      });
+
+      // 1. Left Enclosure Wall (Solid side barrier)
+      const wallL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 3.8, 2.6), boothExtMat);
+      wallL.position.set(-1.22, 1.85, -1.3);
+      wallL.castShadow = true;
+      wallL.receiveShadow = true;
+      doorStationGroup.add(wallL);
+
+      // 2. Right Enclosure Wall (Solid side barrier)
+      const wallR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 3.8, 2.6), boothExtMat);
+      wallR.position.set(1.22, 1.85, -1.3);
+      wallR.castShadow = true;
+      wallR.receiveShadow = true;
+      doorStationGroup.add(wallR);
+
+      // 3. Back Enclosure Wall (Solid rear barrier)
+      const wallB = new THREE.Mesh(new THREE.BoxGeometry(2.58, 3.8, 0.14), boothExtMat);
+      wallB.position.set(0, 1.85, -2.6);
+      wallB.castShadow = true;
+      wallB.receiveShadow = true;
+      doorStationGroup.add(wallB);
+
+      // 4. Roof / Ceiling (Solid top barrier)
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(2.58, 0.14, 2.6), boothExtMat);
+      roof.position.set(0, 3.75, -1.3);
+      roof.castShadow = true;
+      roof.receiveShadow = true;
+      doorStationGroup.add(roof);
+
+      // 5. Interior Stage Base Floor
+      const boothFloor = new THREE.Mesh(new THREE.BoxGeometry(2.34, 0.06, 2.5), boothIntMat);
+      boothFloor.position.set(0, 0.03, -1.3);
+      boothFloor.receiveShadow = true;
+      doorStationGroup.add(boothFloor);
+
+      // 6. Threshold Kickplate (Seals light/line-of-sight directly under the door panel)
+      const threshold = new THREE.Mesh(new THREE.BoxGeometry(2.28, 0.1, 0.24), boothTrimMat);
+      threshold.position.set(0, 0.05, 0);
+      threshold.receiveShadow = true;
+      doorStationGroup.add(threshold);
+
+      // 7. Interior Stage Back Acoustic Panel with Amber Accent Edges
+      const interiorBackPanel = new THREE.Mesh(new THREE.BoxGeometry(2.1, 3.4, 0.04), boothIntMat);
+      interiorBackPanel.position.set(0, 1.8, -2.51);
+      doorStationGroup.add(interiorBackPanel);
+
+      const accentStripL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 3.4, 0.04), amberTrimMat);
+      accentStripL.position.set(-1.05, 1.8, -2.51);
+      doorStationGroup.add(accentStripL);
+
+      const accentStripR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 3.4, 0.04), amberTrimMat);
+      accentStripR.position.set(1.05, 1.8, -2.51);
+      doorStationGroup.add(accentStripR);
+
+      // 8. Interior Ceiling Downlight (Illuminates compartment when door opens)
+      const interiorDownlight = new THREE.SpotLight(0xfff7ed, 1.6, 5.5, Math.PI / 3, 0.4);
+      interiorDownlight.position.set(0, 3.6, -1.3);
+      const downlightTarget = new THREE.Object3D();
+      downlightTarget.position.set(0, 0.1, -1.3);
+      doorStationGroup.add(downlightTarget);
+      interiorDownlight.target = downlightTarget;
+      doorStationGroup.add(interiorDownlight);
+
+      // --- FRONT DOOR FRAME & HINGED DOOR ---
       const frameMat = new THREE.MeshStandardMaterial({ color: 0x181a24, metalness: 0.8, roughness: 0.35 });
       const frameL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.6, 0.3), frameMat);
       frameL.position.set(-1.18, 1.8, 0);
@@ -361,29 +447,31 @@ export default function MontyHall3DLab() {
       scene.add(doorStationGroup);
       doorMeshes.push({ group: doorStationGroup, pivot: hingePivot, panel: doorPanel });
 
-      // Behind Door Item (Realistic Sports Car vs Realistic Live Goat)
+      // --- INTERIOR PRIZE & DUD DISPLAY (NESTED FULLY INSIDE BOOTH) ---
       const itemGroup = new THREE.Group();
-      itemGroup.position.set(xPos, 0, -2.4);
+      // Centered at z = -1.3 inside the booth (0.39m clearance behind closed door)
+      itemGroup.position.set(0, 0, -1.3);
+      doorStationGroup.add(itemGroup);
 
       // Sports Car Prize Anchor
       const prizeMesh = new THREE.Group();
       
-      // Deluxe Chrome / Carbon Turntable Platform
+      // Deluxe Chrome / Carbon Turntable Platform (Sized to fit comfortably inside booth)
       const carTurntable = new THREE.Mesh(
-        new THREE.CylinderGeometry(1.2, 1.3, 0.2, 32),
+        new THREE.CylinderGeometry(0.82, 0.85, 0.12, 32),
         new THREE.MeshStandardMaterial({ color: 0x12131a, metalness: 0.85, roughness: 0.2 })
       );
-      carTurntable.position.y = 0.1;
+      carTurntable.position.y = 0.06;
       carTurntable.receiveShadow = true;
       prizeMesh.add(carTurntable);
 
       // Warm Amber Underglow Ring
       const carUnderglow = new THREE.Mesh(
-        new THREE.RingGeometry(1.05, 1.22, 32),
+        new THREE.RingGeometry(0.72, 0.84, 32),
         new THREE.MeshBasicMaterial({ color: 0xe5a93c, side: THREE.DoubleSide })
       );
       carUnderglow.rotation.x = -Math.PI / 2;
-      carUnderglow.position.y = 0.205;
+      carUnderglow.position.y = 0.125;
       prizeMesh.add(carUnderglow);
 
       const carAnchor = new THREE.Group();
@@ -392,32 +480,32 @@ export default function MontyHall3DLab() {
       // Goat / Farm Paddock Anchor
       const dudMesh = new THREE.Group();
       
-      // Grounded Earthy Pasture Disk
+      // Grounded Earthy Pasture Disk (Sized to fit comfortably inside booth)
       const goatPaddock = new THREE.Mesh(
-        new THREE.CylinderGeometry(1.15, 1.25, 0.18, 32),
-        new THREE.MeshStandardMaterial({ color: 0x222822, roughness: 0.9, metalness: 0.05 })
+        new THREE.CylinderGeometry(0.82, 0.85, 0.12, 32),
+        new THREE.MeshStandardMaterial({ color: 0x202620, roughness: 0.9, metalness: 0.05 })
       );
-      goatPaddock.position.y = 0.09;
+      goatPaddock.position.y = 0.06;
       goatPaddock.receiveShadow = true;
       dudMesh.add(goatPaddock);
 
       // Pasture fence posts around the paddock
-      const fencePostGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.45, 8);
+      const fencePostGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.4, 8);
       const fencePostMat = new THREE.MeshStandardMaterial({ color: 0x4a3728, roughness: 0.9 });
       for (let f = 0; f < 8; f++) {
         const ang = (f / 8) * Math.PI * 2;
         const post = new THREE.Mesh(fencePostGeo, fencePostMat);
-        post.position.set(Math.cos(ang) * 1.05, 0.28, Math.sin(ang) * 1.05);
+        post.position.set(Math.cos(ang) * 0.76, 0.2, Math.sin(ang) * 0.76);
         dudMesh.add(post);
       }
 
       // Subtle Slate Paddock Border Ring
       const goatGlow = new THREE.Mesh(
-        new THREE.RingGeometry(0.95, 1.12, 32),
+        new THREE.RingGeometry(0.66, 0.78, 32),
         new THREE.MeshBasicMaterial({ color: 0x64748b, side: THREE.DoubleSide })
       );
       goatGlow.rotation.x = -Math.PI / 2;
-      goatGlow.position.y = 0.185;
+      goatGlow.position.y = 0.125;
       dudMesh.add(goatGlow);
 
       const goatAnchor = new THREE.Group();
@@ -425,7 +513,6 @@ export default function MontyHall3DLab() {
 
       itemGroup.add(prizeMesh);
       itemGroup.add(dudMesh);
-      scene.add(itemGroup);
 
       itemMeshes.push({ itemGroup, prizeMesh, dudMesh, carAnchor, goatAnchor, goatModel: null, carModel: null });
     });
@@ -439,8 +526,8 @@ export default function MontyHall3DLab() {
     gltfLoader.load('/models/sports_car.glb', (gltf) => {
       itemMeshes.forEach((item) => {
         const carClone = gltf.scene.clone(true);
-        carClone.scale.set(0.92, 0.92, 0.92);
-        carClone.position.set(0, 0.18, 0);
+        carClone.scale.set(0.78, 0.78, 0.78);
+        carClone.position.set(0, 0.12, 0);
         carClone.rotation.y = -Math.PI / 5;
         carClone.traverse((child) => {
           if (child.isMesh) {
@@ -456,8 +543,8 @@ export default function MontyHall3DLab() {
     gltfLoader.load('/models/goat.glb', (gltf) => {
       itemMeshes.forEach((item, idx) => {
         const goatClone = gltf.scene.clone(true);
-        goatClone.scale.set(0.95, 0.95, 0.95);
-        goatClone.position.set(0, 0.15, 0);
+        goatClone.scale.set(0.8, 0.8, 0.8);
+        goatClone.position.set(0, 0.1, 0);
         goatClone.rotation.y = idx === 0 ? 0.35 : idx === 2 ? -0.35 : 0;
         goatClone.traverse((child) => {
           if (child.isMesh) {
@@ -582,7 +669,7 @@ export default function MontyHall3DLab() {
       itemsMeshRef.current.forEach((item, idx) => {
         if (item.goatModel) {
           // Organic breathing & gentle idle head movement
-          item.goatModel.position.y = 0.15 + Math.sin(currentTime * 0.003 + idx * 1.5) * 0.015;
+          item.goatModel.position.y = 0.10 + Math.sin(currentTime * 0.003 + idx * 1.5) * 0.015;
           item.goatModel.rotation.z = Math.sin(currentTime * 0.002 + idx) * 0.02;
         }
         if (item.carModel && item.prizeMesh.visible) {
