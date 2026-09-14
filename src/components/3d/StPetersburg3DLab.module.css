@@ -1,14 +1,14 @@
 .labContainer {
   position: relative;
   width: 100%;
-  background: radial-gradient(circle at 50% 30%, #161208 0%, #080704 100%);
-  border: 3px solid var(--color-border-default, #1e293b);
+  background: var(--color-bg-primary, #08090c);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: var(--radius-lg, 12px);
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  color: #f8fafc;
+  color: var(--color-text-primary, #f9fafb);
   user-select: none;
   margin-bottom: var(--space-8, 32px);
 }
@@ -18,7 +18,7 @@
   width: 100%;
   height: clamp(480px, 60vh, 600px);
   cursor: grab;
-  background: #060604;
+  background: #08090c;
 }
 
 .canvasWrapper:active {
@@ -41,9 +41,9 @@
 }
 
 .headerTitleBox {
-  background: rgba(10, 9, 6, 0.85);
+  background: rgba(14, 15, 20, 0.88);
   backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(245, 158, 11, 0.3);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: 8px;
   padding: 10px 16px;
   pointer-events: auto;
@@ -55,48 +55,48 @@
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #f59e0b;
+  color: var(--color-brand-light, #e5a93c);
   margin-bottom: 2px;
 }
 
 .labTitle {
   font-size: 18px;
   font-weight: 800;
-  color: #fef3c7;
+  color: var(--color-text-primary, #f9fafb);
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .payoutDisplay {
-  background: rgba(10, 9, 6, 0.9);
+  background: rgba(14, 15, 20, 0.92);
   backdrop-filter: blur(12px);
-  border: 2px solid #f59e0b;
+  border: 1.5px solid var(--color-brand-light, #e5a93c);
   border-radius: 8px;
   padding: 10px 18px;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 20px rgba(229, 169, 60, 0.2);
 }
 
 .payoutLabel {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #fbbf24;
+  color: var(--color-text-secondary, #9ca3af);
   letter-spacing: 0.05em;
 }
 
 .payoutValue {
   font-size: 28px;
   font-weight: 800;
-  color: #fef08a;
+  color: var(--color-brand-light, #e5a93c);
   line-height: 1.1;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: var(--font-mono, monospace);
 }
 
 /* ── HUD Streak Meter ── */
@@ -105,9 +105,9 @@
   top: 90px;
   left: 16px;
   z-index: 10;
-  background: rgba(10, 9, 6, 0.8);
+  background: rgba(14, 15, 20, 0.85);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: 6px;
   padding: 8px 14px;
   pointer-events: none;
@@ -120,13 +120,14 @@
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--color-text-secondary, #9ca3af);
 }
 
 .streakValue {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
-  color: #f59e0b;
+  color: var(--color-brand-light, #e5a93c);
+  font-family: var(--font-mono, monospace);
 }
 
 /* ── Interactive Coin Action Overlay ── */
@@ -154,51 +155,63 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: #0b0f19;
+  background: var(--color-brand-light, #e5a93c);
+  color: var(--color-bg-primary, #08090c);
   border: none;
   padding: 12px 22px;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: var(--radius-md, 8px);
+  font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
-  transition: all 0.15s;
+  box-shadow: 0 4px 16px rgba(229, 169, 60, 0.3);
+  transition: all 0.15s ease;
 }
 
 .flipBtn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(245, 158, 11, 0.6);
+  background: #f5b74c;
+  box-shadow: 0 6px 20px rgba(229, 169, 60, 0.45);
 }
 
 .flipBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .secondaryActionBtn {
-  background: rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 19, 26, 0.85);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #cbd5e1;
+  border: 1px solid var(--color-border-default, #21232c);
+  color: var(--color-text-secondary, #9ca3af);
   padding: 12px 18px;
-  border-radius: 8px;
+  border-radius: var(--radius-md, 8px);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 .secondaryActionBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  background: var(--color-card-bg, #12131a);
+  border-color: var(--color-brand-light, #e5a93c);
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.secondaryActionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ── Dashboard Panel ── */
 .dashboard {
-  background: #0a0907;
-  border-top: 1.5px solid rgba(245, 158, 11, 0.15);
+  background: var(--color-bg-primary, #08090c);
+  border-top: 1px solid var(--color-border-default, #21232c);
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
@@ -213,66 +226,73 @@
 }
 
 .mathCard {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 14px 18px;
+  background: var(--color-card-bg, #12131a);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-md, 8px);
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  transition: border-color 0.2s ease;
+}
+
+.mathCard:hover {
+  border-color: var(--color-border-hover, #2f3240);
 }
 
 .mathCardTitle {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: var(--color-text-secondary, #9ca3af);
 }
 
 .mathCardValue {
   font-size: 18px;
   font-weight: 800;
-  font-family: monospace;
+  color: var(--color-text-primary, #f9fafb);
+  font-family: var(--font-mono, monospace);
 }
 
 .mathCardDesc {
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--color-text-secondary, #9ca3af);
   line-height: 1.45;
   margin: 0;
 }
 
 /* ── Batch Simulation Summary Row ── */
 .batchSummaryRow {
-  background: rgba(245, 158, 11, 0.06);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  border-radius: 8px;
-  padding: 12px 18px;
+  background: var(--color-card-bg, #12131a);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-md, 8px);
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
   font-size: 12px;
 }
 
 .batchStat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .batchStatLabel {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--color-text-secondary, #9ca3af);
+  letter-spacing: 0.05em;
 }
 
 .batchStatVal {
   font-size: 15px;
   font-weight: 800;
-  color: #fef08a;
-  font-family: monospace;
+  color: var(--color-brand-light, #e5a93c);
+  font-family: var(--font-mono, monospace);
 }

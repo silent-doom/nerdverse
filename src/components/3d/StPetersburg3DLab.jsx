@@ -381,7 +381,7 @@ export default function StPetersburg3DLab() {
             onClick={runBatchSimulation}
             disabled={isFlipping}
           >
-            <Icon name="zap" size={14} color="#f59e0b" />
+            <Icon name="zap" size={14} color="#e5a93c" />
             <span>Run 1,000-Trial Monte Carlo</span>
           </button>
         </div>
@@ -392,10 +392,10 @@ export default function StPetersburg3DLab() {
         <div className={styles.mathComparisonGrid}>
           {/* Card 1: Linear Expected Value */}
           <div className={styles.mathCard}>
-            <span className={styles.mathCardTitle} style={{ color: '#ef4444' }}>
+            <span className={styles.mathCardTitle}>
               Theoretical Expected Return E(X)
             </span>
-            <span className={styles.mathCardValue} style={{ color: '#ef4444' }}>
+            <span className={styles.mathCardValue}>
               +∞ (Infinite Dollars)
             </span>
             <p className={styles.mathCardDesc}>
@@ -405,10 +405,10 @@ export default function StPetersburg3DLab() {
 
           {/* Card 2: Bernoulli Logarithmic Utility */}
           <div className={styles.mathCard}>
-            <span className={styles.mathCardTitle} style={{ color: '#10b981' }}>
+            <span className={styles.mathCardTitle}>
               Daniel Bernoulli's Utility U = ln(W)
             </span>
-            <span className={styles.mathCardValue} style={{ color: '#10b981' }}>
+            <span className={styles.mathCardValue}>
               ~$20 - $25 Willingness to Pay
             </span>
             <p className={styles.mathCardDesc}>
@@ -418,10 +418,10 @@ export default function StPetersburg3DLab() {
 
           {/* Card 3: Global Bankroll Bound */}
           <div className={styles.mathCard}>
-            <span className={styles.mathCardTitle} style={{ color: '#38bdf8' }}>
+            <span className={styles.mathCardTitle}>
               Global Liquid Wealth Cap ($100T)
             </span>
-            <span className={styles.mathCardValue} style={{ color: '#38bdf8' }}>
+            <span className={styles.mathCardValue}>
               ~$47 Max Real Expectation
             </span>
             <p className={styles.mathCardDesc}>
@@ -455,7 +455,7 @@ export default function StPetersburg3DLab() {
 
             <div className={styles.batchStat}>
               <span className={styles.batchStatLabel}>Net Loss if Ticket = $25</span>
-              <span className={styles.batchStatVal} style={{ color: '#f87171' }}>
+              <span className={styles.batchStatVal}>
                 -${batchStats.lossAt25Ticket.toLocaleString()}
               </span>
             </div>

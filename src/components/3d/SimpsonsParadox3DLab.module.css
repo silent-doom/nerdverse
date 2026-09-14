@@ -1,14 +1,14 @@
 .labContainer {
   position: relative;
   width: 100%;
-  background: radial-gradient(circle at 50% 30%, #0f131f 0%, #07090f 100%);
-  border: 3px solid var(--color-border-default, #1e293b);
+  background: var(--color-bg-primary, #08090c);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: var(--radius-lg, 12px);
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  color: #f8fafc;
+  color: var(--color-text-primary, #f9fafb);
   user-select: none;
   margin-bottom: var(--space-8, 32px);
 }
@@ -18,7 +18,7 @@
   width: 100%;
   height: clamp(480px, 60vh, 620px);
   cursor: grab;
-  background: #06080d;
+  background: #08090c;
 }
 
 .canvasWrapper:active {
@@ -41,9 +41,9 @@
 }
 
 .headerTitleBox {
-  background: rgba(10, 14, 23, 0.85);
+  background: rgba(14, 15, 20, 0.88);
   backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: 8px;
   padding: 10px 16px;
   pointer-events: auto;
@@ -55,38 +55,38 @@
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #a855f7;
+  color: var(--color-brand-light, #e5a93c);
   margin-bottom: 2px;
 }
 
 .labTitle {
   font-size: 18px;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--color-text-primary, #f9fafb);
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .paradoxAlert {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(229, 169, 60, 0.08);
   backdrop-filter: blur(12px);
-  border: 1.5px solid #ef4444;
+  border: 1px solid rgba(229, 169, 60, 0.4);
   border-radius: 8px;
   padding: 8px 16px;
   pointer-events: auto;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 0 24px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .alertText {
   font-size: 12px;
   font-weight: 700;
-  color: #fca5a5;
+  color: var(--color-text-primary, #f9fafb);
   line-height: 1.4;
 }
 
@@ -96,9 +96,9 @@
   top: 90px;
   left: 16px;
   z-index: 10;
-  background: rgba(10, 14, 23, 0.75);
+  background: rgba(14, 15, 20, 0.82);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: 6px;
   padding: 8px 12px;
   pointer-events: none;
@@ -107,6 +107,7 @@
   gap: 6px;
   font-size: 11px;
   font-weight: 600;
+  color: var(--color-text-secondary, #9ca3af);
 }
 
 .legendItem {
@@ -129,19 +130,19 @@
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(10, 14, 23, 0.85);
+  gap: 6px;
+  background: rgba(14, 15, 20, 0.9);
   backdrop-filter: blur(10px);
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 4px 6px;
 }
 
 .toggleBtn {
   background: transparent;
   border: none;
-  color: #94a3b8;
-  padding: 6px 10px;
+  color: var(--color-text-secondary, #9ca3af);
+  padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
@@ -150,19 +151,19 @@
 }
 
 .toggleBtn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary, #f9fafb);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .toggleBtnActive {
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.15);
+  color: #08090c;
+  background: var(--color-brand-light, #e5a93c);
 }
 
 /* ── Dashboard Panel ── */
 .dashboard {
-  background: #090d16;
-  border-top: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-bg-secondary, #0e0f14);
+  border-top: 1px solid var(--color-border-default, #21232c);
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
@@ -177,8 +178,8 @@
 }
 
 .cohortCard {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-card-bg, #12131a);
+  border: 1px solid var(--color-border-default, #21232c);
   border-radius: 8px;
   padding: 14px 18px;
   display: flex;
@@ -195,12 +196,14 @@
 .cohortTitle {
   font-size: 14px;
   font-weight: 800;
+  color: var(--color-text-primary, #f9fafb);
 }
 
 .cohortRate {
   font-size: 16px;
   font-weight: 800;
-  font-family: monospace;
+  font-family: var(--font-mono, monospace);
+  color: var(--color-brand-light, #e5a93c);
 }
 
 .subgroupTable {
@@ -213,20 +216,20 @@
 .subgroupTable td {
   padding: 6px 8px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--color-border-subtle, #171820);
 }
 
 .subgroupTable th {
-  color: #94a3b8;
+  color: var(--color-text-secondary, #9ca3af);
   font-weight: 700;
 }
 
 .subgroupTable td {
-  color: #cbd5e1;
+  color: var(--color-text-primary, #f9fafb);
 }
 
 .winnerHighlight {
-  color: #10b981;
+  color: var(--color-brand-light, #e5a93c);
   font-weight: 800;
 }
 
@@ -238,7 +241,7 @@
   flex-wrap: wrap;
   gap: 10px;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--color-border-subtle, #171820);
 }
 
 .presetBtns {
@@ -248,9 +251,9 @@
 }
 
 .presetBtn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #cbd5e1;
+  background: var(--color-card-bg, #12131a);
+  border: 1px solid var(--color-border-default, #21232c);
+  color: var(--color-text-secondary, #9ca3af);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
@@ -260,14 +263,13 @@
 }
 
 .presetBtn:hover {
-  background: rgba(168, 85, 247, 0.15);
-  color: #ffffff;
-  border-color: #a855f7;
+  background: rgba(229, 169, 60, 0.1);
+  color: var(--color-text-primary, #f9fafb);
+  border-color: var(--color-brand-light, #e5a93c);
 }
 
 .presetBtnActive {
-  background: rgba(168, 85, 247, 0.2);
-  color: #ffffff;
-  border-color: #a855f7;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+  background: rgba(229, 169, 60, 0.15);
+  color: var(--color-brand-light, #e5a93c);
+  border-color: var(--color-brand-light, #e5a93c);
 }

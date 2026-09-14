@@ -148,15 +148,15 @@ export default function MontyHallSimulator() {
                 <Icon
                   name={icon}
                   size={36}
-                  color={isFinished && isPrize ? 'var(--color-status-success)' : isSelected ? 'var(--color-brand-primary)' : 'currentColor'}
+                  color={isFinished && isPrize ? 'var(--color-brand-light, #e5a93c)' : isSelected ? 'var(--color-brand-light, #e5a93c)' : 'currentColor'}
                 />
               </div>
               <div className={styles.doorLabel}>Door {idx + 1}</div>
               {isSelected && !isFinished && (
-                <span style={{ fontSize: '11px', color: 'var(--color-text-link)', fontWeight: 600 }}>Your Pick</span>
+                <span style={{ fontSize: '11px', color: 'var(--color-brand-light, #e5a93c)', fontWeight: 600 }}>Your Pick</span>
               )}
               {statusLabel && (
-                <span style={{ fontSize: '11px', color: isPrize ? 'var(--color-status-success)' : 'var(--color-text-tertiary)' }}>
+                <span style={{ fontSize: '11px', color: isPrize ? 'var(--color-brand-light, #e5a93c)' : 'var(--color-text-tertiary)' }}>
                   {statusLabel}
                 </span>
               )}
@@ -166,8 +166,8 @@ export default function MontyHallSimulator() {
       </div>
 
       {gameState === 'switch_or_stay' && (
-        <div style={{ textAlign: 'center', background: 'var(--color-bg-tertiary)', padding: '20px', borderRadius: '10px', border: '1px solid var(--color-border-strong)' }}>
-          <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#ffffff', fontWeight: 600 }}>
+        <div style={{ textAlign: 'center', background: 'var(--color-card-bg, #12131a)', padding: '20px', borderRadius: '10px', border: '1px solid var(--color-border-default, #21232c)' }}>
+          <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: 'var(--color-text-primary, #f9fafb)', fontWeight: 600 }}>
             Host reveals Door {revealedHostDoor + 1} is empty! Choose your final action:
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -178,7 +178,7 @@ export default function MontyHallSimulator() {
             <button
               onClick={() => handleFinalChoice(false)}
               className={styles.runButton}
-              style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border-strong)' }}
+              style={{ backgroundColor: 'var(--color-card-bg, #12131a)', borderColor: 'var(--color-border-default, #21232c)' }}
             >
               <span>Stay with Original (Theoretical 33.3%)</span>
             </button>
@@ -187,9 +187,9 @@ export default function MontyHallSimulator() {
       )}
 
       {gameState === 'finished' && (
-        <div style={{ textAlign: 'center', background: 'var(--color-bg-tertiary)', padding: '20px', borderRadius: '10px', border: '1px solid var(--color-border-strong)' }}>
-          <h4 style={{ margin: '0 0 12px 0', fontSize: '18px', color: result === 'win' ? 'var(--color-status-success)' : 'var(--color-status-danger)' }}>
-            {result === 'win' ? 'Victory: Grand Prize Won' : 'Defeat: Empty Door Selected'}
+        <div style={{ textAlign: 'center', background: 'var(--color-card-bg, #12131a)', padding: '20px', borderRadius: '10px', border: '1px solid var(--color-border-default, #21232c)' }}>
+          <h4 style={{ margin: '0 0 12px 0', fontSize: '18px', color: result === 'win' ? 'var(--color-brand-light, #e5a93c)' : 'var(--color-text-secondary, #9ca3af)' }}>
+            {result === 'win' ? 'Victory: Grand Prize Won' : 'Trial Concluded: Goat Behind Door'}
           </h4>
           <button onClick={resetGame} className={styles.runButton}>
             <Icon name="refresh" size={16} />

@@ -1936,7 +1936,7 @@ export default function TrolleyProblem3DLab() {
               <div className={styles.neuralTrack}>
                 <div
                   className={styles.neuralFill}
-                  style={{ width: `${scenario.dlPfcActivity}%`, background: '#38BDF8' }}
+                  style={{ width: `${scenario.dlPfcActivity}%`, background: 'var(--color-brand-light, #e5a93c)' }}
                 />
               </div>
             </div>
@@ -1948,7 +1948,7 @@ export default function TrolleyProblem3DLab() {
               <div className={styles.neuralTrack}>
                 <div
                   className={styles.neuralFill}
-                  style={{ width: `${scenario.limbicActivity}%`, background: '#F87171' }}
+                  style={{ width: `${scenario.limbicActivity}%`, background: 'var(--color-text-secondary, #9ca3af)' }}
                 />
               </div>
             </div>

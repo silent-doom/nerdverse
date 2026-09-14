@@ -277,21 +277,21 @@ export default function MontyHall3DLab() {
     overheadSpot.castShadow = true;
     scene.add(overheadSpot);
 
-    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.5);
+    const rimLight = new THREE.DirectionalLight(0xe2e8f0, 1.25);
     rimLight.position.set(0, 7, -6);
     scene.add(rimLight);
 
     // Stage Floor
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(32, 24),
-      new THREE.MeshStandardMaterial({ color: 0x10131a, roughness: 0.45, metalness: 0.65 })
+      new THREE.MeshStandardMaterial({ color: 0x0e1017, roughness: 0.45, metalness: 0.65 })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -0.01;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    const gridHelper = new THREE.GridHelper(24, 24, 0xf59e0b, 0x1f2639);
+    const gridHelper = new THREE.GridHelper(24, 24, 0xe5a93c, 0x1f232c);
     gridHelper.position.y = 0.005;
     scene.add(gridHelper);
 
@@ -310,7 +310,7 @@ export default function MontyHall3DLab() {
       doorSpot.target = doorStationGroup;
       scene.add(doorSpot);
 
-      const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e2433, metalness: 0.7, roughness: 0.35 });
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x181a24, metalness: 0.8, roughness: 0.35 });
       const frameL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.6, 0.3), frameMat);
       frameL.position.set(-1.18, 1.8, 0);
       frameL.castShadow = true;
@@ -326,10 +326,10 @@ export default function MontyHall3DLab() {
       frameT.castShadow = true;
       doorStationGroup.add(frameT);
 
-      // Neon Number Placard
+      // Amber Number Placard
       const signPlacard = new THREE.Mesh(
         new THREE.BoxGeometry(0.7, 0.45, 0.08),
-        new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b, emissiveIntensity: 0.8 })
+        new THREE.MeshStandardMaterial({ color: 0xe5a93c, emissive: 0xe5a93c, emissiveIntensity: 0.6 })
       );
       signPlacard.position.set(0, 4.05, 0.1);
       doorStationGroup.add(signPlacard);
@@ -341,7 +341,7 @@ export default function MontyHall3DLab() {
       // Door Panel
       const doorPanel = new THREE.Mesh(
         new THREE.BoxGeometry(2.16, 3.48, 0.12),
-        new THREE.MeshStandardMaterial({ color: 0x222a3d, roughness: 0.4, metalness: 0.5 })
+        new THREE.MeshStandardMaterial({ color: 0x161822, roughness: 0.45, metalness: 0.5 })
       );
       doorPanel.position.set(1.08, 0, 0);
       doorPanel.castShadow = true;
@@ -351,7 +351,7 @@ export default function MontyHall3DLab() {
 
       const handle = new THREE.Mesh(
         new THREE.CylinderGeometry(0.03, 0.03, 0.4, 12),
-        new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.9, roughness: 0.2 })
+        new THREE.MeshStandardMaterial({ color: 0xe5a93c, metalness: 0.9, roughness: 0.2 })
       );
       handle.position.set(1.9, 0, 0.14);
       handle.castShadow = true;
@@ -371,16 +371,16 @@ export default function MontyHall3DLab() {
       // Deluxe Chrome / Carbon Turntable Platform
       const carTurntable = new THREE.Mesh(
         new THREE.CylinderGeometry(1.2, 1.3, 0.2, 32),
-        new THREE.MeshStandardMaterial({ color: 0x181e2b, metalness: 0.85, roughness: 0.2 })
+        new THREE.MeshStandardMaterial({ color: 0x12131a, metalness: 0.85, roughness: 0.2 })
       );
       carTurntable.position.y = 0.1;
       carTurntable.receiveShadow = true;
       prizeMesh.add(carTurntable);
 
-      // Neon Emerald Underglow Ring
+      // Warm Amber Underglow Ring
       const carUnderglow = new THREE.Mesh(
         new THREE.RingGeometry(1.05, 1.22, 32),
-        new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide })
+        new THREE.MeshBasicMaterial({ color: 0xe5a93c, side: THREE.DoubleSide })
       );
       carUnderglow.rotation.x = -Math.PI / 2;
       carUnderglow.position.y = 0.205;
@@ -392,10 +392,10 @@ export default function MontyHall3DLab() {
       // Goat / Farm Paddock Anchor
       const dudMesh = new THREE.Group();
       
-      // Rustic Pasture Grass Disk
+      // Grounded Earthy Pasture Disk
       const goatPaddock = new THREE.Mesh(
         new THREE.CylinderGeometry(1.15, 1.25, 0.18, 32),
-        new THREE.MeshStandardMaterial({ color: 0x223c28, roughness: 0.85, metalness: 0.05 })
+        new THREE.MeshStandardMaterial({ color: 0x222822, roughness: 0.9, metalness: 0.05 })
       );
       goatPaddock.position.y = 0.09;
       goatPaddock.receiveShadow = true;
@@ -403,7 +403,7 @@ export default function MontyHall3DLab() {
 
       // Pasture fence posts around the paddock
       const fencePostGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.45, 8);
-      const fencePostMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.9 });
+      const fencePostMat = new THREE.MeshStandardMaterial({ color: 0x4a3728, roughness: 0.9 });
       for (let f = 0; f < 8; f++) {
         const ang = (f / 8) * Math.PI * 2;
         const post = new THREE.Mesh(fencePostGeo, fencePostMat);
@@ -411,10 +411,10 @@ export default function MontyHall3DLab() {
         dudMesh.add(post);
       }
 
-      // Warm Amber Paddock Glow Ring
+      // Subtle Slate Paddock Border Ring
       const goatGlow = new THREE.Mesh(
         new THREE.RingGeometry(0.95, 1.12, 32),
-        new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide })
+        new THREE.MeshBasicMaterial({ color: 0x64748b, side: THREE.DoubleSide })
       );
       goatGlow.rotation.x = -Math.PI / 2;
       goatGlow.position.y = 0.185;
@@ -481,7 +481,7 @@ export default function MontyHall3DLab() {
       confettiPositions[i * 3 + 1] = Math.random() * 6 + 1;
       confettiPositions[i * 3 + 2] = (Math.random() - 0.5) * 4 - 2;
 
-      const col = Math.random() > 0.5 ? new THREE.Color(0x10b981) : new THREE.Color(0xf59e0b);
+      const col = Math.random() > 0.5 ? new THREE.Color(0xe5a93c) : new THREE.Color(0xf3f4f6);
       confettiColors[i * 3] = col.r;
       confettiColors[i * 3 + 1] = col.g;
       confettiColors[i * 3 + 2] = col.b;
@@ -628,19 +628,19 @@ export default function MontyHall3DLab() {
       if (doorsMeshRef.current[idx]) {
         const panel = doorsMeshRef.current[idx].panel;
         if (idx === playerPick) {
-          panel.material.color.setHex(0xf59e0b);
-          panel.material.emissive.setHex(0xf59e0b);
-          panel.material.emissiveIntensity = 0.35;
+          panel.material.color.setHex(0xe5a93c);
+          panel.material.emissive.setHex(0xe5a93c);
+          panel.material.emissiveIntensity = 0.25;
         } else if (idx === hostRevealed) {
-          panel.material.color.setHex(0xef4444);
-          panel.material.emissive.setHex(0xef4444);
-          panel.material.emissiveIntensity = 0.2;
+          panel.material.color.setHex(0x272a34);
+          panel.material.emissive.setHex(0x000000);
+          panel.material.emissiveIntensity = 0;
         } else if (gameState === 'finished' && idx === carDoor) {
-          panel.material.color.setHex(0x10b981);
-          panel.material.emissive.setHex(0x10b981);
+          panel.material.color.setHex(0xe5a93c);
+          panel.material.emissive.setHex(0xe5a93c);
           panel.material.emissiveIntensity = 0.4;
         } else {
-          panel.material.color.setHex(0x222a3d);
+          panel.material.color.setHex(0x161822);
           panel.material.emissive.setHex(0x000000);
           panel.material.emissiveIntensity = 0;
         }
@@ -861,32 +861,32 @@ export default function MontyHall3DLab() {
             <div
               key={item.id}
               style={{
-                background: 'rgba(17, 21, 30, 0.75)',
-                border: '1px solid #1E2536',
-                borderRadius: '10px',
+                background: 'var(--color-card-bg, #12131a)',
+                border: '1px solid var(--color-border-default, #21232c)',
+                borderRadius: 'var(--radius-md, 8px)',
                 padding: '1.15rem',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.5rem',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: '#F9FAFB' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: 'var(--color-text-primary, #f9fafb)' }}>
                 <span style={{ fontSize: '1.25rem' }}>{item.icon}</span>
                 <span>{item.title}</span>
               </div>
-              <span style={{ fontSize: '0.6875rem', color: '#F59E0B', fontFamily: 'var(--font-mono, monospace)' }}>
+              <span style={{ fontSize: '0.6875rem', color: 'var(--color-brand-light, #e5a93c)', fontFamily: 'var(--font-mono, monospace)' }}>
                 {item.category}
               </span>
-              <p style={{ fontSize: '0.8125rem', color: '#9CA3AF', lineHeight: '1.45', margin: 0 }}>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary, #9ca3af)', lineHeight: '1.45', margin: 0 }}>
                 {item.description}
               </p>
               <div
                 style={{
                   marginTop: 'auto',
                   paddingTop: '0.5rem',
-                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                  borderTop: '1px solid var(--color-border-default, #21232c)',
                   fontSize: '0.75rem',
-                  color: '#10B981',
+                  color: 'var(--color-brand-light, #e5a93c)',
                   fontWeight: 600,
                 }}
               >
@@ -903,10 +903,10 @@ export default function MontyHall3DLab() {
           type="button"
           onClick={() => setShow100Doors(!show100Doors)}
           style={{
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '8px',
-            color: '#D1D5DB',
+            background: 'rgba(18, 19, 26, 0.75)',
+            border: '1px solid var(--color-border-default, #21232c)',
+            borderRadius: 'var(--radius-md, 8px)',
+            color: 'var(--color-text-secondary, #9ca3af)',
             padding: '0.75rem 1rem',
             width: '100%',
             textAlign: 'left',
@@ -938,7 +938,7 @@ export default function MontyHall3DLab() {
                 Pick a Random Door
               </button>
               {grid100Pick !== null && (
-                <div style={{ fontSize: '0.8125rem', color: '#10B981', display: 'flex', alignItems: 'center' }}>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--color-brand-light, #e5a93c)', display: 'flex', alignItems: 'center' }}>
                   You picked Door #{grid100Pick + 1} (1% chance). Monty purged 98 duds, leaving Door #{grid100Survivor + 1} (99% chance)!
                 </div>
               )}

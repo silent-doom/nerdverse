@@ -182,19 +182,19 @@ export default function BayesTheorem3DLab() {
           baseZ: posZ,
           targetY: 0,
           currentY: 0,
-          color: new THREE.Color(0x0284c7),
+          color: new THREE.Color(0x13151c),
         });
         idx++;
       }
     }
     instancedMesh.instanceMatrix.needsUpdate = true;
 
-    // 7. Scanning Laser Plane
+    // 7. Scanning Laser Plane (Warm Amber Translucent Beam)
     const scanGeo = new THREE.PlaneGeometry(36, 1.5);
     const scanMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
+      color: 0xe5a93c,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.35,
       side: THREE.DoubleSide,
     });
     const scanPlane = new THREE.Mesh(scanGeo, scanMat);
@@ -304,11 +304,11 @@ export default function BayesTheorem3DLab() {
     const healthyPos = Math.round(healthyTotal * pFPR);
     const healthyNeg = healthyTotal - healthyPos;
 
-    // Color definitions
-    const colorTruePos = new THREE.Color(0xfbbf24); // Amber Gold (Sick & Tested +)
-    const colorFalsePos = new THREE.Color(0xf43f5e); // Bright Rose (Healthy & Tested +)
-    const colorFalseNeg = new THREE.Color(0x64748b); // Muted Slate (Sick & Missed -)
-    const colorTrueNeg = new THREE.Color(0x0284c7); // Cyan Blue (Healthy & Tested -)
+    // Color definitions (Monotone / Duotone Scholarly Amber & Obsidian Slate)
+    const colorTruePos = new THREE.Color(0xe5a93c); // Signature Amber (Diseased & Flagged +)
+    const colorFalsePos = new THREE.Color(0x9ca3af); // Muted Slate (Healthy & Falsely Flagged +)
+    const colorFalseNeg = new THREE.Color(0x4b5563); // Charcoal (Diseased & Missed -)
+    const colorTrueNeg = new THREE.Color(0x13151c); // Surface Graphite (Healthy & Cleared -)
 
     three.voxelData.forEach((v, i) => {
       let col;
@@ -348,7 +348,7 @@ export default function BayesTheorem3DLab() {
       <div className={styles.topHeader}>
         <div className={styles.headerTitleBox}>
           <div className={styles.labBadge}>
-            <Icon name="math" size={13} color="#f59e0b" />
+            <Icon name="math" size={13} color="#e5a93c" />
             <span>Bayesian Contingency Projection</span>
           </div>
           <h2 className={styles.labTitle}>Bayes' Theorem 3D Diagnostic Lab</h2>
@@ -363,26 +363,26 @@ export default function BayesTheorem3DLab() {
       {/* 3D Visual Legend */}
       <div className={styles.hudLegend}>
         <div className={styles.legendItem}>
-          <span className={styles.legendDot} style={{ backgroundColor: '#fbbf24' }} />
+          <span className={styles.legendDot} style={{ backgroundColor: '#e5a93c' }} />
           <span>True Positive (Diseased & Flagged): {stats.truePositives.toLocaleString()}</span>
         </div>
         <div className={styles.legendItem}>
-          <span className={styles.legendDot} style={{ backgroundColor: '#f43f5e' }} />
+          <span className={styles.legendDot} style={{ backgroundColor: '#9ca3af' }} />
           <span>False Positive (Healthy & Falsely Flagged): {stats.falsePositives.toLocaleString()}</span>
         </div>
         <div className={styles.legendItem}>
-          <span className={styles.legendDot} style={{ backgroundColor: '#0284c7' }} />
+          <span className={styles.legendDot} style={{ backgroundColor: '#21232c' }} />
           <span>True Negative (Healthy & Cleared): {stats.trueNegatives.toLocaleString()}</span>
         </div>
         <div className={styles.legendItem}>
-          <span className={styles.legendDot} style={{ backgroundColor: '#64748b' }} />
+          <span className={styles.legendDot} style={{ backgroundColor: '#4b5563' }} />
           <span>False Negative (Diseased & Missed): {stats.falseNegatives.toLocaleString()}</span>
         </div>
       </div>
 
       {/* Status Bar */}
       <div className={styles.scanStatus}>
-        <Icon name="zap" size={14} color={isScanning ? '#38bdf8' : '#94a3b8'} />
+        <Icon name="zap" size={14} color={isScanning ? '#e5a93c' : '#9ca3af'} />
         <span>{isScanning ? 'Laser Scanning Cohort...' : 'Population Matrix Ready · Levitation Shows Triage Floor'}</span>
       </div>
 
@@ -458,7 +458,7 @@ export default function BayesTheorem3DLab() {
         <div className={styles.matrixStatsRow}>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>Total Positive Tests</span>
-            <span className={styles.statVal} style={{ color: '#38bdf8' }}>
+            <span className={styles.statVal} style={{ color: '#f9fafb' }}>
               {stats.totalPositives.toLocaleString()}
             </span>
             <span className={styles.statDesc}>All flagged individuals</span>
@@ -466,7 +466,7 @@ export default function BayesTheorem3DLab() {
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>True Positives</span>
-            <span className={styles.statVal} style={{ color: '#fbbf24' }}>
+            <span className={styles.statVal} style={{ color: '#e5a93c' }}>
               {stats.truePositives.toLocaleString()}
             </span>
             <span className={styles.statDesc}>Actually infected</span>
@@ -474,7 +474,7 @@ export default function BayesTheorem3DLab() {
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>False Positives</span>
-            <span className={styles.statVal} style={{ color: '#f43f5e' }}>
+            <span className={styles.statVal} style={{ color: '#9ca3af' }}>
               {stats.falsePositives.toLocaleString()}
             </span>
             <span className={styles.statDesc}>Healthy people panicked</span>
@@ -482,7 +482,7 @@ export default function BayesTheorem3DLab() {
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>Bayesian Ratio</span>
-            <span className={styles.statVal} style={{ color: '#10b981' }}>
+            <span className={styles.statVal} style={{ color: '#e5a93c' }}>
               {stats.truePositives} / {stats.totalPositives}
             </span>
             <span className={styles.statDesc}>True vs Total Flagged</span>
@@ -504,14 +504,14 @@ export default function BayesTheorem3DLab() {
             <button
               className={styles.presetBtn}
               onClick={() => setIsPartitioned(!isPartitioned)}
-              style={{ borderColor: isPartitioned ? '#38bdf8' : 'rgba(255,255,255,0.2)' }}
+              style={{ borderColor: isPartitioned ? '#e5a93c' : 'var(--color-border-default, #21232c)' }}
             >
               {isPartitioned ? 'Flatten Grid' : 'Levitate Triage Floor'}
             </button>
           </div>
 
           <button className={styles.scanBtn} onClick={triggerScan}>
-            <Icon name="zap" size={14} color="#06080d" />
+            <Icon name="zap" size={14} color="#08090c" />
             <span>Run Laser Scan</span>
           </button>
         </div>

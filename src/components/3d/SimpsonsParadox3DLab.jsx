@@ -388,37 +388,37 @@ export default function SimpsonsParadox3DLab() {
       {/* 3D WebGL Canvas */}
       <div ref={mountRef} className={styles.canvasWrapper} />
 
-      {/* Top Floating Header */}
+      {/* Top Floating Header & Anomaly Alert */}
       <div className={styles.topHeader}>
         <div className={styles.headerTitleBox}>
           <div className={styles.labBadge}>
-            <Icon name="math" size={13} color="#a855f7" />
+            <Icon name="git-branch" size={13} color="#e5a93c" />
             <span>Causal Confounder Vector Space</span>
           </div>
           <h2 className={styles.labTitle}>Simpson's Paradox 3D Causal Lab</h2>
         </div>
 
         <div className={styles.paradoxAlert}>
-          <Icon name="alert" size={16} color="#ef4444" />
+          <Icon name="alert-triangle" size={16} color="#e5a93c" />
           <span className={styles.alertText}>
-            Subgroup Slopes: <strong>POSITIVE (Green)</strong><br />
-            Aggregate Slope: <strong>NEGATIVE INVERSION (Red)</strong>
+            Subgroup Slopes: <strong style={{ color: '#e5a93c' }}>POSITIVE (Amber)</strong><br />
+            Aggregate Slope: <strong style={{ color: '#9ca3af' }}>NEGATIVE INVERSION (Slate)</strong>
           </span>
         </div>
       </div>
 
-      {/* HUD Legend */}
+      {/* 3D Visual HUD Overlay */}
       <div className={styles.hudLegend}>
         <div className={styles.legendItem}>
-          <span className={styles.legendLine} style={{ backgroundColor: '#10b981' }} />
+          <span className={styles.legendLine} style={{ backgroundColor: '#e5a93c' }} />
           <span>Stratified Subgroup Slopes (Both Positive)</span>
         </div>
         <div className={styles.legendItem}>
-          <span className={styles.legendLine} style={{ backgroundColor: '#ef4444' }} />
+          <span className={styles.legendLine} style={{ backgroundColor: '#9ca3af' }} />
           <span>Aggregated Collapse Slope (Inverted Negative)</span>
         </div>
         <div className={styles.legendItem}>
-          <span className={styles.legendLine} style={{ backgroundColor: '#a855f7' }} />
+          <span className={styles.legendLine} style={{ backgroundColor: '#475569' }} />
           <span>Z-Axis Confounder: {data.confounderName}</span>
         </div>
       </div>
@@ -445,10 +445,10 @@ export default function SimpsonsParadox3DLab() {
           {/* Cohort 1 */}
           <div className={styles.cohortCard}>
             <div className={styles.cohortHeader}>
-              <span className={styles.cohortTitle} style={{ color: '#0284c7' }}>
+              <span className={styles.cohortTitle}>
                 {data.groupA.name}
               </span>
-              <span className={styles.cohortRate} style={{ color: '#0284c7' }}>
+              <span className={styles.cohortRate} style={{ color: '#9ca3af' }}>
                 {data.groupA.total.rate}% Overall
               </span>
             </div>
@@ -479,10 +479,10 @@ export default function SimpsonsParadox3DLab() {
           {/* Cohort 2 */}
           <div className={styles.cohortCard}>
             <div className={styles.cohortHeader}>
-              <span className={styles.cohortTitle} style={{ color: '#f59e0b' }}>
+              <span className={styles.cohortTitle}>
                 {data.groupB.name}
               </span>
-              <span className={styles.cohortRate} style={{ color: '#f59e0b' }}>
+              <span className={styles.cohortRate} style={{ color: '#e5a93c' }}>
                 {data.groupB.total.rate}% Overall
               </span>
             </div>

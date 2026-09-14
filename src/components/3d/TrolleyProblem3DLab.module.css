@@ -196,19 +196,19 @@
 }
 
 .indicatorIdle {
-  background: #3B82F6;
-  color: #3B82F6;
+  background: #64748b;
+  color: #64748b;
 }
 
 .indicatorRunning {
-  background: #E5A93C;
-  color: #E5A93C;
+  background: var(--color-brand-light, #e5a93c);
+  color: var(--color-brand-light, #e5a93c);
   animation: pulse 1s infinite alternate;
 }
 
 .indicatorResolved {
-  background: #10B981;
-  color: #10B981;
+  background: var(--color-brand-light, #e5a93c);
+  color: var(--color-brand-light, #e5a93c);
 }
 
 @keyframes pulse {
@@ -264,11 +264,11 @@
 }
 
 .dlPfcColor {
-  color: #38BDF8;
+  color: var(--color-brand-light, #e5a93c);
 }
 
 .limbicColor {
-  color: #F87171;
+  color: var(--color-text-secondary, #9ca3af);
 }
 
 .neuralTrack {
@@ -531,15 +531,15 @@
 }
 
 .valPositive {
-  color: #10B981;
+  color: var(--color-text-primary, #f9fafb);
 }
 
 .valNegative {
-  color: #EF4444;
+  color: var(--color-text-secondary, #9ca3af);
 }
 
 .valNeutral {
-  color: #F59E0B;
+  color: var(--color-brand-light, #e5a93c);
 }
 
 .matrixSub {
