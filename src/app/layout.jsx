@@ -36,7 +36,7 @@ export const metadata = {
     siteName: 'NerdVerse',
     title: 'NerdVerse — Explore the Universe, One Concept at a Time',
     description:
-      'Interactive visual explanations of paradoxes, theories, and scientific laws.',
+      'Interactive 3D visual models and thought experiments of the paradoxes shaping reality.',
     images: [
       {
         url: '/images/og-preview.png',
@@ -50,7 +50,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'NerdVerse — Explore the Universe, One Concept at a Time',
     description:
-      'Interactive visual explanations of the universe\'s most fascinating concepts.',
+      'Interactive 3D visual models and thought experiments of the paradoxes shaping reality.',
     images: ['/images/og-preview.png'],
   },
   robots: {
