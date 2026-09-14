@@ -352,6 +352,165 @@
   color: var(--color-brand-light, #e5a93c);
 }
 
+/* ── Quantum Thought Experiment Educational HUD & Controls ── */
+.quantumStageIndicators {
+  position: absolute;
+  top: 140px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
+  gap: 8px;
+}
+
+.quantumStageBadge {
+  background: rgba(14, 17, 24, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stageHighlight {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.stageHighlightCenter {
+  color: #e5a93c;
+  border-color: rgba(229, 169, 60, 0.35);
+}
+
+.stageHighlightEnd {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.presetContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.presetLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.presetBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.presetBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.presetBtnActive {
+  background: rgba(229, 169, 60, 0.15);
+  border-color: var(--color-brand-light, #e5a93c);
+  color: var(--color-brand-light, #e5a93c);
+  font-weight: 700;
+}
+
+.quantumInequalityBox {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.inequalityFormula {
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.03em;
+}
+
+.inequalityExplain {
+  font-size: 12px;
+  color: #cbd5e1;
+  flex: 1;
+  min-width: 200px;
+}
+
+.quantumPedagogyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  background: rgba(12, 14, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.pedagogyCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pedagogyStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-brand-light, #e5a93c);
+  letter-spacing: 0.04em;
+}
+
+.pedagogyTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.pedagogyText {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.45;
+}
+
 @media (max-width: 768px) {
   .canvasWrapper {
     height: 440px;

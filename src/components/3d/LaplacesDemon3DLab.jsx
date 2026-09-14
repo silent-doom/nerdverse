@@ -83,7 +83,13 @@ export default function LaplacesDemon3DLab() {
   const lorenzLineBRef = useRef(null);
   const headAMeshRef = useRef(null);
   const headBMeshRef = useRef(null);
-  const quantumWaveMeshRef = useRef(null);
+  const slitPlateTopRef = useRef(null);
+  const slitPlateBottomRef = useRef(null);
+  const laserMeshRef = useRef(null);
+  const wavefrontRingsRef = useRef([]);
+  const diffractionLinesRef = useRef([]);
+  const probabilityLineRef = useRef(null);
+  const quantumParticlesRef = useRef([]);
 
   // ── Initialize Simulation ──
   useEffect(() => {
@@ -289,33 +295,180 @@ export default function LaplacesDemon3DLab() {
     chaosGroup.add(headB);
     headBMeshRef.current = headB;
 
-    // Group 3: Quantum Indeterminacy
+    // Group 3: Quantum Indeterminacy (Heisenberg Single-Slit Thought Experiment)
     const quantumGroup = new THREE.Group();
     quantumGroup.visible = false;
     scene.add(quantumGroup);
     quantumGroupRef.current = quantumGroup;
 
-    // Quantum Slit Plate
-    const slitMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3 });
-    const slitPlateTop = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 0.1), slitMat);
-    slitPlateTop.position.set(0, 1.2, 0);
-    const slitPlateBottom = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 0.1), slitMat);
-    slitPlateBottom.position.set(0, -1.2, 0);
-    quantumGroup.add(slitPlateTop);
-    quantumGroup.add(slitPlateBottom);
+    // 3.1 Quantum Wave Source (Left Stage at x = -3.2)
+    const emitterHousing = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.35, 0.45, 0.5, 24),
+      new THREE.MeshStandardMaterial({ color: 0x181a24, metalness: 0.85, roughness: 0.35 })
+    );
+    emitterHousing.rotation.z = Math.PI / 2;
+    emitterHousing.position.set(-3.2, 0, 0);
+    quantumGroup.add(emitterHousing);
 
-    // Quantum Wavepacket cloud
-    const waveGeo = new THREE.SphereGeometry(0.8, 32, 32);
-    const waveMat = new THREE.MeshStandardMaterial({
-      color: 0x818cf8,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.65,
+    const emitterLens = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.24, 0.24, 0.08, 24),
+      new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        emissive: 0x0284c7,
+        emissiveIntensity: 1.8,
+        roughness: 0.2,
+      })
+    );
+    emitterLens.rotation.z = Math.PI / 2;
+    emitterLens.position.set(-2.95, 0, 0);
+    quantumGroup.add(emitterLens);
+
+    // Incoming traveling quantum wavefront rings
+    const wavefrontRings = [];
+    for (let w = 0; w < 5; w++) {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(0.48, 0.018, 8, 32),
+        new THREE.MeshBasicMaterial({
+          color: 0x38bdf8,
+          transparent: true,
+          opacity: 0.45,
+          wireframe: true,
+        })
+      );
+      ring.rotation.y = Math.PI / 2;
+      ring.position.set(-2.8 + w * 0.55, 0, 0);
+      quantumGroup.add(ring);
+      wavefrontRings.push(ring);
+    }
+    wavefrontRingsRef.current = wavefrontRings;
+
+    // 3.2 Demon's Measurement Slit Blades & Caliper (Center at x = 0)
+    const bladeMat = new THREE.MeshStandardMaterial({
+      color: 0x11131c,
+      metalness: 0.92,
+      roughness: 0.35,
     });
-    const waveMesh = new THREE.Mesh(waveGeo, waveMat);
-    waveMesh.position.set(0, 0, 0.5);
-    quantumGroup.add(waveMesh);
-    quantumWaveMeshRef.current = waveMesh;
+    const brassTrimMat = new THREE.MeshStandardMaterial({
+      color: 0xdfa037,
+      metalness: 0.88,
+      roughness: 0.25,
+    });
+
+    const topBlade = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.2, 2.6), bladeMat);
+    const bottomBlade = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.2, 2.6), bladeMat);
+    const topTrim = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.04, 2.62), brassTrimMat);
+    const bottomTrim = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.04, 2.62), brassTrimMat);
+    topTrim.position.y = -1.1;
+    bottomTrim.position.y = 1.1;
+    topBlade.add(topTrim);
+    bottomBlade.add(bottomTrim);
+
+    topBlade.position.set(0, 1.1 + 0.4, 0);
+    bottomBlade.position.set(0, -1.1 - 0.4, 0);
+    quantumGroup.add(topBlade);
+    quantumGroup.add(bottomBlade);
+    slitPlateTopRef.current = topBlade;
+    slitPlateBottomRef.current = bottomBlade;
+
+    // Side support posts for slit apparatus
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x272a38, metalness: 0.8 });
+    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 3.2, 12), postMat);
+    postL.position.set(0, 0, -1.35);
+    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 3.2, 12), postMat);
+    postR.position.set(0, 0, 1.35);
+    quantumGroup.add(postL);
+    quantumGroup.add(postR);
+
+    // Demon's Laser Inspection Probe (Demon observing position at the slit)
+    const laserGeo = new THREE.CylinderGeometry(0.02, 0.4, 2.4, 16, 1, true);
+    const laserMat = new THREE.MeshBasicMaterial({
+      color: 0xf59e0b,
+      transparent: true,
+      opacity: 0.35,
+      side: THREE.DoubleSide,
+    });
+    const laserMesh = new THREE.Mesh(laserGeo, laserMat);
+    laserMesh.position.set(0, 1.2, 0);
+    quantumGroup.add(laserMesh);
+    laserMeshRef.current = laserMesh;
+
+    // 3.3 Probabilistic Diffraction Fan Rays (x = 0 to x = 3.2)
+    const NUM_FAN_RAYS = 17;
+    const fanLines = [];
+    for (let k = 0; k < NUM_FAN_RAYS; k++) {
+      const lineGeo = new THREE.BufferGeometry();
+      const pts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(3.2, 0, 0)];
+      lineGeo.setFromPoints(pts);
+      const isCenter = Math.abs(k - 8) <= 2;
+      const lineMat = new THREE.LineBasicMaterial({
+        color: isCenter ? 0x38bdf8 : 0x818cf8,
+        transparent: true,
+        opacity: isCenter ? 0.65 : 0.25,
+      });
+      const line = new THREE.Line(lineGeo, lineMat);
+      quantumGroup.add(line);
+      fanLines.push(line);
+    }
+    diffractionLinesRef.current = fanLines;
+
+    // 3.4 Future Horizon Detection Screen (Right Stage at x = 3.2)
+    const detectorScreen = new THREE.Mesh(
+      new THREE.BoxGeometry(0.06, 3.4, 2.6),
+      new THREE.MeshStandardMaterial({
+        color: 0x0a0d16,
+        metalness: 0.6,
+        roughness: 0.5,
+        transparent: true,
+        opacity: 0.85,
+      })
+    );
+    detectorScreen.position.set(3.2, 0, 0);
+    quantumGroup.add(detectorScreen);
+
+    const screenEdges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(0.06, 3.4, 2.6)),
+      new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.7 })
+    );
+    detectorScreen.add(screenEdges);
+
+    // Probability Density Curve Profile (|ψ(y)|² on detector screen at x = 3.16)
+    const PROB_POINTS = 64;
+    const probCurveGeo = new THREE.BufferGeometry();
+    const probCurvePts = new Float32Array(PROB_POINTS * 3);
+    probCurveGeo.setAttribute('position', new THREE.BufferAttribute(probCurvePts, 3));
+    const probCurveMat = new THREE.LineBasicMaterial({
+      color: 0x38bdf8,
+      linewidth: 2,
+    });
+    const probCurveLine = new THREE.Line(probCurveGeo, probCurveMat);
+    quantumGroup.add(probCurveLine);
+    probabilityLineRef.current = probCurveLine;
+
+    // 3.5 Quantum Flying Particles (Photons / Electrons)
+    const QUANTUM_P_COUNT = 24;
+    const qParticles = [];
+    const qPGeo = new THREE.SphereGeometry(0.045, 12, 12);
+    const qPMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x38bdf8,
+      emissiveIntensity: 1.6,
+      roughness: 0.2,
+    });
+
+    for (let i = 0; i < QUANTUM_P_COUNT; i++) {
+      const pMesh = new THREE.Mesh(qPGeo, qPMat.clone());
+      quantumGroup.add(pMesh);
+      qParticles.push({
+        mesh: pMesh,
+        progress: i / QUANTUM_P_COUNT,
+        speed: 0.007 + (i % 5) * 0.0014,
+        yOffset: (Math.random() - 0.5) * 0.18,
+        zOffset: (Math.random() - 0.5) * 0.18,
+        scatterAngleY: 0,
+        scatterAngleZ: 0,
+      });
+    }
+    quantumParticlesRef.current = qParticles;
 
     // ── Mouse Orbit Controls ──
     let isDragging = false;
@@ -379,6 +532,11 @@ export default function LaplacesDemon3DLab() {
         chaosGroupRef.current.visible = false;
         quantumGroupRef.current.visible = false;
 
+        if (astrolabeGroupRef.current) {
+          astrolabeGroupRef.current.position.set(0, 0, 0);
+          astrolabeGroupRef.current.scale.set(1, 1, 1);
+        }
+
         if (isPlayingRef.current) {
           simClock += 0.016;
         }
@@ -423,6 +581,11 @@ export default function LaplacesDemon3DLab() {
         clockworkGroupRef.current.visible = false;
         chaosGroupRef.current.visible = true;
         quantumGroupRef.current.visible = false;
+
+        if (astrolabeGroupRef.current) {
+          astrolabeGroupRef.current.position.set(0, 0, 0);
+          astrolabeGroupRef.current.scale.set(1, 1, 1);
+        }
 
         // Step Lorenz equations for Trajectory A & B
         for (let sub = 0; sub < 4; sub++) {
@@ -479,22 +642,112 @@ export default function LaplacesDemon3DLab() {
         }
       }
 
-      // ── MODE 3: QUANTUM UNCERTAINTY ──
+      // ── MODE 3: QUANTUM UNCERTAINTY (HEISENBERG SINGLE-SLIT) ──
       else if (currentMode === 'quantum') {
         clockworkGroupRef.current.visible = false;
         chaosGroupRef.current.visible = false;
         quantumGroupRef.current.visible = true;
 
+        if (astrolabeGroupRef.current) {
+          // Smoothly elevate the Astrolabe & Demon Eye above the slit apparatus
+          astrolabeGroupRef.current.position.set(0, 2.5, -0.8);
+          astrolabeGroupRef.current.scale.set(0.7, 0.7, 0.7);
+        }
+
         const sw = slitWidthRef.current;
         // Heisenberg momentum spread ~ hbar / (2 * deltaX)
-        const pSpread = Math.max(0.4, 0.45 / sw);
+        const pSpread = Math.max(0.35, 0.48 / sw);
         setUncertaintyRatio(+(pSpread * sw).toFixed(3));
 
-        if (quantumWaveMeshRef.current) {
-          quantumWaveMeshRef.current.scale.set(sw, pSpread * (1 + Math.sin(simClock * 6) * 0.2), sw);
-          quantumWaveMeshRef.current.rotation.y += 0.02;
-          quantumWaveMeshRef.current.rotation.z += 0.01;
+        // 1. Move aperture blades according to sw
+        if (slitPlateTopRef.current && slitPlateBottomRef.current) {
+          slitPlateTopRef.current.position.y = 1.1 + sw / 2;
+          slitPlateBottomRef.current.position.y = -1.1 - sw / 2;
         }
+
+        // 2. Adjust Demon's laser probe cone onto the slit gap
+        if (laserMeshRef.current) {
+          laserMeshRef.current.scale.set(Math.max(0.35, sw * 1.1), 1, Math.max(0.35, sw * 1.1));
+          laserMeshRef.current.material.opacity = 0.22 + Math.min(0.45, 0.2 / sw);
+        }
+
+        // 3. Move incoming wavefront rings toward the slit
+        if (wavefrontRingsRef.current) {
+          wavefrontRingsRef.current.forEach((ring, idx) => {
+            const baseX = -3.0 + ((simClock * 1.3 + idx * 0.55) % 2.9);
+            ring.position.x = baseX;
+            ring.scale.set(1, Math.min(1.2, 0.4 + sw * 0.5), Math.min(1.2, 0.4 + sw * 0.5));
+            const distFromSlit = Math.abs(baseX);
+            ring.material.opacity = Math.max(0.1, 0.5 - distFromSlit * 0.1);
+          });
+        }
+
+        // 4. Update Diffraction Fan Rays (Momentum Dispersion)
+        const maxSpreadAngle = Math.min(1.18, 0.32 / sw);
+        if (diffractionLinesRef.current) {
+          diffractionLinesRef.current.forEach((line, k) => {
+            const normalizedK = (k - 8) / 8; // -1 to +1
+            const angleY = normalizedK * maxSpreadAngle;
+            const targetY = 3.18 * Math.tan(angleY);
+            const pts = [0, 0, 0, 3.18, targetY, 0];
+            line.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+            line.geometry.attributes.position.needsUpdate = true;
+            const intensity = Math.pow(Math.cos((Math.PI / 2) * normalizedK), 2);
+            line.material.opacity = 0.12 + intensity * 0.48;
+          });
+        }
+
+        // 5. Update Probability Density Curve on Detector Screen (x = 3.16)
+        if (probabilityLineRef.current) {
+          const PROB_PTS = 64;
+          const pts = new Float32Array(PROB_PTS * 3);
+          for (let i = 0; i < PROB_PTS; i++) {
+            const yVal = -1.6 + (i / (PROB_PTS - 1)) * 3.2;
+            const beta = (Math.PI * sw * yVal) / 0.55;
+            const sinc = Math.abs(beta) < 0.001 ? 1.0 : Math.sin(beta) / beta;
+            const intensity = sinc * sinc;
+            pts[i * 3] = 3.16 - intensity * 0.85;
+            pts[i * 3 + 1] = yVal;
+            pts[i * 3 + 2] = 0;
+          }
+          probabilityLineRef.current.geometry.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+          probabilityLineRef.current.geometry.attributes.position.needsUpdate = true;
+        }
+
+        // 6. Animate Quantum Flying Particles
+        if (quantumParticlesRef.current) {
+          quantumParticlesRef.current.forEach((p) => {
+            p.progress += p.speed;
+            if (p.progress > 1.0) {
+              p.progress = 0;
+              const sample = (Math.random() - 0.5) * 2;
+              p.scatterAngleY = sample * maxSpreadAngle * (Math.random() < 0.75 ? 0.7 : 1.0);
+              p.scatterAngleZ = (Math.random() - 0.5) * maxSpreadAngle * 0.35;
+            }
+
+            const currentX = -3.2 + p.progress * 6.4;
+            if (currentX < 0) {
+              p.mesh.position.set(
+                currentX,
+                p.yOffset * (sw * 0.6),
+                p.zOffset * (sw * 0.6)
+              );
+            } else {
+              const distPastSlit = currentX;
+              p.mesh.position.set(
+                currentX,
+                distPastSlit * Math.tan(p.scatterAngleY),
+                distPastSlit * Math.tan(p.scatterAngleZ)
+              );
+            }
+          });
+        }
+
+        // 7. Demon Eye gazes down at the slit measurement point
+        if (demonEyeRef.current) {
+          demonEyeRef.current.lookAt(0, 0, 0);
+        }
+
         simClock += 0.02;
       }
 
@@ -613,6 +866,24 @@ export default function LaplacesDemon3DLab() {
         {/* 3D WebGL Canvas */}
         <div ref={mountRef} className={styles.canvasWrapper} />
 
+        {/* Floating Stage Badges in Quantum Mode */}
+        {activeMode === 'quantum' && (
+          <div className={styles.quantumStageIndicators}>
+            <div className={`${styles.quantumStageBadge} ${styles.stageHighlight}`}>
+              <Icon name="atom" size={12} />
+              <span>1. Coherent Wave Source</span>
+            </div>
+            <div className={`${styles.quantumStageBadge} ${styles.stageHighlightCenter}`}>
+              <Icon name="compass" size={12} />
+              <span>2. Demon Slit (Δx = {slitWidth.toFixed(2)} nm)</span>
+            </div>
+            <div className={`${styles.quantumStageBadge} ${styles.stageHighlightEnd}`}>
+              <Icon name="zap" size={12} />
+              <span>3. Momentum Scatter Fan (Δp)</span>
+            </div>
+          </div>
+        )}
+
         {/* Floating Telemetry Badge */}
         <div className={styles.statusFloatingOverlay}>
           <div className={determinismScore > 50 ? styles.pulseDot : styles.pulseDotWarn} />
@@ -705,36 +976,105 @@ export default function LaplacesDemon3DLab() {
 
         {/* Mode 3: Quantum Uncertainty Controls */}
         {activeMode === 'quantum' && (
-          <div className={styles.controlRow}>
-            <div className={styles.sliderCard}>
-              <div className={styles.sliderHeader}>
-                <span className={styles.sliderLabel}>Demon Position Measurement Slit (Δx)</span>
-                <span className={styles.sliderValue}>{slitWidth.toFixed(2)} nm</span>
+          <>
+            <div className={styles.presetContainer}>
+              <span className={styles.presetLabel}>Demon Measurement Scenarios</span>
+              <div className={styles.presetRow}>
+                <button
+                  type="button"
+                  className={`${styles.presetBtn} ${slitWidth <= 0.3 ? styles.presetBtnActive : ''}`}
+                  onClick={() => setSlitWidth(0.20)}
+                >
+                  <Icon name="zap" size={13} />
+                  <span>Pinpoint Position (Δx = 0.20 nm) → Momentum Explodes</span>
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.presetBtn} ${slitWidth > 0.6 && slitWidth < 1.0 ? styles.presetBtnActive : ''}`}
+                  onClick={() => setSlitWidth(0.80)}
+                >
+                  <Icon name="compass" size={13} />
+                  <span>Balanced State (Δx = 0.80 nm)</span>
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.presetBtn} ${slitWidth >= 1.5 ? styles.presetBtnActive : ''}`}
+                  onClick={() => setSlitWidth(1.60)}
+                >
+                  <Icon name="layers" size={13} />
+                  <span>Wide Slit (Δx = 1.60 nm) → Focused Beam, Unknown Origin</span>
+                </button>
               </div>
-              <input
-                type="range"
-                min="0.15"
-                max="1.8"
-                step="0.05"
-                value={slitWidth}
-                onChange={(e) => setSlitWidth(parseFloat(e.target.value))}
-                className={styles.rangeInput}
-              />
-              <p className={styles.sliderDesc}>
-                Werner Heisenberg proved that Δx · Δp ≥ ℏ/2. Narrowing the measurement slit to pinpoint where a particle is obliterates knowledge of where it is going.
-              </p>
             </div>
 
-            <div className={styles.sliderCard}>
-              <div className={styles.sliderHeader}>
-                <span className={styles.sliderLabel}>Heisenberg Constant Product</span>
-                <span className={styles.sliderValue}>{uncertaintyRatio} ℏ</span>
+            <div className={styles.controlRow}>
+              <div className={styles.sliderCard}>
+                <div className={styles.sliderHeader}>
+                  <span className={styles.sliderLabel}>Demon Position Measurement Slit (Δx)</span>
+                  <span className={styles.sliderValue}>{slitWidth.toFixed(2)} nm</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.15"
+                  max="1.8"
+                  step="0.05"
+                  value={slitWidth}
+                  onChange={(e) => setSlitWidth(parseFloat(e.target.value))}
+                  className={styles.rangeInput}
+                />
+                <p className={styles.sliderDesc}>
+                  Werner Heisenberg proved that Δx · Δp ≥ ℏ/2. Narrowing the measurement slit to pinpoint where a particle is obliterates knowledge of where it is going.
+                </p>
               </div>
-              <p className={styles.sliderDesc}>
-                At the quantum scale, precise initial conditions do not exist in nature. The Demon cannot compute the future because the input data physically does not exist.
-              </p>
+
+              <div className={styles.sliderCard}>
+                <div className={styles.sliderHeader}>
+                  <span className={styles.sliderLabel}>Heisenberg Constant Product</span>
+                  <span className={styles.sliderValue}>{uncertaintyRatio} ℏ</span>
+                </div>
+                <p className={styles.sliderDesc}>
+                  At the quantum scale, precise initial conditions do not exist in nature. The Demon cannot compute the future because the input data physically does not exist.
+                </p>
+              </div>
             </div>
-          </div>
+
+            <div className={styles.quantumInequalityBox}>
+              <div className={styles.inequalityFormula}>
+                Δx ({slitWidth.toFixed(2)} nm) · Δp ({(0.48 / slitWidth).toFixed(2)} ℏ/nm) ≥ ℏ/2
+              </div>
+              <div className={styles.inequalityExplain}>
+                {slitWidth <= 0.3
+                  ? '⚠️ Demon squeezed position: Δx is tightly pinned, but diffracted momentum Δp is wildly scattered. Future position on the screen is completely indeterminate.'
+                  : slitWidth >= 1.4
+                  ? 'ℹ️ Wide aperture: particles continue forward in a narrow beam, but the Demon has no precise starting position coordinate to begin computation.'
+                  : '⚖️ Standard quantum diffraction: position uncertainty and momentum uncertainty balance according to wave mechanics.'}
+              </div>
+            </div>
+
+            <div className={styles.quantumPedagogyGrid}>
+              <div className={styles.pedagogyCard}>
+                <span className={styles.pedagogyStep}>Act I · 1814 Clockwork</span>
+                <h4 className={styles.pedagogyTitle}>Laplace&apos;s Assumption</h4>
+                <p className={styles.pedagogyText}>
+                  Assumed every atom in the universe has a simultaneously exact position (x) and momentum (p), like predictable clockwork billiard balls.
+                </p>
+              </div>
+              <div className={styles.pedagogyCard}>
+                <span className={styles.pedagogyStep}>Act II · 1963 Chaos</span>
+                <h4 className={styles.pedagogyTitle}>The Butterfly Crack</h4>
+                <p className={styles.pedagogyText}>
+                  Showed that a rounding error at the 10th decimal place doubles exponentially. But Laplace could still argue: &quot;My Demon has infinite computing precision!&quot;
+                </p>
+              </div>
+              <div className={styles.pedagogyCard}>
+                <span className={styles.pedagogyStep}>Act III · 1927 Quantum</span>
+                <h4 className={styles.pedagogyTitle}>The Fatal Guillotine</h4>
+                <p className={styles.pedagogyText}>
+                  Heisenberg proved nature does not possess simultaneous (x, p). Squeezing position explodes momentum. The initial data Laplace needs does not physically exist!
+                </p>
+              </div>
+            </div>
+          </>
         )}
 
         {/* Philosophical Insight Card */}
