@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import styles from './Footer.module.css';
 import Icon from '@/components/common/Icon';
@@ -21,10 +23,22 @@ const FOOTER_LINKS = {
 };
 
 /**
- * Site footer with bold branding and solid structure.
+ * Site footer with bold branding, solid structure, and interactive easter eggs.
  */
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  const handleSchrodingerClick = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('nerdverse:schrodinger'));
+    }
+  };
+
+  const handleMurphyClick = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('nerdverse:murphy'));
+    }
+  };
 
   return (
     <footer className={styles.footer} role="contentinfo">
@@ -63,12 +77,37 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
+      {/* Bottom Bar with Easter Eggs */}
       <div className={styles.bottom}>
         <div className={`container ${styles.bottomInner}`}>
           <p className={styles.copyright}>
             © {currentYear} NerdVerse. Open source knowledge infrastructure.
           </p>
+
+          <div className={styles.easterEggRow}>
+            <button
+              type="button"
+              className={styles.eggBtn}
+              onClick={handleSchrodingerClick}
+              title="Click to collapse Schrödinger's cat wavefunction"
+            >
+              <span>📦</span>
+              <span>Schrödinger&apos;s Box</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.eggBtn} ${styles.dangerEggBtn}`}
+              onClick={handleMurphyClick}
+              title="Murphy's Law: Do not click this button"
+            >
+              <span>⚠️</span>
+              <span>DO NOT PRESS</span>
+            </button>
+            <span className={styles.eggBtn} title="Speed of light in vacuum">
+              <span>⚡ c = 299,792,458 m/s</span>
+            </span>
+          </div>
+
           <div className={styles.madeWith}>
             <Icon name="logo" size={13} color="var(--color-brand-primary)" />
             <span>Built for rigorous scientific curiosity</span>

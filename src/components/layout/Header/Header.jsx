@@ -29,6 +29,22 @@ export default function Header() {
     return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen]);
 
+  const [logoClicks, setLogoClicks] = useState(0);
+  const [isWarping, setIsWarping] = useState(false);
+
+  const handleLogoClick = (e) => {
+    const nextCount = logoClicks + 1;
+    setLogoClicks(nextCount);
+
+    if (nextCount >= 5) {
+      e.preventDefault();
+      setLogoClicks(0);
+      setIsWarping(true);
+      window.dispatchEvent(new CustomEvent('nerdverse:singularity'));
+      setTimeout(() => setIsWarping(false), 2000);
+    }
+  };
+
   return (
     <>
       <header
@@ -37,8 +53,20 @@ export default function Header() {
       >
         <div className={`container ${styles.inner}`}>
           {/* Logo */}
-          <Link href="/" className={styles.logo} aria-label="NerdVerse Home">
-            <div className={styles.logoBadge}>
+          <Link
+            href="/"
+            className={styles.logo}
+            aria-label="NerdVerse Home"
+            onClick={handleLogoClick}
+          >
+            <div
+              className={styles.logoBadge}
+              style={{
+                transform: isWarping ? 'rotate(1080deg) scale(1.35)' : 'none',
+                transition: 'transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                boxShadow: isWarping ? '0 0 30px #F59E0B' : 'none',
+              }}
+            >
               <Icon name="logo" size={18} color="#ffffff" />
             </div>
             <span className={styles.logoText}>

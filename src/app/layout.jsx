@@ -1,6 +1,7 @@
 import './globals.css';
 import Header from '@/components/layout/Header/Header';
 import Footer from '@/components/layout/Footer/Footer';
+import EasterEggManager from '@/components/common/EasterEggManager';
 
 export const viewport = {
   width: 'device-width',
@@ -62,6 +63,7 @@ export default function RootLayout({ children }) {
           {children}
         </main>
         <Footer />
+        <EasterEggManager />
       </body>
     </html>
   );
