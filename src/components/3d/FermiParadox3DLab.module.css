@@ -1,0 +1,435 @@
+.labContainer {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg-primary, #06070a);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text-primary, #f9fafb);
+  user-select: none;
+  margin-bottom: var(--space-8, 32px);
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(500px, 65vh, 660px);
+  cursor: grab;
+  background: #06070a;
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* ── Top Floating Header & Drake Calculation Telemetry ── */
+.topHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitleBox {
+  background: rgba(10, 12, 18, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.labBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-brand-light, #e5a93c);
+  margin-bottom: 2px;
+}
+
+.labTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-primary, #f9fafb);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.drakeDisplay {
+  background: rgba(10, 12, 18, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid var(--color-brand-light, #e5a93c);
+  border-radius: 8px;
+  padding: 10px 18px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-shadow: 0 0 20px rgba(229, 169, 60, 0.25);
+}
+
+.drakeLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #9ca3af);
+  letter-spacing: 0.05em;
+}
+
+.drakeValue {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-brand-light, #e5a93c);
+  line-height: 1.1;
+  font-family: var(--font-mono, monospace);
+}
+
+/* ── HUD Filter Status Pill ── */
+.hudFilterPill {
+  position: absolute;
+  top: 92px;
+  left: 16px;
+  z-index: 10;
+  background: rgba(10, 12, 18, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+  font-size: 12px;
+}
+
+.filterDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Colonization Epoch Slider & Wave Controls Dock ── */
+.epochDock {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(10, 12, 18, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 10px;
+  padding: 10px 16px;
+  pointer-events: auto;
+}
+
+.epochControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 220px;
+}
+
+.playBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-brand-light, #e5a93c);
+  color: #08090c;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.playBtn:hover {
+  background: #f5b74c;
+  transform: translateY(-1px);
+}
+
+.epochSliderBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.epochLabelRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-secondary, #9ca3af);
+  font-family: var(--font-mono, monospace);
+}
+
+.epochSlider {
+  width: 100%;
+  accent-color: var(--color-brand-light, #e5a93c);
+  cursor: pointer;
+}
+
+.colonizedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-brand-light, #e5a93c);
+  font-family: var(--font-mono, monospace);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(229, 169, 60, 0.12);
+  border: 1px solid rgba(229, 169, 60, 0.3);
+  white-space: nowrap;
+}
+
+/* ── Dashboard Panel ── */
+.dashboard {
+  padding: 24px;
+  background: var(--color-bg-primary, #06070a);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Scenario / Great Filter Hypotheses Preset Chips ── */
+.scenarioRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.scenarioTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.scenarioChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scenarioChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(18, 19, 26, 0.85);
+  border: 1px solid var(--color-border-default, #21232c);
+  color: var(--color-text-secondary, #9ca3af);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.scenarioChip:hover {
+  border-color: rgba(229, 169, 60, 0.4);
+  color: #f9fafb;
+}
+
+.scenarioChipActive {
+  background: rgba(229, 169, 60, 0.15) !important;
+  border-color: var(--color-brand-light, #e5a93c) !important;
+  color: var(--color-brand-light, #e5a93c) !important;
+}
+
+/* ── Drake Equation Variables Grid ── */
+.drakeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+}
+
+.drakeCard {
+  background: rgba(18, 19, 26, 0.7);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.drakeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drakeParamSymbol {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-brand-light, #e5a93c);
+}
+
+.drakeParamVal {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: #f9fafb;
+}
+
+.drakeParamDesc {
+  font-size: 11px;
+  color: var(--color-text-secondary, #9ca3af);
+  line-height: 1.35;
+}
+
+.drakeSlider {
+  width: 100%;
+  accent-color: var(--color-brand-light, #e5a93c);
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* ── Astrobiological Summary Stats Row ── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+}
+
+.statCard {
+  background: rgba(18, 19, 26, 0.7);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #9ca3af);
+  letter-spacing: 0.04em;
+}
+
+.statVal {
+  font-size: 22px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  line-height: 1.1;
+}
+
+.statDesc {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* ── Mobile Viewport Adaptations ── */
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 400px;
+  }
+
+  .topHeader {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .headerTitleBox {
+    padding: 8px 12px;
+  }
+
+  .labTitle {
+    font-size: 15px;
+  }
+
+  .drakeDisplay {
+    padding: 6px 12px;
+  }
+
+  .drakeValue {
+    font-size: 18px;
+  }
+
+  .hudFilterPill {
+    top: 76px;
+    left: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .epochDock {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .epochControls {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .playBtn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .dashboard {
+    padding: 16px 14px;
+    gap: 14px;
+  }
+
+  .scenarioChips {
+    width: 100%;
+  }
+
+  .scenarioChip {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}

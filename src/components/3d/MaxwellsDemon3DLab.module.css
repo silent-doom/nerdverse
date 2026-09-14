@@ -1,0 +1,504 @@
+.labContainer {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg-primary, #08090c);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text-primary, #f9fafb);
+  user-select: none;
+  margin-bottom: var(--space-8, 32px);
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(480px, 60vh, 620px);
+  cursor: grab;
+  background: #08090c;
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* ── Top Floating Header & Telemetry ── */
+.topHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitleBox {
+  background: rgba(14, 15, 20, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.labBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-brand-light, #e5a93c);
+  margin-bottom: 2px;
+}
+
+.labTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-primary, #f9fafb);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.entropyDisplay {
+  background: rgba(14, 15, 20, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid var(--color-brand-light, #e5a93c);
+  border-radius: 8px;
+  padding: 10px 18px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-shadow: 0 0 20px rgba(229, 169, 60, 0.25);
+}
+
+.entropyLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #9ca3af);
+  letter-spacing: 0.05em;
+}
+
+.entropyValue {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-brand-light, #e5a93c);
+  line-height: 1.1;
+  font-family: var(--font-mono, monospace);
+}
+
+/* ── Dual Chamber Badges ── */
+.chamberBadges {
+  position: absolute;
+  top: 92px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.chamberBadgeLeft,
+.chamberBadgeRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(14, 16, 22, 0.88);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  pointer-events: auto;
+}
+
+.chamberBadgeLeft {
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.15);
+}
+
+.chamberBadgeRight {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.15);
+}
+
+.badgeDotCyan {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+  flex-shrink: 0;
+}
+
+.badgeDotRed {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f87171;
+  box-shadow: 0 0 10px #f87171;
+  flex-shrink: 0;
+}
+
+.chamberBadgeLeft strong,
+.chamberBadgeRight strong {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #f9fafb;
+}
+
+.chamberBadgeLeft span {
+  font-size: 13px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #38bdf8;
+}
+
+.chamberBadgeRight span {
+  font-size: 13px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #f87171;
+}
+
+/* ── Shutter Action Overlay ── */
+.shutterActionOverlay {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.modeButtonGroup {
+  display: flex;
+  gap: 8px;
+  background: rgba(14, 16, 22, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 4px;
+  pointer-events: auto;
+}
+
+.modeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #9ca3af);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modeBtn:hover {
+  color: #f9fafb;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modeBtnActive {
+  background: var(--color-brand-light, #e5a93c) !important;
+  color: #08090c !important;
+}
+
+.trapdoorActuateBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-brand-light, #e5a93c);
+  color: #08090c;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 16px rgba(229, 169, 60, 0.3);
+  transition: all 0.15s ease;
+}
+
+.trapdoorActuateBtn:hover {
+  transform: translateY(-2px);
+  background: #f5b74c;
+  box-shadow: 0 6px 20px rgba(229, 169, 60, 0.45);
+}
+
+.trapdoorOpenState {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* ── Dashboard Panel ── */
+.dashboard {
+  padding: 24px;
+  background: var(--color-bg-primary, #08090c);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Landauer Principle Memory Register Banner ── */
+.landauerBanner {
+  background: rgba(18, 19, 26, 0.9);
+  border: 1px solid rgba(229, 169, 60, 0.35);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.landauerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.landauerTitle {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-brand-light, #e5a93c);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landauerDesc {
+  font-size: 12px;
+  color: var(--color-text-secondary, #9ca3af);
+  line-height: 1.45;
+}
+
+.eraseMemoryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.eraseMemoryBtn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+}
+
+/* ── Controls Grid ── */
+.controlsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+}
+
+.controlCard {
+  background: rgba(18, 19, 26, 0.7);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.controlHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controlLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f9fafb;
+}
+
+.controlVal {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-brand-light, #e5a93c);
+  font-family: var(--font-mono, monospace);
+}
+
+.rangeInput {
+  width: 100%;
+  accent-color: var(--color-brand-light, #e5a93c);
+  cursor: pointer;
+}
+
+.controlFooter {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+/* ── Thermodynamic Stats Cards ── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+}
+
+.statCard {
+  background: rgba(18, 19, 26, 0.7);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #9ca3af);
+  letter-spacing: 0.04em;
+}
+
+.statVal {
+  font-size: 22px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  line-height: 1.1;
+}
+
+.statDesc {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* ── Mobile Viewport Adaptations ── */
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 380px;
+  }
+
+  .topHeader {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .headerTitleBox {
+    padding: 8px 12px;
+  }
+
+  .labTitle {
+    font-size: 15px;
+  }
+
+  .entropyDisplay {
+    padding: 6px 12px;
+  }
+
+  .entropyValue {
+    font-size: 18px;
+  }
+
+  .chamberBadges {
+    top: 76px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .chamberBadgeLeft,
+  .chamberBadgeRight {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .shutterActionOverlay {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .modeButtonGroup {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .modeBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .trapdoorActuateBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dashboard {
+    padding: 16px 14px;
+    gap: 14px;
+  }
+
+  .landauerBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .eraseMemoryBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

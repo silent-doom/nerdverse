@@ -222,7 +222,7 @@ The St. Petersburg Paradox demonstrates that maximizing raw mathematical value i
     difficulty: 'advanced',
     readTime: 7,
     summary: "Can microscopic observation generate free thermodynamic energy from thin air? Trace James Clerk Maxwell's microscopic demon, the Second Law of Thermodynamics, and Rolf Landauer's proof that erasing a bit of information creates physical heat.",
-    interactiveType: null,
+    interactiveType: 'MaxwellsDemon',
     content: `## The Gatekeeper of Molecular Chaos
 
 In 1867, Scottish physicist James Clerk Maxwell formulated a thought experiment designed to test whether the **Second Law of Thermodynamics**—the universal law stating that isolated entropy must always increase—was an absolute mathematical truth or merely a statistical probability.
@@ -292,7 +292,7 @@ In the 21st century, Maxwell's Demon has transitioned from thought experiment to
     difficulty: 'beginner',
     readTime: 6,
     summary: "With hundreds of billions of stars older than the Sun and exponential interstellar transit times, where is everybody? Explore Enrico Fermi's lunchtime question, the Drake Equation, and the harrowing implications of the Great Filter.",
-    interactiveType: null,
+    interactiveType: 'FermiParadox',
     content: `## A Lunchtime Epiphany at Los Alamos
 
 One summer afternoon in 1950, four legendary Manhattan Project physicists—Enrico Fermi, Edward Teller, Herbert York, and Emil Konopinski—walked toward the Fuller Lodge dining hall at Los Alamos National Laboratory. They had been joking about a recent *New Yorker* cartoon attributing missing municipal trash cans to alien scavengers.

@@ -10,6 +10,8 @@ const TrolleyProblem3DLab = dynamic(() => import('@/components/3d/TrolleyProblem
 const BayesTheorem3DLab = dynamic(() => import('@/components/3d/BayesTheorem3DLab'), { ssr: false });
 const SimpsonsParadox3DLab = dynamic(() => import('@/components/3d/SimpsonsParadox3DLab'), { ssr: false });
 const StPetersburg3DLab = dynamic(() => import('@/components/3d/StPetersburg3DLab'), { ssr: false });
+const MaxwellsDemon3DLab = dynamic(() => import('@/components/3d/MaxwellsDemon3DLab'), { ssr: false });
+const FermiParadox3DLab = dynamic(() => import('@/components/3d/FermiParadox3DLab'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type }) {
   switch (type) {
@@ -29,6 +31,10 @@ export default function ConceptSimulatorResolver({ type }) {
       return <SimpsonsParadox3DLab />;
     case 'StPetersburg':
       return <StPetersburg3DLab />;
+    case 'MaxwellsDemon':
+      return <MaxwellsDemon3DLab />;
+    case 'FermiParadox':
+      return <FermiParadox3DLab />;
     default:
       return null;
   }

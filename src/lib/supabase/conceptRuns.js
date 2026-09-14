@@ -127,6 +127,37 @@ const SEED_TELEMETRY = {
       { id: 'seed-10', metrics: { state: 'decayed' }, value: 0 },
     ],
   },
+  'maxwells-demon': {
+    theoreticalTarget: 2.3, // Landauer dissipation threshold for 1 TB equivalent erasure
+    unit: 'nJ Heat',
+    label: 'Landauer Heat Dissipation (nJ)',
+    runs: [
+      { id: 'seed-1', metrics: { bitsErased: 120, heatNanoJoules: 0.345 }, value: 0.35 },
+      { id: 'seed-2', metrics: { bitsErased: 240, heatNanoJoules: 0.690 }, value: 0.69 },
+      { id: 'seed-3', metrics: { bitsErased: 360, heatNanoJoules: 1.035 }, value: 1.04 },
+      { id: 'seed-4', metrics: { bitsErased: 480, heatNanoJoules: 1.380 }, value: 1.38 },
+      { id: 'seed-5', metrics: { bitsErased: 600, heatNanoJoules: 1.725 }, value: 1.73 },
+      { id: 'seed-6', metrics: { bitsErased: 720, heatNanoJoules: 2.070 }, value: 2.07 },
+      { id: 'seed-7', metrics: { bitsErased: 840, heatNanoJoules: 2.415 }, value: 2.42 },
+      { id: 'seed-8', metrics: { bitsErased: 960, heatNanoJoules: 2.760 }, value: 2.76 },
+      { id: 'seed-9', metrics: { bitsErased: 1024, heatNanoJoules: 2.944 }, value: 2.94 },
+    ],
+  },
+  'fermi-paradox': {
+    theoreticalTarget: 52, // Standard Sagan-Drake cosmological parameter solution
+    unit: 'N Civs',
+    label: 'Drake Communicative Civilizations (N)',
+    runs: [
+      { id: 'seed-1', metrics: { scenario: 'rare-earth', calculatedN: 0.01 }, value: 0 },
+      { id: 'seed-2', metrics: { scenario: 'filter-ahead', calculatedN: 0.05 }, value: 0 },
+      { id: 'seed-3', metrics: { scenario: 'standard', calculatedN: 18 }, value: 18 },
+      { id: 'seed-4', metrics: { scenario: 'standard', calculatedN: 35 }, value: 35 },
+      { id: 'seed-5', metrics: { scenario: 'standard', calculatedN: 52 }, value: 52 },
+      { id: 'seed-6', metrics: { scenario: 'standard', calculatedN: 74 }, value: 74 },
+      { id: 'seed-7', metrics: { scenario: 'standard', calculatedN: 120 }, value: 120 },
+      { id: 'seed-8', metrics: { scenario: 'sagan-optimist', calculatedN: 450 }, value: 450 },
+    ],
+  },
 };
 
 // Generic fallback for any other concept
@@ -184,6 +215,10 @@ export async function recordConceptRun(conceptSlug, runType = 'single', metrics 
     numericValue = metrics.landedButterDown ? 100 : 0;
   } else if (conceptSlug === 'schrodingers-cat') {
     numericValue = metrics.state === 'alive' ? 100 : 0;
+  } else if (conceptSlug === 'maxwells-demon') {
+    numericValue = Number(metrics.heatNanoJoules || 2.3);
+  } else if (conceptSlug === 'fermi-paradox') {
+    numericValue = Number(metrics.calculatedN || 52);
   } else {
     numericValue = typeof metrics.value === 'number' ? metrics.value : 50;
   }
@@ -262,6 +297,10 @@ export async function fetchConceptTelemetry(conceptSlug) {
             val = item.metrics?.landedButterDown ? 100 : 0;
           } else if (conceptSlug === 'schrodingers-cat') {
             val = item.metrics?.state === 'alive' ? 100 : 0;
+          } else if (conceptSlug === 'maxwells-demon') {
+            val = Number(item.metrics?.heatNanoJoules || 2.3);
+          } else if (conceptSlug === 'fermi-paradox') {
+            val = Number(item.metrics?.calculatedN || 52);
           } else {
             val = Number(item.metrics?.value || 50);
           }
