@@ -7,6 +7,88 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import styles from './StPetersburg3DLab.module.css';
 import Icon from '@/components/common/Icon';
 
+// ── Treasury Asset Generators (Gold Bullion & Currency Bundles) ──
+function createGoldBarMesh(three) {
+  if (three.goldBarTemplate) {
+    const clone = three.goldBarTemplate.clone(true);
+    clone.scale.set(1.0, 1.0, 1.0);
+    clone.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    return clone;
+  }
+
+  // High-fidelity procedural bullion bar (trapezoidal tapered ingot with stamped hallmark)
+  const group = new THREE.Group();
+  const barGeo = new THREE.CylinderGeometry(0.55, 0.70, 0.44, 4, 1, false, Math.PI / 4);
+  barGeo.scale(1.7, 1.0, 1.0);
+  const goldMat = new THREE.MeshStandardMaterial({
+    color: 0xf59e0b,
+    emissive: 0xd97706,
+    emissiveIntensity: 0.22,
+    metalness: 0.98,
+    roughness: 0.16,
+  });
+  const bar = new THREE.Mesh(barGeo, goldMat);
+  bar.castShadow = true;
+  bar.receiveShadow = true;
+  group.add(bar);
+
+  // Top hallmark stamp inset
+  const stampGeo = new THREE.BoxGeometry(1.4, 0.02, 0.55);
+  const stampMat = new THREE.MeshStandardMaterial({
+    color: 0xd97706,
+    metalness: 0.92,
+    roughness: 0.3,
+  });
+  const stamp = new THREE.Mesh(stampGeo, stampMat);
+  stamp.position.y = 0.22;
+  group.add(stamp);
+
+  return group;
+}
+
+function createCurrencyMesh(three) {
+  if (three.cashBundleTemplate) {
+    const clone = three.cashBundleTemplate.clone(true);
+    clone.scale.set(1.0, 1.0, 1.0);
+    clone.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    return clone;
+  }
+
+  // High-fidelity procedural currency strap ($10,000 banknote stack with paper band)
+  const group = new THREE.Group();
+  const billGeo = new THREE.BoxGeometry(2.2, 0.38, 1.1);
+  const billMat = new THREE.MeshStandardMaterial({
+    color: 0x164e3a, // Emerald banknote green
+    roughness: 0.65,
+    metalness: 0.05,
+  });
+  const billStack = new THREE.Mesh(billGeo, billMat);
+  billStack.castShadow = true;
+  billStack.receiveShadow = true;
+  group.add(billStack);
+
+  const strapGeo = new THREE.BoxGeometry(0.48, 0.39, 1.12);
+  const strapMat = new THREE.MeshStandardMaterial({
+    color: 0xfef08a, // Gold/cream currency strap
+    roughness: 0.5,
+    metalness: 0.1,
+  });
+  const strap = new THREE.Mesh(strapGeo, strapMat);
+  group.add(strap);
+
+  return group;
+}
+
 export default function StPetersburg3DLab() {
   const mountRef = useRef(null);
 
@@ -16,6 +98,7 @@ export default function StPetersburg3DLab() {
   const [isFlipping, setIsFlipping] = useState(false);
   const [lastOutcome, setLastOutcome] = useState(null); // 'HEADS' | 'TAILS' | null
   const [isGameOver, setIsGameOver] = useState(false);
+  const [wealthType, setWealthType] = useState('gold'); // 'gold' | 'cash' | 'mixed'
 
   // Monte Carlo batch simulation stats
   const [batchStats, setBatchStats] = useState(null);
@@ -27,6 +110,9 @@ export default function StPetersburg3DLab() {
     renderer: null,
     controls: null,
     coinMesh: null,
+    coinModel: null,
+    goldBarTemplate: null,
+    cashBundleTemplate: null,
     towerGroup: null,
     isAnimatingFlip: false,
     flipProgress: 0,
@@ -34,20 +120,60 @@ export default function StPetersburg3DLab() {
     animId: null,
   });
 
+  // Rebuild 3D treasury stack based on current streak and asset type
+  const rebuildTreasuryStack = useCallback((currentStreak, type) => {
+    const three = threeRef.current;
+    if (!three.towerGroup) return;
+
+    while (three.towerGroup.children.length > 0) {
+      three.towerGroup.remove(three.towerGroup.children[0]);
+    }
+
+    if (currentStreak <= 0) {
+      // Baseline initial $2 starter prize displayed on the treasury plinth
+      const starterMesh = type === 'cash' ? createCurrencyMesh(three) : createGoldBarMesh(three);
+      starterMesh.position.set(5, 0.44, 0);
+      three.towerGroup.add(starterMesh);
+      return;
+    }
+
+    // Stack cross-hatched layers as wealth accumulates exponentially
+    for (let s = 1; s <= currentStreak; s++) {
+      const level = s - 1;
+      const isCross = level % 2 === 1;
+      const layerY = 0.44 + level * 0.46;
+      const isCash = type === 'cash' || (type === 'mixed' && level % 2 === 1);
+
+      const itemA = isCash ? createCurrencyMesh(three) : createGoldBarMesh(three);
+      const itemB = isCash ? createCurrencyMesh(three) : createGoldBarMesh(three);
+
+      if (!isCross) {
+        // Parallel to X axis
+        itemA.position.set(5, layerY, -0.65);
+        itemB.position.set(5, layerY, 0.65);
+        itemA.rotation.y = 0;
+        itemB.rotation.y = 0;
+      } else {
+        // Parallel to Z axis (cross-hatched)
+        itemA.position.set(4.35, layerY, 0);
+        itemB.position.set(5.65, layerY, 0);
+        itemA.rotation.y = Math.PI / 2;
+        itemB.rotation.y = Math.PI / 2;
+      }
+
+      three.towerGroup.add(itemA);
+      three.towerGroup.add(itemB);
+    }
+  }, []);
+
   // Start new single-player game
   const resetGame = useCallback(() => {
     setStreak(0);
     setPayout(2);
     setLastOutcome(null);
     setIsGameOver(false);
-
-    const three = threeRef.current;
-    if (three.towerGroup) {
-      while (three.towerGroup.children.length > 0) {
-        three.towerGroup.remove(three.towerGroup.children[0]);
-      }
-    }
-  }, []);
+    rebuildTreasuryStack(0, wealthType);
+  }, [rebuildTreasuryStack, wealthType]);
 
   // Single Coin Flip
   const flipCoin = useCallback(() => {
@@ -71,27 +197,12 @@ export default function StPetersburg3DLab() {
         const nextPayout = Math.pow(2, nextStreak + 1);
         setStreak(nextStreak);
         setPayout(nextPayout);
-
-        // Add block to 3D payout tower
-        if (three.towerGroup) {
-          const blockHeight = 0.8;
-          const blockGeo = new THREE.BoxGeometry(2.2, blockHeight, 2.2);
-          const blockMat = new THREE.MeshStandardMaterial({
-            color: 0xf59e0b,
-            emissive: 0xf59e0b,
-            emissiveIntensity: 0.45,
-            metalness: 0.8,
-            roughness: 0.2,
-          });
-          const block = new THREE.Mesh(blockGeo, blockMat);
-          block.position.set(5, nextStreak * blockHeight - blockHeight / 2, 0);
-          three.towerGroup.add(block);
-        }
+        rebuildTreasuryStack(nextStreak, wealthType);
       } else {
         setIsGameOver(true);
       }
     }, 900);
-  }, [isFlipping, isGameOver, streak]);
+  }, [isFlipping, isGameOver, streak, wealthType, rebuildTreasuryStack]);
 
   // Run 1,000 Trial Monte Carlo Batch
   const runBatchSimulation = useCallback(() => {
@@ -230,9 +341,30 @@ export default function StPetersburg3DLab() {
     coinMesh.castShadow = true;
     coinHolder.add(coinMesh);
 
-    // Tower Group
+    // Tower Group (Accumulating Wealth Stack)
     const towerGroup = new THREE.Group();
     scene.add(towerGroup);
+
+    // Luxurious Casino Treasury Vault Plinth on the right
+    const treasuryPlinth = new THREE.Group();
+    treasuryPlinth.position.set(5, 0, 0);
+    scene.add(treasuryPlinth);
+
+    const plinthBase = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.8, 3.0, 0.35, 32),
+      new THREE.MeshStandardMaterial({ color: 0x141820, roughness: 0.45, metalness: 0.65 })
+    );
+    plinthBase.position.y = 0.175;
+    plinthBase.receiveShadow = true;
+    treasuryPlinth.add(plinthBase);
+
+    const plinthRim = new THREE.Mesh(
+      new THREE.TorusGeometry(2.8, 0.06, 12, 48),
+      new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2, metalness: 0.95 })
+    );
+    plinthRim.rotation.x = Math.PI / 2;
+    plinthRim.position.y = 0.35;
+    treasuryPlinth.add(plinthRim);
 
     // Load Blender-crafted St. Petersburg Coin Model
     const loader = new GLTFLoader();
@@ -262,6 +394,41 @@ export default function StPetersburg3DLab() {
       }
     );
 
+    // Load Blender-crafted Bullion Gold Bar Model
+    loader.load(
+      '/models/gold_bar.glb',
+      (gltf) => {
+        const model = gltf.scene;
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        threeRef.current.goldBarTemplate = model;
+        rebuildTreasuryStack(streak, wealthType);
+      },
+      undefined,
+      () => {}
+    );
+
+    // Load Blender-crafted Currency Bundle Model
+    loader.load(
+      '/models/cash_bundle.glb',
+      (gltf) => {
+        const model = gltf.scene;
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        threeRef.current.cashBundleTemplate = model;
+      },
+      undefined,
+      () => {}
+    );
+
     threeRef.current = {
       scene,
       camera,
@@ -269,12 +436,17 @@ export default function StPetersburg3DLab() {
       controls,
       coinMesh,
       coinModel: coinMesh,
+      goldBarTemplate: null,
+      cashBundleTemplate: null,
       towerGroup,
       isAnimatingFlip: false,
       flipProgress: 0,
       flipTargetOutcome: 'HEADS',
       animId: null,
     };
+
+    // Render baseline starter wealth on the plinth
+    rebuildTreasuryStack(0, wealthType);
 
     const handleResize = () => {
       if (!container) return;
@@ -382,6 +554,40 @@ export default function StPetersburg3DLab() {
             >
               <Icon name="zap" size={14} color="#e5a93c" />
               <span>Run 1,000-Trial Monte Carlo</span>
+            </button>
+          </div>
+
+          {/* Treasury Asset Selector */}
+          <div className={styles.wealthTypeSelector}>
+            <button
+              className={`${styles.wealthBtn} ${wealthType === 'gold' ? styles.wealthBtnActive : ''}`}
+              onClick={() => {
+                setWealthType('gold');
+                rebuildTreasuryStack(streak, 'gold');
+              }}
+            >
+              <Icon name="award" size={13} />
+              <span>Gold Bullion</span>
+            </button>
+            <button
+              className={`${styles.wealthBtn} ${wealthType === 'cash' ? styles.wealthBtnActive : ''}`}
+              onClick={() => {
+                setWealthType('cash');
+                rebuildTreasuryStack(streak, 'cash');
+              }}
+            >
+              <Icon name="dollar-sign" size={13} />
+              <span>Currency Bundles</span>
+            </button>
+            <button
+              className={`${styles.wealthBtn} ${wealthType === 'mixed' ? styles.wealthBtnActive : ''}`}
+              onClick={() => {
+                setWealthType('mixed');
+                rebuildTreasuryStack(streak, 'mixed');
+              }}
+            >
+              <Icon name="layers" size={13} />
+              <span>Mixed Treasury</span>
             </button>
           </div>
         </div>

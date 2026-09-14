@@ -157,6 +157,44 @@
   pointer-events: auto;
 }
 
+.wealthTypeSelector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(14, 15, 20, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-md, 8px);
+  padding: 4px;
+  pointer-events: auto;
+}
+
+.wealthBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-secondary, #9ca3af);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wealthBtn:hover {
+  color: var(--color-text-primary, #f9fafb);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wealthBtnActive {
+  background: rgba(229, 169, 60, 0.15) !important;
+  color: var(--color-brand-light, #e5a93c) !important;
+  border-color: rgba(229, 169, 60, 0.45) !important;
+}
+
 .flipBtn {
   display: inline-flex;
   align-items: center;
