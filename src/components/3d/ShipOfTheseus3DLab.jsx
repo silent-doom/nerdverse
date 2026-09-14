@@ -6,7 +6,7 @@ import styles from './ShipOfTheseus3DLab.module.css';
 import Icon from '@/components/common/Icon';
 import { recordConceptRun } from '@/lib/supabase/conceptRuns';
 
-const NUM_PLANKS = 14; // 7 port + 7 starboard
+const NUM_PLANKS = 20; // 10 port + 10 starboard curved hull strakes
 
 export default function ShipOfTheseus3DLab() {
   const mountRef = useRef(null);
@@ -41,6 +41,7 @@ export default function ShipOfTheseus3DLab() {
   const shipBGroupRef = useRef(null);
   const planksARef = useRef([]);
   const planksBRef = useRef([]);
+  const oarsARef = useRef([]);
   const auraMeshRef = useRef(null);
 
   // ── Materials ──
@@ -140,116 +141,336 @@ export default function ShipOfTheseus3DLab() {
     scene.add(waterMesh);
     waterMeshRef.current = waterMesh;
 
-    // 6. Stone Harbor Pier & Dry Dock Scaffolding (Right Side)
-    const pierGeo = new THREE.BoxGeometry(7, 1.4, 12);
+    // 6. Ancient Athenian Stone Harbor Quay & Dry Dock Scaffolding
+    const pierGeo = new THREE.BoxGeometry(8.2, 1.8, 14);
     const pierMesh = new THREE.Mesh(pierGeo, stoneMat);
-    pierMesh.position.set(4.8, 0.3, 0);
+    pierMesh.position.set(5.4, 0.4, 0);
     scene.add(pierMesh);
 
-    // Dry Dock Wood Cradles on Pier
-    for (let i = -3; i <= 3; i += 1.5) {
-      const cradle = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.25, 0.3), agedWoodMat);
-      cradle.position.set(4.5, 1.05, i);
-      scene.add(cradle);
+    // Stone Mooring Bollards along edge of Quay
+    const bollardMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, roughness: 0.8 });
+    for (let b = -5; b <= 5; b += 2.5) {
+      const bollard = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.5, 16), bollardMat);
+      bollard.position.set(1.5, 1.45, b);
+      scene.add(bollard);
+
+      // Coiled hemp rope ring at base of bollard
+      const ropeRing = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.045, 8, 16), agedWoodMat);
+      ropeRing.rotation.x = Math.PI / 2;
+      ropeRing.position.set(1.5, 1.25, b);
+      scene.add(ropeRing);
     }
 
-    // Harbor Crane Mast
-    const cranePole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 4.2), agedWoodMat);
-    cranePole.position.set(6.8, 2.8, 2.5);
-    scene.add(cranePole);
-    const craneArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3.2), agedWoodMat);
-    craneArm.rotation.z = Math.PI / 4;
-    craneArm.position.set(5.7, 4.2, 2.5);
-    scene.add(craneArm);
+    // Heavy Timber Dry Dock Cradles & Bilge Shores holding Ship B
+    for (let i = -3.6; i <= 3.6; i += 1.2) {
+      // Keel blocks
+      const block = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.35, 0.4), agedWoodMat);
+      block.position.set(5.4, 1.28, i);
+      scene.add(block);
 
-    // ── 7. Ship Helper Generator ──
+      // Diagonal timber shores (bilge struts) on port and starboard
+      const shoreL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.8), agedWoodMat);
+      shoreL.rotation.z = Math.PI / 5.2;
+      shoreL.position.set(3.9, 1.65, i);
+      scene.add(shoreL);
+
+      const shoreR = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.8), agedWoodMat);
+      shoreR.rotation.z = -Math.PI / 5.2;
+      shoreR.position.set(6.9, 1.65, i);
+      scene.add(shoreR);
+    }
+
+    // Ancient Shipwright Crane & Tackle
+    const craneGroup = new THREE.Group();
+    const cranePole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 5.4, 16), agedWoodMat);
+    cranePole.position.set(8.2, 3.6, 3.4);
+    craneGroup.add(cranePole);
+    const craneArm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 4.4, 16), agedWoodMat);
+    craneArm.rotation.z = Math.PI / 3.6;
+    craneArm.position.set(6.7, 5.4, 3.4);
+    craneGroup.add(craneArm);
+    scene.add(craneGroup);
+
+    // Terracotta Amphorae Storage Vessels
+    const amphoraMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 });
+    for (let a = 0; a < 4; a++) {
+      const amphora = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.09, 0.65, 12), amphoraMat);
+      amphora.position.set(8.3 + (a % 2) * 0.3, 1.55, -2.8 + a * 0.45);
+      scene.add(amphora);
+    }
+
+    // Bronze Fire Braziers on the Quay Corners
+    const brazierMat = new THREE.MeshStandardMaterial({ color: 0x262626, metalness: 0.9, roughness: 0.3 });
+    const brazierL = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.18, 0.8, 16), brazierMat);
+    brazierL.position.set(1.6, 1.6, 5.8);
+    scene.add(brazierL);
+    const brazierLight = new THREE.PointLight(0xf59e0b, 1.8, 9);
+    brazierLight.position.set(1.6, 2.2, 5.8);
+    scene.add(brazierLight);
+
+    // ── 7. Grand Athenian Galley Generator ──
     const createShip = (isDryDock) => {
       const shipGroup = new THREE.Group();
       const planks = [];
+      const oars = [];
 
-      // Keel & Base Spine
-      const keelGeo = new THREE.BoxGeometry(0.3, 0.4, 5.2);
-      const keel = new THREE.Mesh(keelGeo, agedWoodMat);
-      keel.position.y = 0;
+      // 1. Keel Spine (Heavy curved centerline timber)
+      const keelMat = agedWoodMat;
+      const keel = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.45, 7.8), keelMat);
+      keel.position.y = 0.05;
       shipGroup.add(keel);
 
-      // Curved Bow / Prow Ram
-      const prowGeo = new THREE.ConeGeometry(0.4, 1.4, 8);
-      prowGeo.rotateX(-Math.PI / 3);
-      const prow = new THREE.Mesh(prowGeo, bronzeMat);
-      prow.position.set(0, 0.4, 2.9);
-      shipGroup.add(prow);
+      // 2. Bow Stempost (Rising curved prow)
+      const stemGeo = new THREE.CylinderGeometry(0.18, 0.22, 2.6, 16);
+      const stem = new THREE.Mesh(stemGeo, keelMat);
+      stem.rotation.x = Math.PI / 4.8;
+      stem.position.set(0, 1.15, 4.3);
+      shipGroup.add(stem);
 
-      // Curved Stern
-      const sternGeo = new THREE.TorusGeometry(0.8, 0.15, 8, 16, Math.PI / 2);
-      sternGeo.rotateY(Math.PI / 2);
-      const stern = new THREE.Mesh(sternGeo, agedWoodMat);
-      stern.position.set(0, 0.7, -2.6);
-      shipGroup.add(stern);
+      // Athenian Sacred Eye (Ophthalmos) on Bow (Port & Starboard)
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.3 });
+      const pupilMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+      for (const side of [-1, 1]) {
+        const eyeBase = new THREE.Mesh(new THREE.CircleGeometry(0.22, 16), eyeMat);
+        eyeBase.rotation.y = (side * Math.PI) / 2;
+        eyeBase.position.set(side * 0.26, 1.4, 4.2);
+        shipGroup.add(eyeBase);
 
-      // Central Mast & Yardarm
-      const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 3.8), agedWoodMat);
-      mast.position.set(0, 1.9, 0.2);
-      shipGroup.add(mast);
+        const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.1, 16), pupilMat);
+        pupil.rotation.y = (side * Math.PI) / 2;
+        pupil.position.set(side * 0.27, 1.4, 4.2);
+        shipGroup.add(pupil);
+      }
 
-      const yardarm = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.8), agedWoodMat);
-      yardarm.rotation.z = Math.PI / 2;
-      yardarm.position.set(0, 3.2, 0.2);
-      shipGroup.add(yardarm);
+      // 3. Bronze Naval Ram (Embolos) at waterline
+      const ramGroup = new THREE.Group();
+      const ramCore = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.8, 16), bronzeMat);
+      ramCore.rotation.x = -Math.PI / 2;
+      ramCore.scale.set(1.15, 0.75, 1.0);
+      ramGroup.add(ramCore);
 
-      // Sail
-      const sail = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.0), sailMat);
-      sail.position.set(0, 2.2, 0.25);
-      shipGroup.add(sail);
+      // Triple-cutting blades on ram
+      const finH = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.12, 0.8), bronzeMat);
+      finH.position.z = 0.3;
+      ramGroup.add(finH);
 
-      // Modular Hull Planks (7 Port, 7 Starboard)
-      for (let i = 0; i < 7; i++) {
-        const zPos = (i - 3) * 0.7;
+      const finV = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.2, 0.8), bronzeMat);
+      finV.position.z = 0.3;
+      ramGroup.add(finV);
+
+      // Upper Auxiliary Ram (Proembolion)
+      const proem = new THREE.Mesh(new THREE.ConeGeometry(0.32, 1.0, 12), bronzeMat);
+      proem.rotation.x = -Math.PI / 2;
+      proem.position.set(0, 0.65, -0.2);
+      ramGroup.add(proem);
+
+      ramGroup.position.set(0, 0.12, 4.75);
+      shipGroup.add(ramGroup);
+
+      // 4. Stern Aphlaston (Sweeping ornamental goose-neck tail)
+      const aphlastonGroup = new THREE.Group();
+      const aphlastonCurve = new THREE.Mesh(
+        new THREE.TorusGeometry(1.5, 0.18, 12, 32, Math.PI * 0.65),
+        keelMat
+      );
+      aphlastonCurve.rotation.y = Math.PI / 2;
+      aphlastonCurve.position.set(0, 1.35, -4.1);
+      aphlastonGroup.add(aphlastonCurve);
+
+      // Decorative bronze finials
+      for (let f = 0; f < 3; f++) {
+        const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.2), bronzeMat);
+        leaf.position.set(0, 2.5 + f * 0.25, -4.7 + f * 0.15);
+        aphlastonGroup.add(leaf);
+      }
+      shipGroup.add(aphlastonGroup);
+
+      // 5. Timber Main Deck
+      const deck = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.14, 7.2), agedWoodMat);
+      deck.position.set(0, 0.72, -0.1);
+      shipGroup.add(deck);
+
+      // Captain's Aft Quarterdeck & Helming Platform
+      const aftDeck = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.3, 1.8), agedWoodMat);
+      aftDeck.position.set(0, 0.95, -3.1);
+      shipGroup.add(aftDeck);
+
+      // 6. Transverse Structural Ribs
+      for (let r = -3.2; r <= 3.2; r += 0.8) {
+        const rib = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.12, 0.14), agedWoodMat);
+        rib.position.set(0, 0.78, r);
+        shipGroup.add(rib);
+      }
+
+      // 7. Raised Bulwarks (Gunwales)
+      for (const side of [-1, 1]) {
+        const bulwark = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.7, 7.2), agedWoodMat);
+        bulwark.position.set(side * 1.22, 1.15, -0.1);
+        shipGroup.add(bulwark);
+      }
+
+      // 8. Modular Hull Planking (10 Port, 10 Starboard)
+      // Conforming precisely to ancient Greek galley curvature
+      for (let i = 0; i < 10; i++) {
+        const t = i / 9; // 0 to 1 along length
+        const zPos = -3.3 + t * 6.6;
+        const beamFactor = Math.sqrt(Math.max(0.15, 1 - Math.pow(zPos / 4.2, 2)));
+        const beamW = 1.25 * beamFactor;
+        const pLength = 0.72;
+        const tangentAngle = Math.atan2(-2 * (zPos / 17.64), 1);
 
         // Port Plank
-        const pGeo = new THREE.BoxGeometry(0.12, 0.35, 0.65);
-        const portPlank = new THREE.Mesh(pGeo, agedWoodMat.clone());
-        portPlank.position.set(-0.75, 0.3, zPos);
-        portPlank.rotation.z = -0.3;
+        const portPlank = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.45, pLength), agedWoodMat.clone());
+        portPlank.position.set(-beamW, 0.38, zPos);
+        portPlank.rotation.y = tangentAngle;
+        portPlank.rotation.z = -0.28;
         shipGroup.add(portPlank);
         planks.push(portPlank);
 
         // Starboard Plank
-        const starPlank = new THREE.Mesh(pGeo, agedWoodMat.clone());
-        starPlank.position.set(0.75, 0.3, zPos);
-        starPlank.rotation.z = 0.3;
+        const starPlank = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.45, pLength), agedWoodMat.clone());
+        starPlank.position.set(beamW, 0.38, zPos);
+        starPlank.rotation.y = -tangentAngle;
+        starPlank.rotation.z = 0.28;
         shipGroup.add(starPlank);
         planks.push(starPlank);
       }
 
-      // Oars along sides (if floating)
-      if (!isDryDock) {
-        for (let i = -2; i <= 2; i += 1.0) {
-          const oarL = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2.0), agedWoodMat);
-          oarL.rotation.z = Math.PI / 3;
-          oarL.position.set(-1.3, -0.1, i);
-          shipGroup.add(oarL);
+      // 9. Greek Hoplon Shields (6 Port, 6 Starboard)
+      const shieldColors = [0xb45309, 0x1e3a8a, 0x991b1b, 0x065f46];
+      for (let s = 0; s < 6; s++) {
+        const zShield = -2.4 + s * 0.95;
+        const beamFactor = Math.sqrt(Math.max(0.2, 1 - Math.pow(zShield / 4.2, 2)));
+        const xPos = 1.28 * beamFactor;
 
-          const oarR = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2.0), agedWoodMat);
-          oarR.rotation.z = -Math.PI / 3;
-          oarR.position.set(1.3, -0.1, i);
-          shipGroup.add(oarR);
+        for (const side of [-1, 1]) {
+          const shieldGroup = new THREE.Group();
+          const rim = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.035, 12, 24), bronzeMat);
+          shieldGroup.add(rim);
+
+          const faceMat = new THREE.MeshStandardMaterial({
+            color: shieldColors[s % shieldColors.length],
+            roughness: 0.4,
+            metalness: 0.2,
+          });
+          const face = new THREE.Mesh(new THREE.CircleGeometry(0.33, 24), faceMat);
+          shieldGroup.add(face);
+
+          const boss = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), bronzeMat);
+          boss.scale.z = 0.5;
+          boss.position.z = 0.04;
+          shieldGroup.add(boss);
+
+          shieldGroup.rotation.y = (side * Math.PI) / 2;
+          shieldGroup.position.set(side * xPos, 1.25, zShield);
+          shipGroup.add(shieldGroup);
         }
       }
 
-      return { shipGroup, planks };
+      // 10. Rowing Oars (10 Port, 10 Starboard)
+      if (!isDryDock) {
+        for (let o = 0; o < 10; o++) {
+          const zOar = -2.8 + o * 0.62;
+          const beamFactor = Math.sqrt(Math.max(0.2, 1 - Math.pow(zOar / 4.2, 2)));
+          const xOar = 1.32 * beamFactor;
+
+          for (const side of [-1, 1]) {
+            const oarGroup = new THREE.Group();
+            const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.04, 3.2, 12), agedWoodMat);
+            shaft.position.y = -1.2;
+            oarGroup.add(shaft);
+
+            const blade = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.8, 0.04), agedWoodMat);
+            blade.position.y = -2.4;
+            oarGroup.add(blade);
+
+            oarGroup.position.set(side * xOar, 0.65, zOar);
+            oarGroup.rotation.z = side * (Math.PI / 3.4);
+            oarGroup.rotation.x = Math.PI / 16;
+            shipGroup.add(oarGroup);
+            oars.push({ group: oarGroup, defaultZ: oarGroup.rotation.z, defaultX: oarGroup.rotation.x, side, index: o });
+          }
+        }
+      }
+
+      // 11. Twin Steering Rudders (Pedalia)
+      for (const side of [-1, 1]) {
+        const rudderGroup = new THREE.Group();
+        const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 3.4), agedWoodMat);
+        shaft.position.y = -1.2;
+        rudderGroup.add(shaft);
+
+        const blade = new THREE.Mesh(new THREE.BoxGeometry(0.42, 1.4, 0.07), agedWoodMat);
+        blade.position.set(0, -2.0, -0.15);
+        rudderGroup.add(blade);
+
+        const tiller = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.8), agedWoodMat);
+        tiller.rotation.z = Math.PI / 2;
+        tiller.position.set(side * -0.3, 0.3, 0);
+        rudderGroup.add(tiller);
+
+        rudderGroup.position.set(side * 0.95, 0.85, -3.8);
+        rudderGroup.rotation.x = Math.PI / 8;
+        rudderGroup.rotation.y = side * -0.2;
+        shipGroup.add(rudderGroup);
+      }
+
+      // 12. Main Mast & Yardarm
+      const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 6.2, 16), agedWoodMat);
+      mast.position.set(0, 3.2, 0.4);
+      shipGroup.add(mast);
+
+      const yardarm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 4.8, 16), agedWoodMat);
+      yardarm.rotation.z = Math.PI / 2;
+      yardarm.position.set(0, 5.4, 0.45);
+      shipGroup.add(yardarm);
+
+      // 13. Billowing Linen Sail
+      const sailGeo = new THREE.CylinderGeometry(2.4, 2.4, 3.4, 24, 8, true, -Math.PI * 0.35, Math.PI * 0.7);
+      sailGeo.rotateY(Math.PI / 2);
+      const sail = new THREE.Mesh(sailGeo, sailMat);
+      sail.position.set(0, 3.8, 0.95);
+      sail.scale.set(1.0, 1.0, 0.55);
+      shipGroup.add(sail);
+
+      // 14. Rigging Lines (Stays & Shrouds)
+      const ropeMat = new THREE.LineBasicMaterial({ color: 0x1e222a, linewidth: 1.5, transparent: true, opacity: 0.7 });
+      const forestayGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 6.2, 0.4),
+        new THREE.Vector3(0, 1.4, 4.3),
+      ]);
+      shipGroup.add(new THREE.Line(forestayGeo, ropeMat));
+
+      const backstayGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 6.2, 0.4),
+        new THREE.Vector3(0, 1.6, -3.9),
+      ]);
+      shipGroup.add(new THREE.Line(backstayGeo, ropeMat));
+
+      for (const side of [-1, 1]) {
+        for (const offset of [-0.6, 0.6]) {
+          const shroudGeo = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 5.8, 0.4),
+            new THREE.Vector3(side * 1.25, 1.1, 0.4 + offset),
+          ]);
+          shipGroup.add(new THREE.Line(shroudGeo, ropeMat));
+        }
+      }
+
+      return { shipGroup, planks, oars };
     };
 
     // ── Build Ship A (Floating in Harbor) ──
     const shipAData = createShip(false);
-    shipAData.shipGroup.position.set(-2.4, 0.15, 0);
+    shipAData.shipGroup.position.set(-2.8, 0.18, 0);
     scene.add(shipAData.shipGroup);
     shipAGroupRef.current = shipAData.shipGroup;
     planksARef.current = shipAData.planks;
+    oarsARef.current = shipAData.oars;
 
     // ── Build Ship B (Dry Dock on Pier) ──
     const shipBData = createShip(true);
-    shipBData.shipGroup.position.set(4.5, 1.3, 0);
+    shipBData.shipGroup.position.set(5.4, 1.45, 0);
     scene.add(shipBData.shipGroup);
     shipBGroupRef.current = shipBData.shipGroup;
     planksBRef.current = shipBData.planks;
@@ -260,9 +481,9 @@ export default function ShipOfTheseus3DLab() {
     });
 
     // ── Final Cause Telos Aura ──
-    const auraGeo = new THREE.SphereGeometry(3.2, 24, 24);
+    const auraGeo = new THREE.SphereGeometry(3.6, 24, 24);
     const aura = new THREE.Mesh(auraGeo, glowMat);
-    aura.position.set(-2.4, 1.5, 0);
+    aura.position.set(-2.8, 1.8, 0);
     aura.visible = false;
     scene.add(aura);
     auraMeshRef.current = aura;
@@ -322,9 +543,17 @@ export default function ShipOfTheseus3DLab() {
 
       // Ship A gentle floating wave bob
       if (shipAGroupRef.current) {
-        shipAGroupRef.current.position.y = 0.15 + Math.sin(clock * 1.4) * 0.07;
-        shipAGroupRef.current.rotation.z = Math.sin(clock * 1.1) * 0.025;
-        shipAGroupRef.current.rotation.x = Math.cos(clock * 0.8) * 0.015;
+        shipAGroupRef.current.position.y = 0.18 + Math.sin(clock * 1.3) * 0.08;
+        shipAGroupRef.current.rotation.z = Math.sin(clock * 1.0) * 0.025;
+        shipAGroupRef.current.rotation.x = Math.cos(clock * 0.75) * 0.015;
+      }
+
+      // Rhythmic rowing animation on Ship A's oars
+      if (oarsARef.current) {
+        oarsARef.current.forEach((oar) => {
+          oar.group.rotation.z = oar.defaultZ + Math.sin(clock * 1.5 + oar.index * 0.18) * 0.06;
+          oar.group.rotation.x = oar.defaultX + Math.cos(clock * 1.5 + oar.index * 0.18) * 0.04;
+        });
       }
 
       // Final Cause aura pulse
@@ -514,7 +743,7 @@ export default function ShipOfTheseus3DLab() {
               type="range"
               min="0"
               max="100"
-              step="7"
+              step="5"
               value={replacementPct}
               onChange={(e) => setReplacementPct(parseInt(e.target.value, 10))}
               className={styles.rangeInput}
