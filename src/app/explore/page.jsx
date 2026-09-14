@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import Icon from '@/components/common/Icon';
 import styles from './ExploreGraph.module.css';
 
@@ -20,7 +21,7 @@ export default function ExplorePage() {
       <header className={styles.header}>
         <div className={styles.badge}>
           <Icon name="network" size={15} />
-          <span>3D Domain Projection & Epistemic Graph</span>
+          <span>3D Domain Projection &amp; Epistemic Graph</span>
         </div>
         <h1 className={styles.title}>The Knowledge Graph</h1>
         <p className={styles.subtitle}>
@@ -29,6 +30,10 @@ export default function ExplorePage() {
         </p>
 
         <div className={styles.featuresStrip}>
+          <Link href="/concepts" className={styles.catalogLinkPill}>
+            <Icon name="layers" size={13} color="#38bdf8" />
+            <span>Browse Full Concepts Catalog (19 Ideas) →</span>
+          </Link>
           <div className={styles.featurePill}>
             <Icon name="atom" size={13} color="#38bdf8" />
             <span>7 Domain Clusters</span>

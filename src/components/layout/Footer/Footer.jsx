@@ -8,17 +8,17 @@ const FOOTER_LINKS = {
   Explore: [
     { label: 'All Concepts', href: '/concepts' },
     { label: 'Knowledge Graph', href: '/explore' },
-    { label: 'Disciplines', href: '/concepts?view=categories' },
+    { label: 'Disciplines', href: '/concepts#disciplines' },
   ],
   Community: [
-    { label: 'Discussions', href: '#' },
-    { label: 'Contributors', href: '#' },
-    { label: 'Guidelines', href: '#' },
+    { label: 'Discussions', href: '/community#discussions' },
+    { label: 'Contributors', href: '/community#contributors' },
+    { label: 'Guidelines', href: '/community#guidelines' },
   ],
   About: [
-    { label: 'Our Mission', href: '#' },
-    { label: 'Open Source', href: '#' },
-    { label: 'Contact', href: '#' },
+    { label: 'Our Mission', href: '/about#mission' },
+    { label: 'Open Source', href: 'https://github.com/silent-doom/nerdverse', external: true },
+    { label: 'Contact', href: '/about#contact' },
   ],
 };
 
@@ -66,9 +66,21 @@ export default function Footer() {
               <ul className={styles.columnList}>
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className={styles.columnLink}>
-                      {link.label}
-                    </Link>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.columnLink}
+                      >
+                        {link.label}
+                        <span style={{ fontSize: '10px', marginLeft: '4px', opacity: 0.7 }}>↗</span>
+                      </a>
+                    ) : (
+                      <Link href={link.href} className={styles.columnLink}>
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

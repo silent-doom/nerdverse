@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styles from './Header.module.css';
 import Navigation from '@/components/layout/Navigation/Navigation';
 import MobileMenu from '@/components/layout/MobileMenu/MobileMenu';
+import SearchModal from '@/components/search/SearchModal';
 import Icon from '@/components/common/Icon';
 
 /**
@@ -13,6 +14,7 @@ import Icon from '@/components/common/Icon';
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +24,25 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Global keyboard shortcut for ⌘K / Ctrl+K / '/'
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      } else if (e.key === '/' && !isSearchOpen) {
+        const tag = document.activeElement?.tagName?.toLowerCase();
+        if (tag !== 'input' && tag !== 'textarea') {
+          e.preventDefault();
+          setIsSearchOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen]);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -83,7 +104,8 @@ export default function Header() {
             <button
               className={styles.searchButton}
               aria-label="Search concepts"
-              title="Search (Ctrl+K)"
+              title="Search (Ctrl+K or /)"
+              onClick={() => setIsSearchOpen(true)}
             >
               <Icon name="search" size={16} />
               <span className={styles.searchShortcut}>⌘K</span>
@@ -113,6 +135,12 @@ export default function Header() {
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
+      />
+
+      {/* Global Concept Search Modal */}
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
       />
     </>
   );

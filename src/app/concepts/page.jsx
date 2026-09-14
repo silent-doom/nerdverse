@@ -46,10 +46,14 @@ export default async function ConceptsPage({ searchParams }) {
         <p className={styles.subtitle}>
           Interactive mental models, thought experiments, and mathematical paradoxes decoded with precision.
         </p>
+        <Link href="/explore" className={styles.exploreGraphBannerBtn}>
+          <Icon name="network" size={15} color="#38bdf8" />
+          <span>Switch to 3D Knowledge Graph ({allPublished.length} Nodes) →</span>
+        </Link>
       </header>
 
       {/* Filter Toolbar */}
-      <div className={styles.filtersBar}>
+      <div id="disciplines" className={styles.filtersBar}>
         <div className={styles.filterBarHeader}>
           <div className={styles.filterBarTitleBox}>
             <span className={styles.filterBarLabel}>Scientific Disciplines</span>
@@ -81,7 +85,7 @@ export default async function ConceptsPage({ searchParams }) {
             </div>
             <span className={styles.chipCount}>{allPublished.length}</span>
           </Link>
-          {CATEGORIES.map((cat) => {
+          {CATEGORIES.filter((cat) => (categoryCounts[cat.id] || 0) > 0).map((cat) => {
             const count = categoryCounts[cat.id] || 0;
             const isActive = activeCategory === cat.id;
 
