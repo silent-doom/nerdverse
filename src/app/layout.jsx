@@ -11,6 +11,7 @@ export const viewport = {
 };
 
 export const metadata = {
+  metadataBase: new URL('https://nerdverse-alpha.vercel.app'),
   title: {
     default: 'NerdVerse — Explore the Universe, One Concept at a Time',
     template: '%s | NerdVerse',
@@ -31,26 +32,41 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://nerdverse.app',
+    url: 'https://nerdverse-alpha.vercel.app',
     siteName: 'NerdVerse',
     title: 'NerdVerse — Explore the Universe, One Concept at a Time',
     description:
       'Interactive visual explanations of paradoxes, theories, and scientific laws.',
+    images: [
+      {
+        url: '/images/og-preview.png',
+        width: 1200,
+        height: 630,
+        alt: 'NerdVerse — Explore the Universe, One Concept at a Time',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NerdVerse',
+    title: 'NerdVerse — Explore the Universe, One Concept at a Time',
     description:
       'Interactive visual explanations of the universe\'s most fascinating concepts.',
+    images: ['/images/og-preview.png'],
   },
   robots: {
     index: true,
     follow: true,
   },
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/icon.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 };
 
