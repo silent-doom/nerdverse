@@ -13,7 +13,7 @@ describe('ConceptTelemetryChart', () => {
     });
 
     expect(screen.getByTestId('concept-telemetry-chart')).toBeInTheDocument();
-    expect(screen.getByText(/Monty Hall Problem Telemetry/i)).toBeInTheDocument();
+    expect(screen.getByText(/Monty Hall Problem — Statistics Till Now/i)).toBeInTheDocument();
     expect(screen.getByText(/Total Community Runs/i)).toBeInTheDocument();
     expect(screen.getByText(/Theoretical Target/i)).toBeInTheDocument();
     expect(screen.getByText(/66.67/i)).toBeInTheDocument();

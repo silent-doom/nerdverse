@@ -84,7 +84,7 @@ export default function ConceptTelemetryChart({ conceptSlug, conceptTitle }) {
       <div className={styles.telemetryContainer} data-testid="concept-telemetry-chart">
         <div className={styles.statusPill}>
           <div className={styles.pulseDotOffline} />
-          <span>Loading Telemetry...</span>
+          <span>Loading Statistics...</span>
         </div>
       </div>
     );
@@ -100,15 +100,15 @@ export default function ConceptTelemetryChart({ conceptSlug, conceptTitle }) {
               <div className={telemetry.isLiveCloud ? styles.pulseDot : styles.pulseDotOffline} />
               <span>
                 {telemetry.isLiveCloud
-                  ? 'Live Supabase Telemetry'
+                  ? 'Live Statistics Till Now'
                   : telemetry.isSupabaseConfigured
-                  ? 'Supabase Connected'
-                  : 'Crowdsourced Telemetry Baseline'}
+                  ? 'Live Statistics Till Now'
+                  : 'Crowdsourced Statistics Till Now'}
               </span>
             </div>
           </div>
           <h3 className={styles.chartHeading}>
-            {conceptTitle ? `${conceptTitle} Telemetry` : 'Empirical Telemetry & Law of Large Numbers'}
+            {conceptTitle ? `${conceptTitle} — Statistics Till Now` : 'Empirical Statistics Till Now'}
           </h3>
           <p className={styles.chartSubtitle}>
             Aggregating historical community simulation runs and comparing observed outcomes against theoretical limits.
