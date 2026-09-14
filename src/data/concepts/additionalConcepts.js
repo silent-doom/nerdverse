@@ -14,7 +14,7 @@ export const additionalConcepts = [
     difficulty: 'intermediate',
     readTime: 6,
     summary: "The mathematical rule of rational belief revision. Discover how Reverend Thomas Bayes and Pierre-Simon Laplace formalized how prior confidence must be calibrated against incoming empirical evidence—and why human intuition suffers from catastrophic base-rate neglect.",
-    interactiveType: null,
+    interactiveType: 'BayesTheorem',
     content: `## The Presbyterian Minister's Posthumous Legacy
 
 In 1763, two years after the death of Presbyterian minister Thomas Bayes, his close friend Richard Price stood before the Royal Society of London to read a revolutionary manuscript: *An Essay towards solving a Problem in the Doctrine of Chances*. 
@@ -85,7 +85,7 @@ A rational agent does not demand absolute certainty before acting. They maintain
     difficulty: 'advanced',
     readTime: 6,
     summary: "When aggregated data tells the exact opposite story of every subgroup within it. Explore the subtle statistical illusion that can make a medical treatment appear both superior in every clinical cohort and inferior in the total population.",
-    interactiveType: null,
+    interactiveType: 'SimpsonsParadox',
     content: `## The UC Berkeley Gender Bias Scandal of 1973
 
 In the autumn of 1973, the University of California, Berkeley published its graduate school admissions data. The numbers provoked immediate outrage:
@@ -151,7 +151,7 @@ Only by identifying the causal fork can analysts condition on the true confounde
     difficulty: 'intermediate',
     readTime: 5,
     summary: "A game of chance with an infinite mathematical expected payoff that no rational human would pay more than $25 to enter. Discover the riddle that shattered classical probability and gave birth to modern utility theory.",
-    interactiveType: null,
+    interactiveType: 'StPetersburg',
     content: `## The Casino of Saint Petersburg
 
 In 1738, Swiss mathematician Daniel Bernoulli published a paper in the *Commentaries of the Imperial Academy of Science of Saint Petersburg* presenting a deceptively simple coin-tossing wager originally conceived by his cousin Nicolas Bernoulli in 1713:

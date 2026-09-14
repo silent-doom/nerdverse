@@ -1,0 +1,273 @@
+.labContainer {
+  position: relative;
+  width: 100%;
+  background: radial-gradient(circle at 50% 30%, #0f131f 0%, #07090f 100%);
+  border: 3px solid var(--color-border-default, #1e293b);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  color: #f8fafc;
+  user-select: none;
+  margin-bottom: var(--space-8, 32px);
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(480px, 60vh, 620px);
+  cursor: grab;
+  background: #06080d;
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* ── Top Floating Header ── */
+.topHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitleBox {
+  background: rgba(10, 14, 23, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.labBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #a855f7;
+  margin-bottom: 2px;
+}
+
+.labTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.paradoxAlert {
+  background: rgba(239, 68, 68, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid #ef4444;
+  border-radius: 8px;
+  padding: 8px 16px;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.3);
+}
+
+.alertText {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fca5a5;
+  line-height: 1.4;
+}
+
+/* ── HUD Overlay ── */
+.hudLegend {
+  position: absolute;
+  top: 90px;
+  left: 16px;
+  z-index: 10;
+  background: rgba(10, 14, 23, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendLine {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+/* ── Projection Toggle Floating Pill ── */
+.projectionFloatingPill {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 14, 23, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.toggleBtn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.toggleBtnActive {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+/* ── Dashboard Panel ── */
+.dashboard {
+  background: #090d16;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.1);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Dual Comparison Cards ── */
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.cohortCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cohortHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cohortTitle {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.cohortRate {
+  font-size: 16px;
+  font-weight: 800;
+  font-family: monospace;
+}
+
+.subgroupTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.subgroupTable th,
+.subgroupTable td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.subgroupTable th {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.subgroupTable td {
+  color: #cbd5e1;
+}
+
+.winnerHighlight {
+  color: #10b981;
+  font-weight: 800;
+}
+
+/* ── Preset Controls ── */
+.presetsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.presetBtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.presetBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.presetBtn:hover {
+  background: rgba(168, 85, 247, 0.15);
+  color: #ffffff;
+  border-color: #a855f7;
+}
+
+.presetBtnActive {
+  background: rgba(168, 85, 247, 0.2);
+  color: #ffffff;
+  border-color: #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+}

@@ -7,6 +7,9 @@ const GrandfatherSpacetime3D = dynamic(() => import('@/components/3d/Grandfather
 const SchrodingersCat3DLab = dynamic(() => import('@/components/3d/SchrodingersCat3DLab'), { ssr: false });
 const MontyHall3DLab = dynamic(() => import('@/components/3d/MontyHall3DLab'), { ssr: false });
 const TrolleyProblem3DLab = dynamic(() => import('@/components/3d/TrolleyProblem3DLab'), { ssr: false });
+const BayesTheorem3DLab = dynamic(() => import('@/components/3d/BayesTheorem3DLab'), { ssr: false });
+const SimpsonsParadox3DLab = dynamic(() => import('@/components/3d/SimpsonsParadox3DLab'), { ssr: false });
+const StPetersburg3DLab = dynamic(() => import('@/components/3d/StPetersburg3DLab'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type }) {
   switch (type) {
@@ -20,6 +23,12 @@ export default function ConceptSimulatorResolver({ type }) {
       return <MontyHall3DLab />;
     case 'TrolleyProblem':
       return <TrolleyProblem3DLab />;
+    case 'BayesTheorem':
+      return <BayesTheorem3DLab />;
+    case 'SimpsonsParadox':
+      return <SimpsonsParadox3DLab />;
+    case 'StPetersburg':
+      return <StPetersburg3DLab />;
     default:
       return null;
   }
