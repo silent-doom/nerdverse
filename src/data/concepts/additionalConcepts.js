@@ -365,7 +365,7 @@ The Fermi Paradox is not science fiction; it is the ultimate consequence calculu
     difficulty: 'intermediate',
     readTime: 6,
     summary: "If a supreme intellect knew the exact position and momentum of every particle in the cosmos, could it calculate all history and all eternity? Trace classical determinism from Newton's clockwork universe to its shattering by quantum mechanics and chaos theory.",
-    interactiveType: null,
+    interactiveType: 'LaplacesDemon',
     content: `## The Clockwork Cosmos of 1814
 
 In 1814, French mathematician and astronomer Pierre-Simon Laplace published his philosophical essay on probabilities (*Essai philosophique sur les probabilités*), articulating the supreme expression of classical scientific determinism:
@@ -431,7 +431,7 @@ Philosophers split into three camps:
     difficulty: 'beginner',
     readTime: 5,
     summary: "If every single plank of a legendary wooden ship is replaced one by one over decades, is it still the original vessel? Discover the 2,000-year-old paradox that challenges identity, cellular biology, and mind uploading.",
-    interactiveType: null,
+    interactiveType: 'ShipOfTheseus',
     content: `## The Harbor of Ancient Athens
 
 In his *Life of Theseus*, the Greek historian Plutarch recorded a philosophical conundrum preserved in the harbor of Athens:

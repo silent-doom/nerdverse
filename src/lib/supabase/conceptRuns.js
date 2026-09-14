@@ -158,6 +158,36 @@ const SEED_TELEMETRY = {
       { id: 'seed-8', metrics: { scenario: 'sagan-optimist', calculatedN: 450 }, value: 450 },
     ],
   },
+  'laplaces-demon': {
+    theoreticalTarget: 100.0, // Classical Laplace clockwork premise
+    unit: '% Predictability',
+    label: 'Demon Predictability Index (%)',
+    runs: [
+      { id: 'seed-1', metrics: { mode: 'clockwork', determinismScore: 100 }, value: 100 },
+      { id: 'seed-2', metrics: { mode: 'clockwork', determinismScore: 100 }, value: 100 },
+      { id: 'seed-3', metrics: { mode: 'chaos', determinismScore: 42 }, value: 42 },
+      { id: 'seed-4', metrics: { mode: 'clockwork', determinismScore: 100 }, value: 100 },
+      { id: 'seed-5', metrics: { mode: 'quantum', determinismScore: 0 }, value: 0 },
+      { id: 'seed-6', metrics: { mode: 'chaos', determinismScore: 38 }, value: 38 },
+      { id: 'seed-7', metrics: { mode: 'clockwork', determinismScore: 100 }, value: 100 },
+      { id: 'seed-8', metrics: { mode: 'quantum', determinismScore: 0 }, value: 0 },
+    ],
+  },
+  'ship-of-theseus': {
+    theoreticalTarget: 68.0, // Historical philosophical preference for continuous form (Ship A)
+    unit: '% Continuous Form',
+    label: 'Metaphysical Identity Consensus (% Ship A)',
+    runs: [
+      { id: 'seed-1', metrics: { choice: 'shipA', replacementPct: 100 }, value: 100 },
+      { id: 'seed-2', metrics: { choice: 'shipA', replacementPct: 80 }, value: 100 },
+      { id: 'seed-3', metrics: { choice: 'shipB', replacementPct: 100 }, value: 0 },
+      { id: 'seed-4', metrics: { choice: 'shipA', replacementPct: 50 }, value: 100 },
+      { id: 'seed-5', metrics: { choice: 'both', replacementPct: 100 }, value: 50 },
+      { id: 'seed-6', metrics: { choice: 'shipA', replacementPct: 100 }, value: 100 },
+      { id: 'seed-7', metrics: { choice: 'neither', replacementPct: 100 }, value: 0 },
+      { id: 'seed-8', metrics: { choice: 'shipA', replacementPct: 90 }, value: 100 },
+    ],
+  },
 };
 
 // Generic fallback for any other concept
@@ -219,6 +249,10 @@ export async function recordConceptRun(conceptSlug, runType = 'single', metrics 
     numericValue = Number(metrics.heatNanoJoules || 2.3);
   } else if (conceptSlug === 'fermi-paradox') {
     numericValue = Number(metrics.calculatedN || 52);
+  } else if (conceptSlug === 'laplaces-demon') {
+    numericValue = typeof metrics.determinismScore === 'number' ? metrics.determinismScore : 100;
+  } else if (conceptSlug === 'ship-of-theseus') {
+    numericValue = metrics.choice === 'shipA' ? 100 : metrics.choice === 'both' ? 50 : 0;
   } else {
     numericValue = typeof metrics.value === 'number' ? metrics.value : 50;
   }
