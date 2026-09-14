@@ -170,10 +170,14 @@
   transform: scale(1.04);
 }
 
-/* Retro CRT Phosphor Green Mode (Konami Matrix Effect) */
+/* Retro CRT Phosphor Green Mode (Zero-gravity retro particles) */
 :global(body.retro-phosphor-mode) {
-  filter: contrast(1.15) brightness(1.05) hue-rotate(85deg);
-  transition: filter 0.5s ease;
+  /* Kept clean without hue-rotate so 3D Solar System planets, canvases, and media maintain their natural, authentic colors */
+}
+
+/* Ensure 3D WebGL Canvases never inherit any filters */
+:global(canvas) {
+  filter: none !important;
 }
 
 /* Floating Zero-Gravity Retro Particles Layer */
@@ -215,53 +219,57 @@
   }
 }
 
-/* Retro Mode Active HUD & Reset Pill */
+/* Retro Mode Active HUD & Reset Pill - Cleanly Padded and Positioned Below Navbar */
 .retroActiveHud {
   position: fixed;
-  top: 1rem;
+  top: 5.5rem; /* 88px - floats comfortably below the 72px navbar */
   left: 50%;
   transform: translateX(-50%);
   z-index: 100002;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  background: rgba(10, 14, 20, 0.94);
+  gap: 1rem;
+  background: rgba(10, 14, 22, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid #10B981;
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.45);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 24px rgba(16, 185, 129, 0.35);
   border-radius: 9999px;
-  padding: 0.4rem 0.6rem 0.4rem 1rem;
+  padding: 0.6rem 1.25rem 0.6rem 1.4rem;
+  white-space: nowrap;
   animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .retroHudBadge {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-family: var(--font-mono, monospace);
   font-weight: 700;
   color: #10B981;
   letter-spacing: 0.08em;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .retroResetBtn {
   background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.5);
-  color: #F87171;
-  font-size: 0.6875rem;
+  border: 1px solid rgba(239, 68, 68, 0.6);
+  color: #FCA5A5;
+  font-size: 0.75rem;
   font-family: var(--font-mono, monospace);
   font-weight: 700;
-  padding: 0.3rem 0.75rem;
+  padding: 0.4rem 0.95rem;
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.18s ease;
+  white-space: nowrap;
 }
 
 .retroResetBtn:hover {
   background: #EF4444;
   color: #FFFFFF;
-  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
-  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+  transform: scale(1.04);
 }
 
 :global(body.murphy-tilted) {
