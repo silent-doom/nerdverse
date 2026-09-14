@@ -27,31 +27,31 @@ Independently and with vastly greater mathematical rigor, French polymath Pierre
 
 At its heart, Bayes' Theorem provides a rigorous mechanical formula for revising beliefs:
 
-$$P(H | E) = \\frac{P(E | H) \\cdot P(H)}{P(E)}$$
+$$P(H | E) = [ P(E | H) · P(H) ] / P(E)$$
 
 Where:
-- **$P(H)$ (The Prior):** Your baseline confidence in hypothesis $H$ before observing the new evidence.
-- **$P(E | H)$ (The Likelihood):** The probability that the evidence $E$ would occur if hypothesis $H$ were genuinely true.
-- **$P(E)$ (Marginal Likelihood):** The total probability of observing evidence $E$ across all conceivable realities: $P(E | H)P(H) + P(E | \\neg H)P(\\neg H)$.
-- **$P(H | E)$ (The Posterior):** Your updated, mathematically justified confidence in hypothesis $H$ given evidence $E$.
+- **P(H) (The Prior):** Your baseline confidence in hypothesis H before observing the new evidence.
+- **P(E | H) (The Likelihood):** The probability that the evidence E would occur if hypothesis H were genuinely true.
+- **P(E) (Marginal Likelihood):** The total probability of observing evidence E across all conceivable realities: P(E | H)P(H) + P(E | ¬H)P(¬H).
+- **P(H | E) (The Posterior):** Your updated, mathematically justified confidence in hypothesis H given evidence E.
 
 ## The Base-Rate Fallacy: A Deadly Clinical Intuition Trap
 
 To understand why human brains are intuitively dreadful Bayesians, consider a real-world medical screening scenario:
 
-Suppose a rare neurological condition affects **1 in 1,000 citizens** in a general population ($P(Disease) = 0.001$). A laboratory develops an assay that boasts a **99% true-positive sensitivity** ($P(Positive | Disease) = 0.99$) and a **95% true-negative specificity** (a 5% false-positive rate: $P(Positive | Healthy) = 0.05$).
+Suppose a rare neurological condition affects **1 in 1,000 citizens** in a general population (P(Disease) = 0.001). A laboratory develops an assay that boasts a **99% true-positive sensitivity** (P(Positive | Disease) = 0.99) and a **95% true-negative specificity** (a 5% false-positive rate: P(Positive | Healthy) = 0.05).
 
 You randomly test positive during an annual physical. What are the odds that you actually have the disease?
 
 Most physicians and patients instinctively guess "95% or 99%." The actual answer is roughly **1.94%**.
 
 Here is why:
-- In a sample of 100,000 people, exactly **100 individuals** have the condition. The test catches 99 of them ($100 \\times 0.99 = 99$).
-- The remaining **99,900 individuals** are healthy. But with a 5% false-positive rate, the assay falsely flags **4,995 healthy people** ($99,900 \\times 0.05 = 4,995$).
-- In total, 5,094 people test positive ($99 + 4,995$).
+- In a sample of 100,000 people, exactly **100 individuals** have the condition. The test catches 99 of them (100 × 0.99 = 99).
+- The remaining **99,900 individuals** are healthy. But with a 5% false-positive rate, the assay falsely flags **4,995 healthy people** (99,900 × 0.05 = 4,995).
+- In total, 5,094 people test positive (99 + 4,995).
 - The true probability of harboring the pathogen is:
 
-$$\\frac{99}{5,094} \\approx 0.0194 \\quad (1.94\\%)$$
+$$P(Disease | Positive) = 99 / 5,094 ≈ 0.0194 (1.94%)$$
 
 Failing to apply Bayes' Theorem leads to base-rate neglect, causing patients to endure invasive surgeries, severe psychological panic, and misallocated clinical resources.
 
@@ -160,15 +160,15 @@ You enter a casino. A fair coin is flipped until it lands on **Tails**, at which
 - If Tails appears on the 1st flip, you win **$2**.
 - If Tails appears on the 2nd flip, you win **$4**.
 - If Tails appears on the 3rd flip, you win **$8**.
-- If Tails appears on the $n$-th flip, you win **$2^n$**.
+- If Tails appears on the *n*-th flip, you win **$2ⁿ** ($2 raised to the n-th power).
 
 What is a fair price to enter this game?
 
 ## The Infinite Expected Value Divergence
 
-Under classical probability theory pioneered by Blaise Pascal and Pierre de Fermat, a game's "fair price" equals its expected mathematical return $E(X)$:
+Under classical probability theory pioneered by Blaise Pascal and Pierre de Fermat, a game's "fair price" equals its expected mathematical return E(X):
 
-$$E(X) = \\sum_{n=1}^{\\infty} P(n) \\cdot V(n) = \\left(\\frac{1}{2} \\cdot 2\\right) + \\left(\\frac{1}{4} \\cdot 4\\right) + \\left(\\frac{1}{8} \\cdot 8\\right) + \\dots = 1 + 1 + 1 + \\dots = \\infty$$
+$$E(X) = Σ P(n) · V(n) = (1/2 · 2) + (1/4 · 4) + (1/8 · 8) + ... = 1 + 1 + 1 + ... = ∞$$
 
 The mathematical expectation of this game is **infinite dollars**. According to classical economic theory, an investor should be willing to wager their entire life savings, mortgage their house, and pay millions of dollars for a single round of play.
 
@@ -178,13 +178,13 @@ Why does cold mathematical logic diverge so catastrophically from human rational
 
 ## Daniel Bernoulli's Breakthrough: Diminishing Marginal Utility
 
-Daniel Bernoulli realized that mathematicians had committed a fatal category error: **they had conflated objective monetary wealth ($W$) with subjective psychological utility ($U$).**
+Daniel Bernoulli realized that mathematicians had committed a fatal category error: **they had conflated objective monetary wealth (W) with subjective psychological utility (U).**
 
 A gift of $1,000 to a destitute beggar rescues them from starvation and alters their life trajectory. That same $1,000 handed to a billionaire is negligible pocket change. 
 
 Bernoulli proposed that human satisfaction increases not linearly, but **logarithmically**:
 
-$$U(W) = \\ln(W)$$
+$$U(W) = ln(W)$$
 
 When expected value is computed across logarithmic utility rather than nominal dollars, the infinite sum converges to a modest, finite value (typically between $10 and $25 depending on an individual's baseline wealth). Bernoulli had invented **Expected Utility Theory** and the principle of **diminishing marginal returns**.
 
@@ -192,7 +192,7 @@ When expected value is computed across logarithmic utility rather than nominal d
 
 There is an even more devastating physical explanation: **no casino on Earth has infinite bankrolls.**
 
-If the global financial system possesses total liquid assets of roughly $100 trillion ($10^{14}$), the casino will default and declare bankruptcy after just 47 consecutive heads ($2^{47} \\approx 140 \\text{ trillion}$). 
+If the global financial system possesses total liquid assets of roughly $100 trillion (10¹⁴), the casino will default and declare bankruptcy after just 47 consecutive heads (2⁴⁷ ≈ 140 trillion). 
 
 When you cap the maximum conceivable payout at the wealth of planet Earth, the expected value collapses from infinity down to roughly **$47**!
 
@@ -227,22 +227,22 @@ The St. Petersburg Paradox demonstrates that maximizing raw mathematical value i
 
 In 1867, Scottish physicist James Clerk Maxwell formulated a thought experiment designed to test whether the **Second Law of Thermodynamics**—the universal law stating that isolated entropy must always increase—was an absolute mathematical truth or merely a statistical probability.
 
-Maxwell imagined a box divided into two isolated chambers ($A$ and $B$) filled with gas at uniform temperature. The molecules buzz about with a wide distribution of velocities: some crawl along slowly (cold), while others zip through space at blinding speeds (hot).
+Maxwell imagined a box divided into two isolated chambers (Chamber A and Chamber B) filled with gas at uniform temperature. The molecules buzz about with a wide distribution of velocities: some crawl along slowly (cold), while others zip through space at blinding speeds (hot).
 
 In the dividing wall sits a frictionless, microscopic trapdoor operated by an intelligent being: **Maxwell's Demon**.
 
-Whenever a fast molecule approaches the door from Chamber $A$, the Demon opens the hatch and lets it dart into Chamber $B$. Whenever a slow molecule approaches from Chamber $B$, the Demon lets it slip into Chamber $A$.
+Whenever a fast molecule approaches the door from Chamber A, the Demon opens the hatch and lets it dart into Chamber B. Whenever a slow molecule approaches from Chamber B, the Demon lets it slip into Chamber A.
 
-Over time, without doing any mechanical work, the Demon concentrates all hot molecules in Chamber $B$ and all cold molecules in Chamber $A$. A temperature differential emerges from uniform equilibrium! 
+Over time, without doing any mechanical work, the Demon concentrates all hot molecules in Chamber B and all cold molecules in Chamber A. A temperature differential emerges from uniform equilibrium! 
 
-Chamber $B$ can now power a steam engine, creating a **perpetual motion machine of the second kind** and decreasing the entropy of the cosmos for free.
+Chamber B can now power a steam engine, creating a **perpetual motion machine of the second kind** and decreasing the entropy of the cosmos for free.
 
 ## The 115-Year Mystery: Where Does the Energy Come From?
 
 For over a century, the world's greatest theoretical physicists struggled to identify the Demon's thermodynamic bill:
 - **Marian Smoluchowski (1912):** Argued that thermal vibrations would shake the Demon's microscopic trapdoor uncontrollably, causing it to flap randomly.
 - **Leo Szilard (1929):** Showed that the Demon must measure the position of molecules using photons, and that the physical act of illumination generates entropy that cancels any gain.
-- **Léon Brillouin (1951):** Calculated that the information gathered by the Demon requires at least $k_B \\ln 2$ of thermodynamic entropy per measurement.
+- **Léon Brillouin (1951):** Calculated that the information gathered by the Demon requires at least k_B · ln 2 of thermodynamic entropy per measurement.
 
 Yet Szilard and Brillouin were still partially incorrect! In the 1970s, Charles Bennett at IBM demonstrated that a Demon could, in theory, observe molecules reversibly using zero thermodynamic energy.
 
@@ -258,9 +258,9 @@ To sort molecules continuously, the Demon must store memory bits (*"Molecule 47 
 
 Landauer proved that **erasing one bit of classical information inevitably dissipates a minimum quantity of physical heat into the environment**:
 
-$$Q_{\\text{erase}} = k_B T \\ln 2$$
+$$Q_erase ≥ k_B · T · ln 2$$
 
-Where $k_B$ is the Boltzmann constant and $T$ is temperature. 
+Where k_B is the Boltzmann constant (1.38 × 10⁻²³ J/K) and T is temperature. 
 
 When the Demon erases its internal memory to reset for the next cycle, it dumps heat into the universe that is **strictly equal to or greater than** the entropy it reduced by sorting molecules. The Second Law of Thermodynamics is triumphantly saved!
 
@@ -310,13 +310,13 @@ If intelligent life arises naturally, the galaxy should have been thoroughly col
 
 Yet our radio telescopes observe absolute, deafening silence.
 
-## The Drake Equation & Astrobiological Priors
+## The Drake Equation: Quantifying the Silence
 
-In 1961, astronomer Frank Drake formulated the mathematical framework for estimating the number of active, communicative extraterrestrial civilizations ($N$) in the Milky Way:
+In 1961, astronomer Frank Drake formulated the mathematical framework for estimating the number of active, communicative extraterrestrial civilizations (*N*) in the Milky Way:
 
-$$N = R_* \\cdot f_p \\cdot n_e \\cdot f_l \\cdot f_i \\cdot f_c \\cdot L$$
+$$N = R_* · f_p · n_e · f_l · f_i · f_c · L$$
 
-Where $R_*$ is the rate of star formation, $f_p$ is the fraction of stars with planets, $n_e$ is habitable planets per star, $f_l$ is the fraction where life arises, $f_i$ is intelligence, $f_c$ is radio communication, and $L$ is civilization lifetime.
+Where R* is the rate of star formation, f_p is the fraction of stars with planets, n_e is habitable planets per star, f_l is the fraction where life arises, f_i is intelligence, f_c is radio communication, and L is civilization lifetime.
 
 Modern Kepler space telescope telemetry has conclusively settled the astronomical factors: **habitable rocky worlds are numbered in the tens of billions**. The bottleneck is biological or technological.
 
@@ -341,7 +341,7 @@ If the cosmos is silent, we should desperately hope that the jump from inorganic
 ## Consequence Calculus: The Existential Imperative
 
 The Fermi Paradox is not science fiction; it is the ultimate consequence calculus for the human species:
-- **Existential Risk Mitigation:** If technological civilizations have a short lifetime ($L$), existential safety (biosecurity, AI alignment, nuclear de-escalation) is the highest utility investment in human history.
+- **Existential Risk Mitigation:** If technological civilizations have a short lifetime (*L*), existential safety (biosecurity, AI alignment, nuclear de-escalation) is the highest utility investment in human history.
 - **Multidimensional Redundancy:** Becoming a multi-planetary species acts as cosmic insurance against local planetary extinction cascades.`,
     sources: [
       { title: "Enrico Fermi: The Los Alamos Historical Anecdote (Eric Jones, 1985)", url: "https://www.osti.gov/biblio/5746675" },
@@ -381,20 +381,23 @@ To Laplace, working in the triumphant wake of Isaac Newton's laws of motion and 
 Throughout the 20th century, three distinct mathematical and physical revolutions dismantled Laplace's vision:
 
 ### 1. Quantum Mechanics & The Heisenberg Uncertainty Principle (1927)
-Laplace's Demon requires two basic inputs for every particle: its exact **position** ($x$) and its exact **momentum** ($p$). 
+
+Laplace's Demon requires two basic inputs for every particle: its exact **position** (*x*) and its exact **momentum** (*p*). 
 
 Werner Heisenberg proved that this information does not physically exist in nature:
 
-$$\\Delta x \\cdot \\Delta p \\ge \\frac{\\hbar}{2}$$
+$$Δx · Δp ≥ ℏ / 2$$
 
 At the quantum scale, particles do not possess simultaneous definite locations and velocities. Measuring one with infinite precision blurs the other into fundamental uncertainty. The Demon cannot even acquire the initial conditions without destroying the state it seeks to measure.
 
 ### 2. Deterministic Chaos & The Butterfly Effect (1963)
+
 Even if we remain within classical Newtonian physics, Edward Lorenz demonstrated that non-linear dynamical systems exhibit extreme sensitivity to initial conditions. 
 
 To predict the weather 60 days into the future, the Demon would need to measure temperature and atmospheric pressure to an infinite number of decimal places. Any rounding error at the 50th decimal place exponentially magnifies until the predictive model is entirely uncoupled from reality.
 
 ### 3. Computational Self-Reference & Turing Incompleteness
+
 Could the Demon exist inside our universe? 
 
 To simulate every atom in the cosmos, the Demon's computational hardware would have to consist of atoms within the universe itself. The Demon must simulate itself simulating the universe, leading directly to infinite recursive self-reference and the halting problem.
@@ -589,11 +592,11 @@ Then, Turing used his invention to prove that mathematics contains permanent, in
 
 ## The Halting Conundrum
 
-Consider the simplest question one can ask about a computer program: *If we run program $P$ with input $I$, will it eventually finish and halt, or will it run forever in an infinite loop?*
+Consider the simplest question one can ask about a computer program: *If we run program P with input I, will it eventually finish and halt, or will it run forever in an infinite loop?*
 
-Every software engineer encounters this when their IDE hangs on a frozen script. Wouldn't it be magnificent to write a diagnostic compiler tool—let us call it **$\text{Halt}(P, I)$**—that inspects any codebase and returns:
-- **$\text{TRUE}$** if program $P$ halts.
-- **$\text{FALSE}$** if program $P$ runs forever.
+Every software engineer encounters this when their IDE hangs on a frozen script. Wouldn't it be magnificent to write a diagnostic compiler tool—let us call it **\`Halt(P, I)\`**—that inspects any codebase and returns:
+- **\`TRUE\`** if program P halts.
+- **\`FALSE\`** if program P runs forever.
 
 Turing proved that writing such a program is **mathematically impossible**. Not merely difficult; it is an absolute logical contradiction, as impossible as drawing a four-sided triangle.
 
@@ -601,9 +604,9 @@ Turing proved that writing such a program is **mathematically impossible**. Not 
 
 Turing's proof is breathtakingly elegant and mirrors Kurt Gödel's Incompleteness Theorems:
 
-Suppose a brilliant programmer claims to have created $\text{Halt}(P, I)$.
+Suppose a brilliant programmer claims to have created \`Halt(P, I)\`.
 
-We can now construct a mischievous new program called **$\text{Opposite}(X)$**:
+We can now construct a mischievous new program called **\`Opposite(X)\`**:
 
 \`\`\`python
 def Opposite(X):
@@ -616,16 +619,16 @@ def Opposite(X):
         return True
 \`\`\`
 
-Now we feed program $\text{Opposite}$ into itself as its own input: **$\text{Opposite}(\text{Opposite})$**.
+Now we feed program \`Opposite\` into itself as its own input: **\`Opposite(Opposite)\`**.
 
-What must $\text{Halt}(\text{Opposite}, \text{Opposite})$ return?
+What must \`Halt(Opposite, Opposite)\` return?
 
-- **Case 1: $\text{Halt}$ says $\text{Opposite}$ will halt.**
-  If $\text{Halt}$ returns $\text{TRUE}$, the code inside $\text{Opposite}$ triggers the infinite loop: \`while True: pass\`. Therefore, it **does not halt**! $\text{Halt}$ was wrong.
-- **Case 2: $\text{Halt}$ says $\text{Opposite}$ will loop forever.**
-  If $\text{Halt}$ returns $\text{FALSE}$, the code immediately exits: \`return True\`. Therefore, it **halts**! $\text{Halt}$ was wrong again.
+- **Case 1: \`Halt\` says \`Opposite\` will halt.**
+  If \`Halt\` returns \`TRUE\`, the code inside \`Opposite\` triggers the infinite loop: \`while True: pass\`. Therefore, it **does not halt**! \`Halt\` was wrong.
+- **Case 2: \`Halt\` says \`Opposite\` will loop forever.**
+  If \`Halt\` returns \`FALSE\`, the code immediately exits: \`return True\`. Therefore, it **halts**! \`Halt\` was wrong again.
 
-$\text{Halt}$ is trapped in a fatal self-referential paradox. It cannot answer correctly in either direction without contradicting its own prediction. 
+\`Halt\` is trapped in a fatal self-referential paradox. It cannot answer correctly in either direction without contradicting its own prediction. 
 
 Therefore, no general algorithm can ever solve the Halting Problem for all programs.
 
@@ -780,14 +783,17 @@ Searle formulated his critique in three premises:
 Searle's thought experiment triggered the most fierce debate in modern cognitive science. Opponents formulated several famous rebuttals:
 
 ### 1. The Systems Reply (Most Popular)
+
 While the man alone does not understand Chinese, **the entire system**—the man, the rulebooks, the filing cabinets, and the input/output channels taken together—does understand Chinese! 
 
 Just as a single biological neuron in your left temporal lobe does not understand English, the collective integrated network of 86 billion neurons certainly does.
 
 ### 2. The Robot Reply
+
 If you place the computer inside a robotic chassis equipped with cameras, tactile sensors, and motor limbs, the symbols become **grounded** in physical causal interactions with the world.
 
 ### 3. The Brain Simulator Reply
+
 What if the computer simulates the exact neurochemical firing of every single synapse in a native speaker's brain? Searle replied that simulating a thunderstorm on a supercomputer does not make the computer's CPU wet; simulating a mind does not make code conscious.
 
 ## Large Language Models & The Modern Frontier
@@ -989,35 +995,35 @@ This counter-intuitive phenomenon is known as **Braess's Paradox**.
 
 ## The Arithmetic of the Congestion Trap
 
-To see the paradox clearly, consider an idealized traffic network connecting a residential suburb (Point $S$) to a downtown commercial district (Point $D$):
+To see the paradox clearly, consider an idealized traffic network connecting a residential suburb (Point S) to a downtown commercial district (Point D):
 
-Four thousand commuters ($N = 4,000$) wish to travel from $S$ to $D$. Two parallel routes are available:
-- **Route 1:** Travels from $S$ to intermediate node $A$, then to $D$.
-  - Segment $S \\to A$ is a narrow bridge that congests with traffic: Travel time = $T/100$ minutes (where $T$ is the number of cars).
-  - Segment $A \\to D$ is a wide open expressway: Travel time = **45 minutes** regardless of traffic.
-- **Route 2:** Travels from $S$ to intermediate node $B$, then to $D$.
-  - Segment $S \\to B$ is a wide open expressway: Travel time = **45 minutes**.
-  - Segment $B \\to D$ is a narrow bridge: Travel time = $T/100$ minutes.
+Four thousand commuters (N = 4,000) wish to travel from S to D. Two parallel routes are available:
+- **Route 1:** Travels from S to intermediate node A, then to D.
+  - Segment S → A is a narrow bridge that congests with traffic: Travel time = T / 100 minutes (where T is the number of cars).
+  - Segment A → D is a wide open expressway: Travel time = **45 minutes** regardless of traffic.
+- **Route 2:** Travels from S to intermediate node B, then to D.
+  - Segment S → B is a wide open expressway: Travel time = **45 minutes**.
+  - Segment B → D is a narrow bridge: Travel time = T / 100 minutes.
 
 In equilibrium, commuters split evenly: 2,000 drivers choose Route 1, and 2,000 choose Route 2:
-- Travel time on Route 1: $\\frac{2000}{100} + 45 = 20 + 45 = \\mathbf{65 \\text{ minutes}}$.
-- Travel time on Route 2: $45 + \\frac{2000}{100} = 45 + 20 = \\mathbf{65 \\text{ minutes}}$.
+- Travel time on Route 1: 2,000 / 100 + 45 = 20 + 45 = **65 minutes**.
+- Travel time on Route 2: 45 + 2,000 / 100 = 45 + 20 = **65 minutes**.
 
 Every commuter reaches work in **65 minutes**.
 
 ### Now, Add a "Super-Highway"
 
-The municipal city council invests millions to construct a state-of-the-art, hyper-fast, zero-minute bypass tunnel linking node $A$ directly to node $B$: **Travel time between $A$ and $B$ is essentially 0 minutes!**
+The municipal city council invests millions to construct a state-of-the-art, hyper-fast, zero-minute bypass tunnel linking node A directly to node B: **Travel time between A and B is essentially 0 minutes!**
 
 What happens?
 
-Every rational commuter driving toward node $A$ notices that instead of continuing along the 45-minute highway to $D$, they can zip across the new bypass to node $B$. 
+Every rational commuter driving toward node A notices that instead of continuing along the 45-minute highway to D, they can zip across the new bypass to node B. 
 
-Route $S \\to A \\to B \\to D$ now appears enticing. Even if all 4,000 drivers choose the new route:
-- Segment $S \\to A$: $\\frac{4000}{100} = 40$ minutes.
-- Bypass $A \\to B$: 0 minutes.
-- Segment $B \\to D$: $\\frac{4000}{100} = 40$ minutes.
-- Total commute time: $40 + 0 + 40 = \\mathbf{80 \\text{ minutes}}$!
+Route S → A → B → D now appears enticing. Even if all 4,000 drivers choose the new route:
+- Segment S → A: 4,000 / 100 = 40 minutes.
+- Bypass A → B: 0 minutes.
+- Segment B → D: 4,000 / 100 = 40 minutes.
+- Total commute time: 40 + 0 + 40 = **80 minutes**!
 
 Because the new route is a **Nash equilibrium** (no individual driver can shorten their personal commute by unilaterally switching back to the old 45-minute routes), every single driver is sucked into the new path. 
 

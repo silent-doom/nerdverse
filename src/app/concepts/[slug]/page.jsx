@@ -24,6 +24,68 @@ export async function generateMetadata({ params }) {
   };
 }
 
+function formatInline(text) {
+  if (!text) return '';
+  return text
+    .replace(/\\text\{([^}]+)\}/g, '$1')
+    .replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>')
+    .replace(/\\approx/g, '≈')
+    .replace(/\\cdot/g, '·')
+    .replace(/\\times/g, '×')
+    .replace(/\\to/g, '→')
+    .replace(/\\neg\s*/g, '¬')
+    .replace(/\\ge/g, '≥')
+    .replace(/\\le/g, '≤')
+    .replace(/\\hbar/g, 'ℏ')
+    .replace(/\\Delta/g, 'Δ')
+    .replace(/\\sum/g, 'Σ')
+    .replace(/\\infty/g, '∞')
+    .replace(/\\dots/g, '...')
+    .replace(/\\ln/g, 'ln')
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 / $2')
+    .replace(/\$([^$]+)\$/g, '<em>$1</em>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+function cleanDisplayFormula(raw) {
+  let f = raw.replace(/^\$\$\s*/, '').replace(/\s*\$\$$/, '');
+  f = f
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 / $2')
+    .replace(/\\text\{([^}]+)\}/g, '$1')
+    .replace(/\\mathbf\{([^}]+)\}/g, '$1')
+    .replace(/\\quad/g, '  ')
+    .replace(/\\Delta/g, 'Δ')
+    .replace(/\\cdot/g, '·')
+    .replace(/\\ge/g, '≥')
+    .replace(/\\le/g, '≤')
+    .replace(/\\hbar/g, 'ℏ')
+    .replace(/\\approx/g, '≈')
+    .replace(/\\infty/g, '∞')
+    .replace(/\\sum_\{[^}]+\}\^\{[^}]+\}/g, 'Σ')
+    .replace(/\\sum/g, 'Σ')
+    .replace(/\\left\(|\\right\)/g, '')
+    .replace(/\\dots/g, '...')
+    .replace(/\\ln/g, 'ln')
+    .replace(/\\%/g, '%')
+    .replace(/\\\\/g, ' ');
+  return f.trim();
+}
+
+function parseContentBlocks(raw) {
+  if (!raw) return [];
+  const normalized = raw
+    .replace(/\r\n/g, '\n')
+    .replace(/(^|\n)(#{1,4}\s+[^\n]+)/g, '$1\n\n$2\n\n')
+    .replace(/(^|\n)(>[^\n]+(\n>[^\n]+)*)/g, '$1\n\n$2\n\n')
+    .replace(/(\$\$[\s\S]*?\$\$)/g, '\n\n$1\n\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  return normalized.split('\n\n').map((b) => b.trim()).filter(Boolean);
+}
+
 export default async function ConceptDetailPage({ params }) {
   const { slug } = await params;
   const concept = getConceptBySlug(slug);
@@ -48,15 +110,10 @@ export default async function ConceptDetailPage({ params }) {
         </div>
 
         <div className={styles.metaRow}>
-          {category && (
-            <Badge variant="category" style={{ '--badge-color': category.color }}>
-              <Icon name={category.iconName} size={12} />
-              <span>{category.name}</span>
-            </Badge>
-          )}
-          <Badge variant="difficulty" size="sm">
-            {concept.difficulty}
+          <Badge variant="category" category={concept.category} size="md">
+            {category?.name || concept.category}
           </Badge>
+          <Badge variant="difficulty" difficulty={concept.difficulty} size="md" />
           <div className={styles.readTime}>
             <Icon name="clock" size={13} />
             <span>{concept.readTime} min read</span>
@@ -81,19 +138,54 @@ export default async function ConceptDetailPage({ params }) {
       <section className={styles.contentSection}>
         <div className={styles.contentCard}>
           <div className={styles.prose}>
-            {concept.content.split('\n\n').map((block, idx) => {
+            {parseContentBlocks(concept.content).map((block, idx) => {
               if (block.startsWith('## ')) {
-                return <h2 key={idx} className={styles.h2}>{block.replace('## ', '')}</h2>;
+                return (
+                  <h2
+                    key={idx}
+                    className={styles.h2}
+                    dangerouslySetInnerHTML={{ __html: formatInline(block.replace(/^##\s+/, '')) }}
+                  />
+                );
               }
               if (block.startsWith('### ')) {
-                return <h3 key={idx} className={styles.h3}>{block.replace('### ', '')}</h3>;
+                return (
+                  <h3
+                    key={idx}
+                    className={styles.h3}
+                    dangerouslySetInnerHTML={{ __html: formatInline(block.replace(/^###\s+/, '')) }}
+                  />
+                );
+              }
+              if (block.startsWith('>')) {
+                return (
+                  <blockquote key={idx} className={styles.blockquote}>
+                    <p dangerouslySetInnerHTML={{ __html: formatInline(block.replace(/^>\s*/gm, '')) }} />
+                  </blockquote>
+                );
+              }
+              if (block.startsWith('$$') && block.endsWith('$$')) {
+                return (
+                  <div key={idx} className={styles.formulaBlock}>
+                    <span>{cleanDisplayFormula(block)}</span>
+                  </div>
+                );
+              }
+              if (block.startsWith('```')) {
+                const lines = block.split('\n');
+                const code = lines.slice(1, -1).join('\n');
+                return (
+                  <pre key={idx} className={styles.codeBlock}>
+                    <code>{code}</code>
+                  </pre>
+                );
               }
               if (block.startsWith('- ')) {
-                const items = block.split('\n').map((line) => line.replace('- ', ''));
+                const items = block.split('\n').map((line) => line.replace(/^[-\*]\s+/, ''));
                 return (
                   <ul key={idx} className={styles.list}>
                     {items.map((item, i) => (
-                      <li key={i} dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
+                      <li key={i} dangerouslySetInnerHTML={{ __html: formatInline(item) }} />
                     ))}
                   </ul>
                 );
@@ -103,10 +195,7 @@ export default async function ConceptDetailPage({ params }) {
                   key={idx}
                   className={styles.paragraph}
                   dangerouslySetInnerHTML={{
-                    __html: block
-                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                      .replace(/`([^`]+)`/g, '<code>$1</code>'),
+                    __html: formatInline(block),
                   }}
                 />
               );
