@@ -575,7 +575,7 @@ When individuals are freed from the fear of ego destruction, they can update the
     difficulty: 'advanced',
     readTime: 8,
     summary: "Can an algorithm ever exist that proves whether any computer program will finish running or loop forever? Discover Alan Turing's 1936 mathematical proof that placed permanent, unbreakable limits on what software can ever know.",
-    interactiveType: null,
+    interactiveType: 'HaltingProblem',
     content: `## The Universal Machine of 1936
 
 In 1900 at the International Congress of Mathematicians in Paris, David Hilbert posed the *Entscheidungsproblem* (the Decision Problem): *Can an algorithmic mechanical procedure ever be designed that, given any formal mathematical proposition, determines whether it is true or false?*

@@ -203,6 +203,21 @@ const SEED_TELEMETRY = {
       { id: 'seed-8', metrics: { condition: 'cult-prophecy', dissonanceScore: 98, taskRating: 9.5 }, value: 9.5 },
     ],
   },
+  'halting-problem': {
+    theoreticalTarget: 100.0, // 100% mathematical undecidability of the halting problem
+    unit: '% Undecidable',
+    label: 'Halting Undecidability Proof Index',
+    runs: [
+      { id: 'seed-1', metrics: { program: 'binary-increment', steps: 12, halts: true, paradox: false }, value: 100 },
+      { id: 'seed-2', metrics: { program: 'opposite-paradox', steps: 999, halts: false, paradox: true }, value: 100 },
+      { id: 'seed-3', metrics: { program: 'busy-beaver-3', steps: 14, halts: true, paradox: false }, value: 100 },
+      { id: 'seed-4', metrics: { program: 'collatz-27', steps: 111, halts: true, paradox: false }, value: 100 },
+      { id: 'seed-5', metrics: { program: 'opposite-paradox', steps: 999, halts: false, paradox: true }, value: 100 },
+      { id: 'seed-6', metrics: { program: 'ping-pong-loop', steps: 500, halts: false, paradox: false }, value: 100 },
+      { id: 'seed-7', metrics: { program: 'opposite-paradox', steps: 999, halts: false, paradox: true }, value: 100 },
+      { id: 'seed-8', metrics: { program: 'busy-beaver-4', steps: 107, halts: true, paradox: false }, value: 100 },
+    ],
+  },
 };
 
 // Generic fallback for any other concept
@@ -350,6 +365,8 @@ export async function fetchConceptTelemetry(conceptSlug) {
             val = Number(item.metrics?.heatNanoJoules || 2.3);
           } else if (conceptSlug === 'fermi-paradox') {
             val = Number(item.metrics?.calculatedN || 52);
+          } else if (conceptSlug === 'halting-problem') {
+            val = item.metrics?.paradox ? 100 : (item.metrics?.halts ? 0 : 50);
           } else {
             val = Number(item.metrics?.value || 50);
           }
