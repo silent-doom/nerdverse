@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import styles from './MontyHall3DLab.module.css';
 import Icon from '@/components/common/Icon';
+import { recordConceptRun } from '@/lib/supabase/conceptRuns';
 
 /**
  * Real-world practical context applications of Bayesian information concentration
@@ -154,6 +155,14 @@ export default function MontyHall3DLab() {
           };
         }
       });
+
+      // Record empirical telemetry to Supabase / crowdsourced dataset
+      recordConceptRun('monty-hall', 'single', {
+        switched: willSwitch,
+        won,
+        carDoor,
+        chosenDoor,
+      });
     },
     [gameState, playerPick, hostRevealed, carDoor]
   );
@@ -205,6 +214,14 @@ export default function MontyHall3DLab() {
         `Ran ${runs.toLocaleString()} simulated rounds: Switching won ${switchPct}% (${switchWins.toLocaleString()}) vs Staying ${stayPct}% (${stayWins.toLocaleString()}).`
       );
       setIsSimulatingBatch(false);
+
+      // Record batch telemetry
+      recordConceptRun('monty-hall', 'batch', {
+        runs,
+        switchWins,
+        stayWins,
+        switchWinRate: Number(switchPct),
+      });
     }, 200);
   }, []);
 

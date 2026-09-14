@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import styles from './BayesTheorem3DLab.module.css';
 import Icon from '@/components/common/Icon';
+import { recordConceptRun } from '@/lib/supabase/conceptRuns';
 
 export default function BayesTheorem3DLab() {
   const mountRef = useRef(null);
@@ -130,10 +131,18 @@ export default function BayesTheorem3DLab() {
       three.scannerMesh.position.z = -14;
       three.scannerMesh.visible = true;
     }
+
+    recordConceptRun('bayes-theorem', 'single', {
+      baseRate,
+      sensitivity,
+      falsePositiveRate,
+      posteriorPct: parseFloat(stats.posteriorPct),
+    });
+
     setTimeout(() => {
       setIsScanning(false);
     }, 1800);
-  }, []);
+  }, [baseRate, sensitivity, falsePositiveRate, stats.posteriorPct]);
 
   // Three.js Setup
   useEffect(() => {

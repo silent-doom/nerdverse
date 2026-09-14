@@ -1,0 +1,323 @@
+.telemetryContainer {
+  background: var(--color-card-bg, #0e0f14);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px;
+  margin-top: 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.telemetryContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-brand-light, #e5a93c), transparent);
+}
+
+/* ── Top Header ── */
+.topHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--color-border-default, #21232c);
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.statusPillLive {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #10b981;
+}
+
+.pulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.pulseDotOffline {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e5a93c;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.chartHeading {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary, #f9fafb);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.chartSubtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary, #9ca3af);
+  margin: 0;
+}
+
+/* ── Tab Switcher ── */
+.tabGroup {
+  display: flex;
+  background: rgba(18, 19, 26, 0.9);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #9ca3af);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabBtn:hover {
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.tabBtnActive {
+  background: rgba(229, 169, 60, 0.15) !important;
+  color: var(--color-brand-light, #e5a93c) !important;
+  border: 1px solid rgba(229, 169, 60, 0.35);
+}
+
+/* ── Summary Stats Cards ── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: rgba(18, 19, 26, 0.7);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.2s ease;
+}
+
+.statCard:hover {
+  border-color: rgba(229, 169, 60, 0.3);
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.statVal {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  line-height: 1.1;
+}
+
+.statFootnote {
+  font-size: 11px;
+  color: var(--color-text-tertiary, #6b7280);
+}
+
+/* ── SVG Chart Viewport ── */
+.chartViewport {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: rgba(10, 11, 15, 0.85);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svgChart {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ── Tooltip ── */
+.tooltipBox {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(14, 15, 20, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-brand-light, #e5a93c);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #f9fafb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 20;
+  transform: translate(-50%, -120%);
+  white-space: nowrap;
+}
+
+.tooltipTitle {
+  font-weight: 800;
+  color: var(--color-brand-light, #e5a93c);
+  margin-bottom: 2px;
+}
+
+/* ── Distribution Histogram ── */
+.histogramContainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  padding-top: 30px;
+  gap: 16px;
+}
+
+.histColumn {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.histBarWrapper {
+  width: 100%;
+  max-width: 54px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.histBar {
+  width: 100%;
+  background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+}
+
+.histBarCount {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: var(--color-brand-light, #e5a93c);
+}
+
+.histLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-secondary, #9ca3af);
+  font-family: var(--font-mono, monospace);
+}
+
+.histPct {
+  font-size: 10px;
+  color: var(--color-text-tertiary, #6b7280);
+}
+
+/* ── Footer Banner ── */
+.footerBanner {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(18, 19, 26, 0.6);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.legendGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendLineGold {
+  width: 14px;
+  height: 3px;
+  background: #f59e0b;
+  border-radius: 2px;
+}
+
+.legendLineCyan {
+  width: 14px;
+  height: 2px;
+  background: #38bdf8;
+  border-top: 2px dashed #38bdf8;
+}

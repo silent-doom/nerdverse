@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getConceptBySlug, getAllPublishedConcepts, getRelatedConcepts } from '@/data/concepts';
 import { getCategoryById } from '@/lib/constants/categories';
 import ConceptSimulatorResolver from '@/components/interactive/ConceptSimulatorResolver';
+import ConceptTelemetryChart from '@/components/analytics/ConceptTelemetryChart';
 import Badge from '@/components/ui/Badge/Badge';
 import Card from '@/components/ui/Card/Card';
 import Icon from '@/components/common/Icon';
@@ -72,6 +73,9 @@ export default async function ConceptDetailPage({ params }) {
           <ConceptSimulatorResolver type={concept.interactiveType} />
         </section>
       )}
+
+      {/* Interactive Statistical Telemetry Graph & Historical Runs */}
+      <ConceptTelemetryChart conceptSlug={concept.slug} conceptTitle={concept.title} />
 
       {/* Main Content Body */}
       <section className={styles.contentSection}>

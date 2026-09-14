@@ -6,6 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import styles from './StPetersburg3DLab.module.css';
 import Icon from '@/components/common/Icon';
+import { recordConceptRun } from '@/lib/supabase/conceptRuns';
 
 // ── Treasury Asset Generators (Gold Bullion & Currency Bundles) ──
 function createGoldBarMesh(three) {
@@ -200,9 +201,10 @@ export default function StPetersburg3DLab() {
         rebuildTreasuryStack(nextStreak, wealthType);
       } else {
         setIsGameOver(true);
+        recordConceptRun('st-petersburg-paradox', 'single', { streak, payout });
       }
     }, 900);
-  }, [isFlipping, isGameOver, streak, wealthType, rebuildTreasuryStack]);
+  }, [isFlipping, isGameOver, streak, payout, wealthType, rebuildTreasuryStack]);
 
   // Run 1,000 Trial Monte Carlo Batch
   const runBatchSimulation = useCallback(() => {
@@ -234,6 +236,13 @@ export default function StPetersburg3DLab() {
       medianPayout,
       totalWinnings,
       lossAt25Ticket: Math.round(trials * 25 - totalWinnings),
+    });
+
+    recordConceptRun('st-petersburg-paradox', 'batch', {
+      trials,
+      maxStreak,
+      meanPayout,
+      payout: meanPayout,
     });
   }, []);
 

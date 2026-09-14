@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import styles from './TrolleyProblem3DLab.module.css';
 import Button from '@/components/ui/Button/Button';
 import Icon from '@/components/common/Icon';
+import { recordConceptRun } from '@/lib/supabase/conceptRuns';
 
 /**
  * Scenario Presets & Consequence Arithmetic Specifications
@@ -1854,6 +1855,12 @@ export default function TrolleyProblem3DLab() {
         },
         ...prev.slice(0, 4),
       ]);
+
+      recordConceptRun('trolley-problem', 'decision', {
+        choice: isSwitchPulled ? 'divert' : 'inaction',
+        scenario: scenario.title,
+        livesSaved: saved,
+      });
     } else if (simState === 'RUNNING') {
       setSimState('IDLE');
       animStateRef.current.simState = 'IDLE';
