@@ -78,6 +78,13 @@
   }
 }
 
+@media (max-width: 420px) {
+  .columns {
+    grid-template-columns: 1fr;
+    gap: var(--space-6, 24px);
+  }
+}
+
 .column {
   display: flex;
   flex-direction: column;

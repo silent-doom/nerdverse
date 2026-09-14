@@ -660,6 +660,14 @@
   .quickActionsDock {
     bottom: 12px;
     left: 12px;
+    right: 12px;
+    max-width: calc(100% - 24px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .quickActionsDock::-webkit-scrollbar {
+    display: none;
   }
 
   .hintBadge {

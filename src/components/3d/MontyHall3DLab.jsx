@@ -965,7 +965,7 @@ export default function MontyHall3DLab() {
       {/* Practical Context Section: Real-World Applications */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginTop: '0.5rem' }}>
         <div className={styles.domainLabel}>Practical Context: Why This Principle Dictates Real-World Decisions</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.85rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '0.85rem' }}>
           {PRACTICAL_APPLICATIONS.map((item) => (
             <div
               key={item.id}

@@ -265,8 +265,14 @@
 /* ── Mathematical Comparison Grid ── */
 .mathComparisonGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .mathComparisonGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mathCard {
@@ -339,4 +345,86 @@
   font-weight: 800;
   color: var(--color-brand-light, #e5a93c);
   font-family: var(--font-mono, monospace);
+}
+
+/* ── Mobile Viewport Adaptations ── */
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 380px;
+  }
+
+  .topHeader {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .headerTitleBox {
+    padding: 8px 12px;
+  }
+
+  .labTitle {
+    font-size: 15px;
+  }
+
+  .payoutDisplay {
+    padding: 6px 12px;
+  }
+
+  .payoutValue {
+    font-size: 20px;
+  }
+
+  .streakHud {
+    top: 76px;
+    left: 10px;
+    padding: 6px 10px;
+  }
+
+  .coinActionOverlay {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .actionButtonGroup {
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .flipBtn,
+  .secondaryActionBtn {
+    padding: 10px 14px;
+    font-size: 12px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .dashboard {
+    padding: 16px 14px;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wealthTypeSelector {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .wealthBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .batchSummaryRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }

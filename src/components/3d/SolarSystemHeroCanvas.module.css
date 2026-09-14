@@ -448,6 +448,13 @@
     scale: 0.85;
     transform-origin: bottom right;
   }
+  .focusCard {
+    top: 60px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: calc(100% - 24px);
+  }
   .interactiveHint {
     display: none;
   }

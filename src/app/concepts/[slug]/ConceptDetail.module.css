@@ -98,6 +98,12 @@
   padding: var(--space-8, 32px);
 }
 
+@media (max-width: 640px) {
+  .contentCard {
+    padding: var(--space-5, 20px) var(--space-4, 16px);
+  }
+}
+
 .prose {
   color: var(--color-text-primary, #f5f6fa);
   line-height: 1.8;
@@ -242,8 +248,14 @@
 
 .relatedGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: var(--space-6, 24px);
+}
+
+@media (max-width: 640px) {
+  .relatedGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .relatedCardLink {

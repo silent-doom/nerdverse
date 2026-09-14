@@ -135,7 +135,7 @@
 /* ── Summary Stats Cards ── */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -320,4 +320,44 @@
   height: 2px;
   background: #38bdf8;
   border-top: 2px dashed #38bdf8;
+}
+
+@media (max-width: 640px) {
+  .telemetryContainer {
+    padding: 16px 12px;
+    margin-top: 24px;
+  }
+
+  .topHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .tabGroup {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .tabBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .chartViewport {
+    height: 230px;
+    padding: 8px;
+  }
+
+  .histogramContainer {
+    gap: 8px;
+  }
+
+  .footerBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 }

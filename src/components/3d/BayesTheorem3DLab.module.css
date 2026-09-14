@@ -375,6 +375,12 @@
   }
 }
 
+@media (max-width: 480px) {
+  .matrixStatsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
 .statCard {
   background: rgba(18, 19, 26, 0.7);
   border: 1px solid var(--color-border-default, #21232c);
@@ -444,4 +450,77 @@
   border-color: var(--color-brand-light, #e5a93c);
   background: rgba(229, 169, 60, 0.1);
   color: var(--color-brand-light, #e5a93c);
+}
+
+/* ── Mobile Viewport Adaptations ── */
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 380px;
+  }
+
+  .topHeader {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .headerTitleBox {
+    padding: 8px 12px;
+  }
+
+  .labTitle {
+    font-size: 15px;
+  }
+
+  .posteriorDisplay {
+    padding: 6px 12px;
+  }
+
+  .posteriorValue {
+    font-size: 20px;
+  }
+
+  .chamberBadges {
+    top: 76px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .positiveChamberBadge,
+  .clearedChamberBadge {
+    padding: 6px 10px;
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .viewModeOverlay {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+
+  .viewModeGroup {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .viewBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .laserScanBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dashboard {
+    padding: 16px 14px;
+    gap: 14px;
+  }
 }
