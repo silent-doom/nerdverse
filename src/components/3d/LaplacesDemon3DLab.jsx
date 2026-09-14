@@ -533,6 +533,7 @@ export default function LaplacesDemon3DLab() {
         quantumGroupRef.current.visible = false;
 
         if (astrolabeGroupRef.current) {
+          astrolabeGroupRef.current.visible = true;
           astrolabeGroupRef.current.position.set(0, 0, 0);
           astrolabeGroupRef.current.scale.set(1, 1, 1);
         }
@@ -583,6 +584,7 @@ export default function LaplacesDemon3DLab() {
         quantumGroupRef.current.visible = false;
 
         if (astrolabeGroupRef.current) {
+          astrolabeGroupRef.current.visible = true;
           astrolabeGroupRef.current.position.set(0, 0, 0);
           astrolabeGroupRef.current.scale.set(1, 1, 1);
         }
@@ -649,9 +651,9 @@ export default function LaplacesDemon3DLab() {
         quantumGroupRef.current.visible = true;
 
         if (astrolabeGroupRef.current) {
-          // Smoothly elevate the Astrolabe & Demon Eye above the slit apparatus
-          astrolabeGroupRef.current.position.set(0, 2.5, -0.8);
-          astrolabeGroupRef.current.scale.set(0.7, 0.7, 0.7);
+          // Hide the 18th-century astrolabe/armillary sphere in quantum mode
+          // to eliminate confusion with an atomic nucleus/orbital model.
+          astrolabeGroupRef.current.visible = false;
         }
 
         const sw = slitWidthRef.current;
