@@ -109,6 +109,8 @@ export default function BayesTheorem3DLab() {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.35;
       container.appendChild(renderer.domElement);
     } catch {
       return;
@@ -122,17 +124,25 @@ export default function BayesTheorem3DLab() {
     controls.minDistance = 10;
     controls.target.set(0, 2, 0);
 
-    // 4. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    // 4. Studio Lighting (Crisp, balanced clinical diagnostic illumination)
+    const ambientLight = new THREE.AmbientLight(0xf8fafc, 1.45);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.8);
-    dirLight.position.set(15, 30, 15);
-    scene.add(dirLight);
+    const mainKeyLight = new THREE.DirectionalLight(0xfff7ed, 2.5);
+    mainKeyLight.position.set(12, 24, 16);
+    scene.add(mainKeyLight);
 
-    const dirLight2 = new THREE.DirectionalLight(0xf59e0b, 1.0);
-    dirLight2.position.set(-15, -10, -15);
-    scene.add(dirLight2);
+    const fillLight = new THREE.DirectionalLight(0xe0e7ff, 1.35);
+    fillLight.position.set(-14, 16, 12);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.6);
+    rimLight.position.set(0, 10, -16);
+    scene.add(rimLight);
+
+    const centerSpot = new THREE.SpotLight(0x38bdf8, 3.2, 45, Math.PI / 3.5, 0.4);
+    centerSpot.position.set(0, 22, 4);
+    scene.add(centerSpot);
 
     // 5. Grid Helper Floor
     const grid = new THREE.GridHelper(40, 20, 0x1e293b, 0x0f172a);

@@ -19,6 +19,28 @@ vi.mock('three', async (importOriginal) => {
   };
 });
 
+vi.mock('three/examples/jsm/loaders/GLTFLoader.js', () => ({
+  GLTFLoader: class {
+    load(url, onLoad) {
+      const scene = {
+        position: { set: vi.fn() },
+        scale: { set: vi.fn() },
+        rotation: { set: vi.fn() },
+        clone: function() {
+          return {
+            position: { set: vi.fn() },
+            scale: { set: vi.fn() },
+            rotation: { set: vi.fn() },
+            traverse: vi.fn(),
+          };
+        },
+        traverse: vi.fn(),
+      };
+      onLoad({ scene });
+    }
+  },
+}));
+
 describe('MontyHall3DLab', () => {
   beforeEach(() => {
     HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({

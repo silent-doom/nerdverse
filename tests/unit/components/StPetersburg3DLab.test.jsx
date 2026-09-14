@@ -38,6 +38,11 @@ vi.mock('three/examples/jsm/loaders/GLTFLoader.js', () => ({
       const scene = {
         position: { set: vi.fn() },
         scale: { set: vi.fn() },
+        getObjectByName: vi.fn().mockReturnValue({
+          position: { set: vi.fn() },
+          rotation: { set: vi.fn() },
+        }),
+        traverse: vi.fn(),
       };
       onLoad({ scene });
     }

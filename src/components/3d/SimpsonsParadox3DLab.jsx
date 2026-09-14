@@ -133,9 +133,11 @@ export default function SimpsonsParadox3DLab() {
 
     let renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.35;
       container.appendChild(renderer.domElement);
     } catch {
       return;
@@ -148,17 +150,25 @@ export default function SimpsonsParadox3DLab() {
     controls.minDistance = 8;
     controls.target.set(0, 4, 0);
 
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    // Studio Lighting (Clean, balanced studio vector space illumination)
+    const ambientLight = new THREE.AmbientLight(0xf8fafc, 1.45);
     scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 1.5);
-    dirLight1.position.set(20, 30, 20);
-    scene.add(dirLight1);
+    const mainKeyLight = new THREE.DirectionalLight(0xfff7ed, 2.6);
+    mainKeyLight.position.set(16, 26, 18);
+    scene.add(mainKeyLight);
 
-    const dirLight2 = new THREE.DirectionalLight(0xa855f7, 1.2);
-    dirLight2.position.set(-20, -10, -20);
-    scene.add(dirLight2);
+    const fillLight = new THREE.DirectionalLight(0xe0e7ff, 1.35);
+    fillLight.position.set(-16, 14, 12);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xa855f7, 1.6);
+    rimLight.position.set(0, 10, -18);
+    scene.add(rimLight);
+
+    const topSpot = new THREE.SpotLight(0x38bdf8, 3.4, 40, Math.PI / 3.5, 0.4);
+    topSpot.position.set(0, 22, 2);
+    scene.add(topSpot);
 
     // Floor Grid
     const grid = new THREE.GridHelper(36, 18, 0x1e293b, 0x0f172a);

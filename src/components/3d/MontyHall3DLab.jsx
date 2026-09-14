@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import styles from './MontyHall3DLab.module.css';
 import Icon from '@/components/common/Icon';
 
@@ -253,24 +254,32 @@ export default function MontyHall3DLab() {
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // Studio Lighting
-    const ambientLight = new THREE.AmbientLight(0x1e2230, 1.8);
+    // Studio Lighting & Tone Mapping (Balanced, clear illumination without murky darkness)
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35;
+
+    const ambientLight = new THREE.AmbientLight(0xf8fafc, 1.45);
     scene.add(ambientLight);
 
-    const mainSpot = new THREE.SpotLight(0xfff1d6, 4.5);
-    mainSpot.position.set(0, 9, 8);
-    mainSpot.angle = Math.PI / 4;
-    mainSpot.penumbra = 0.6;
-    mainSpot.castShadow = true;
-    scene.add(mainSpot);
+    const mainKeyLight = new THREE.DirectionalLight(0xfff7ed, 2.5);
+    mainKeyLight.position.set(5, 10, 8);
+    mainKeyLight.castShadow = true;
+    mainKeyLight.shadow.mapSize.width = 1024;
+    mainKeyLight.shadow.mapSize.height = 1024;
+    scene.add(mainKeyLight);
 
-    const blueRimLight = new THREE.DirectionalLight(0x3b82f6, 1.8);
-    blueRimLight.position.set(-6, 5, -4);
-    scene.add(blueRimLight);
+    const fillLight = new THREE.DirectionalLight(0xe0e7ff, 1.35);
+    fillLight.position.set(-7, 7, 7);
+    scene.add(fillLight);
 
-    const amberRimLight = new THREE.DirectionalLight(0xf59e0b, 1.6);
-    amberRimLight.position.set(6, 5, -4);
-    scene.add(amberRimLight);
+    const overheadSpot = new THREE.SpotLight(0xffedd5, 3.2, 28, Math.PI / 3.5, 0.45);
+    overheadSpot.position.set(0, 10, 2);
+    overheadSpot.castShadow = true;
+    scene.add(overheadSpot);
+
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.5);
+    rimLight.position.set(0, 7, -6);
+    scene.add(rimLight);
 
     // Stage Floor
     const floor = new THREE.Mesh(
@@ -294,6 +303,12 @@ export default function MontyHall3DLab() {
     doorXPositions.forEach((xPos, idx) => {
       const doorStationGroup = new THREE.Group();
       doorStationGroup.position.set(xPos, 0, -2);
+
+      // Station Spotlight
+      const doorSpot = new THREE.SpotLight(0xffedd5, 2.2, 12, Math.PI / 4, 0.4);
+      doorSpot.position.set(xPos, 5.5, -0.5);
+      doorSpot.target = doorStationGroup;
+      scene.add(doorSpot);
 
       const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e2433, metalness: 0.7, roughness: 0.35 });
       const frameL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.6, 0.3), frameMat);
@@ -346,70 +361,114 @@ export default function MontyHall3DLab() {
       scene.add(doorStationGroup);
       doorMeshes.push({ group: doorStationGroup, pivot: hingePivot, panel: doorPanel });
 
-      // Behind Door Item (Sports Car vs Goat)
+      // Behind Door Item (Realistic Sports Car vs Realistic Live Goat)
       const itemGroup = new THREE.Group();
       itemGroup.position.set(xPos, 0, -2.4);
 
-      // Pedestal
-      const ped = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.85, 0.95, 0.25, 24),
-        new THREE.MeshStandardMaterial({ color: 0x151924, metalness: 0.8, roughness: 0.3 })
-      );
-      ped.position.y = 0.125;
-      itemGroup.add(ped);
-
-      // Sports Car Prize
+      // Sports Car Prize Anchor
       const prizeMesh = new THREE.Group();
-      const carBody = new THREE.Mesh(
-        new THREE.BoxGeometry(1.6, 0.45, 0.85),
-        new THREE.MeshStandardMaterial({ color: 0x10b981, metalness: 0.85, roughness: 0.15 })
+      
+      // Deluxe Chrome / Carbon Turntable Platform
+      const carTurntable = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.2, 1.3, 0.2, 32),
+        new THREE.MeshStandardMaterial({ color: 0x181e2b, metalness: 0.85, roughness: 0.2 })
       );
-      carBody.position.y = 0.5;
-      carBody.castShadow = true;
-      prizeMesh.add(carBody);
+      carTurntable.position.y = 0.1;
+      carTurntable.receiveShadow = true;
+      prizeMesh.add(carTurntable);
 
-      const carCockpit = new THREE.Mesh(
-        new THREE.BoxGeometry(0.85, 0.35, 0.7),
-        new THREE.MeshStandardMaterial({ color: 0x059669, metalness: 0.9, roughness: 0.1 })
-      );
-      carCockpit.position.set(-0.15, 0.85, 0);
-      prizeMesh.add(carCockpit);
-
-      // Underglow
-      const ring = new THREE.Mesh(
-        new THREE.RingGeometry(0.7, 0.82, 32),
+      // Neon Emerald Underglow Ring
+      const carUnderglow = new THREE.Mesh(
+        new THREE.RingGeometry(1.05, 1.22, 32),
         new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide })
       );
-      ring.rotation.x = -Math.PI / 2;
-      ring.position.y = 0.01;
-      prizeMesh.add(ring);
+      carUnderglow.rotation.x = -Math.PI / 2;
+      carUnderglow.position.y = 0.205;
+      prizeMesh.add(carUnderglow);
 
-      // Goat / Dud Box
+      const carAnchor = new THREE.Group();
+      prizeMesh.add(carAnchor);
+
+      // Goat / Farm Paddock Anchor
       const dudMesh = new THREE.Group();
-      const dudBody = new THREE.Mesh(
-        new THREE.BoxGeometry(0.8, 0.8, 0.8),
-        new THREE.MeshStandardMaterial({ color: 0x6b7280, roughness: 0.7, metalness: 0.3 })
+      
+      // Rustic Pasture Grass Disk
+      const goatPaddock = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.15, 1.25, 0.18, 32),
+        new THREE.MeshStandardMaterial({ color: 0x223c28, roughness: 0.85, metalness: 0.05 })
       );
-      dudBody.position.y = 0.65;
-      dudBody.castShadow = true;
-      dudMesh.add(dudBody);
+      goatPaddock.position.y = 0.09;
+      goatPaddock.receiveShadow = true;
+      dudMesh.add(goatPaddock);
 
-      const dudSymbol = new THREE.Mesh(
-        new THREE.ConeGeometry(0.3, 0.6, 4),
-        new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xef4444, emissiveIntensity: 0.5 })
+      // Pasture fence posts around the paddock
+      const fencePostGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.45, 8);
+      const fencePostMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.9 });
+      for (let f = 0; f < 8; f++) {
+        const ang = (f / 8) * Math.PI * 2;
+        const post = new THREE.Mesh(fencePostGeo, fencePostMat);
+        post.position.set(Math.cos(ang) * 1.05, 0.28, Math.sin(ang) * 1.05);
+        dudMesh.add(post);
+      }
+
+      // Warm Amber Paddock Glow Ring
+      const goatGlow = new THREE.Mesh(
+        new THREE.RingGeometry(0.95, 1.12, 32),
+        new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide })
       );
-      dudSymbol.position.y = 1.35;
-      dudMesh.add(dudSymbol);
+      goatGlow.rotation.x = -Math.PI / 2;
+      goatGlow.position.y = 0.185;
+      dudMesh.add(goatGlow);
+
+      const goatAnchor = new THREE.Group();
+      dudMesh.add(goatAnchor);
 
       itemGroup.add(prizeMesh);
       itemGroup.add(dudMesh);
       scene.add(itemGroup);
 
-      itemMeshes.push({ itemGroup, prizeMesh, dudMesh });
+      itemMeshes.push({ itemGroup, prizeMesh, dudMesh, carAnchor, goatAnchor, goatModel: null, carModel: null });
     });
 
     doorsMeshRef.current = doorMeshes;
     itemsMeshRef.current = itemMeshes;
+
+    // Load Blender 3D Models (Sports Car & Goat)
+    const gltfLoader = new GLTFLoader();
+    
+    gltfLoader.load('/models/sports_car.glb', (gltf) => {
+      itemMeshes.forEach((item) => {
+        const carClone = gltf.scene.clone(true);
+        carClone.scale.set(0.92, 0.92, 0.92);
+        carClone.position.set(0, 0.18, 0);
+        carClone.rotation.y = -Math.PI / 5;
+        carClone.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        item.carAnchor.add(carClone);
+        item.carModel = carClone;
+      });
+    });
+
+    gltfLoader.load('/models/goat.glb', (gltf) => {
+      itemMeshes.forEach((item, idx) => {
+        const goatClone = gltf.scene.clone(true);
+        goatClone.scale.set(0.95, 0.95, 0.95);
+        goatClone.position.set(0, 0.15, 0);
+        goatClone.rotation.y = idx === 0 ? 0.35 : idx === 2 ? -0.35 : 0;
+        goatClone.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        item.goatAnchor.add(goatClone);
+        item.goatModel = goatClone;
+      });
+    });
 
     // Confetti Particles
     const confettiCount = 180;
@@ -518,6 +577,19 @@ export default function MontyHall3DLab() {
           doorsMeshRef.current[i].pivot.rotation.y = doorAnglesCurrent.current[i];
         }
       }
+
+      // Animate 3D Models
+      itemsMeshRef.current.forEach((item, idx) => {
+        if (item.goatModel) {
+          // Organic breathing & gentle idle head movement
+          item.goatModel.position.y = 0.15 + Math.sin(currentTime * 0.003 + idx * 1.5) * 0.015;
+          item.goatModel.rotation.z = Math.sin(currentTime * 0.002 + idx) * 0.02;
+        }
+        if (item.carModel && item.prizeMesh.visible) {
+          // Slow luxury turntable rotation when prize is active
+          item.carAnchor.rotation.y += delta * 0.35;
+        }
+      });
 
       if (confettiSystemRef.current && confettiSystemRef.current.visible) {
         const positions = confettiSystemRef.current.geometry.attributes.position.array;

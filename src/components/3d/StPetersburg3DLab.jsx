@@ -135,16 +135,20 @@ export default function StPetersburg3DLab() {
     const height = container.clientHeight || 500;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x080704, 0.015);
+    scene.fog = new THREE.FogExp2(0x0a0c10, 0.012);
 
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
-    camera.position.set(16, 15, 20);
+    camera.position.set(14, 14, 18);
 
     let renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.35;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       container.appendChild(renderer.domElement);
     } catch {
       return;
@@ -155,44 +159,76 @@ export default function StPetersburg3DLab() {
     controls.dampingFactor = 0.05;
     controls.maxDistance = 50;
     controls.minDistance = 6;
-    controls.target.set(2, 3, 0);
+    controls.target.set(1, 2, 0);
 
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    // Studio Lighting (Balanced, clear illumination matching laboratory standard)
+    const ambientLight = new THREE.AmbientLight(0xf8fafc, 1.45);
     scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xf59e0b, 2.0);
-    dirLight1.position.set(10, 25, 10);
-    scene.add(dirLight1);
+    const mainKeyLight = new THREE.DirectionalLight(0xfff7ed, 2.6);
+    mainKeyLight.position.set(8, 14, 10);
+    mainKeyLight.castShadow = true;
+    mainKeyLight.shadow.mapSize.width = 1024;
+    mainKeyLight.shadow.mapSize.height = 1024;
+    scene.add(mainKeyLight);
 
-    const dirLight2 = new THREE.DirectionalLight(0xfde047, 1.2);
-    dirLight2.position.set(-10, -5, -10);
-    scene.add(dirLight2);
+    const fillLight = new THREE.DirectionalLight(0xe0e7ff, 1.35);
+    fillLight.position.set(-8, 8, 8);
+    scene.add(fillLight);
 
-    // Stage Grid & Pedestal
-    const grid = new THREE.GridHelper(26, 14, 0x78350f, 0x292524);
-    grid.position.y = 0;
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.5);
+    rimLight.position.set(0, 6, -8);
+    scene.add(rimLight);
+
+    // Casino Table Spotlight
+    const tableSpot = new THREE.SpotLight(0xffedd5, 3.8, 30, Math.PI / 3.5, 0.4);
+    tableSpot.position.set(-3, 9, 2);
+    tableSpot.castShadow = true;
+    scene.add(tableSpot);
+
+    // Payout Tower Spotlight
+    const towerSpot = new THREE.SpotLight(0xfde047, 3.2, 32, Math.PI / 4, 0.5);
+    towerSpot.position.set(5, 12, 4);
+    scene.add(towerSpot);
+
+    // Luxurious Dark Casino Baize Floor
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(36, 28),
+      new THREE.MeshStandardMaterial({ color: 0x0a1410, roughness: 0.65, metalness: 0.2 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.01;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const grid = new THREE.GridHelper(30, 20, 0xf59e0b, 0x1f2937);
+    grid.position.y = 0.005;
     scene.add(grid);
 
-    // Casino Pedestal
-    const pedestalGeo = new THREE.CylinderGeometry(3.5, 4.0, 0.6, 32);
-    const pedestalMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.4, metalness: 0.8 });
-    const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
-    pedestal.position.set(-3, 0.3, 0);
-    scene.add(pedestal);
+    // Procedural Fallback Coin & Pedestal Holder
+    const coinHolder = new THREE.Group();
+    coinHolder.position.set(-3, 0, 0);
+    scene.add(coinHolder);
 
-    // Golden Coin Mesh
-    const coinGeo = new THREE.CylinderGeometry(1.5, 1.5, 0.22, 36);
+    const pedestalGeo = new THREE.CylinderGeometry(3.6, 3.8, 0.4, 32);
+    const pedestalMat = new THREE.MeshStandardMaterial({ color: 0x22120b, roughness: 0.4, metalness: 0.3 });
+    const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
+    pedestal.position.y = 0.2;
+    pedestal.receiveShadow = true;
+    coinHolder.add(pedestal);
+
+    const coinGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.24, 36);
     const coinMat = new THREE.MeshStandardMaterial({
       color: 0xf59e0b,
       emissive: 0xd97706,
-      emissiveIntensity: 0.2,
+      emissiveIntensity: 0.25,
       metalness: 0.95,
       roughness: 0.15,
     });
     const coinMesh = new THREE.Mesh(coinGeo, coinMat);
-    coinMesh.position.set(-3, 0.72, 0);
-    scene.add(coinMesh);
+    coinMesh.position.y = 0.6;
+    coinMesh.castShadow = true;
+    coinHolder.add(coinMesh);
 
     // Tower Group
     const towerGroup = new THREE.Group();
@@ -204,12 +240,21 @@ export default function StPetersburg3DLab() {
       '/models/st_petersburg_coin.glb',
       (gltf) => {
         const model = gltf.scene;
-        model.position.set(-3, 0.72, 0);
+        model.position.set(-3, 0, 0);
         model.scale.set(1.0, 1.0, 1.0);
-        scene.remove(coinMesh);
-        scene.remove(pedestal);
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        scene.remove(coinHolder);
         scene.add(model);
-        threeRef.current.coinMesh = model;
+
+        const rotator = model.getObjectByName('Coin_Rotator');
+        threeRef.current.coinModel = rotator || model;
+        threeRef.current.coinMesh = rotator || model;
+        threeRef.current.fullModel = model;
       },
       undefined,
       () => {
@@ -223,6 +268,7 @@ export default function StPetersburg3DLab() {
       renderer,
       controls,
       coinMesh,
+      coinModel: coinMesh,
       towerGroup,
       isAnimatingFlip: false,
       flipProgress: 0,
@@ -245,21 +291,26 @@ export default function StPetersburg3DLab() {
       controls.update();
 
       const three = threeRef.current;
-      if (three.isAnimatingFlip && three.coinMesh) {
+      const coinToFlip = three.coinModel || three.coinMesh;
+      if (three.isAnimatingFlip && coinToFlip) {
         three.flipProgress += 0.035;
 
         // Upward parabolic vault
-        const jumpHeight = Math.sin(three.flipProgress * Math.PI) * 5.0;
-        three.coinMesh.position.y = 0.72 + jumpHeight;
+        const jumpHeight = Math.sin(three.flipProgress * Math.PI) * 4.8;
+        coinToFlip.position.y = 0.6 + jumpHeight;
 
         // Rapid coin rotation
-        three.coinMesh.rotation.x += 0.35;
-        three.coinMesh.rotation.z += 0.15;
+        coinToFlip.rotation.x += 0.38;
+        coinToFlip.rotation.z += 0.14;
 
         if (three.flipProgress >= 1.0) {
           three.isAnimatingFlip = false;
-          three.coinMesh.position.y = 0.72;
-          three.coinMesh.rotation.set(three.flipTargetOutcome === 'HEADS' ? 0 : Math.PI, 0, 0);
+          coinToFlip.position.y = 0.6;
+          coinToFlip.rotation.set(
+            three.flipTargetOutcome === 'HEADS' ? 0 : Math.PI,
+            0,
+            0
+          );
         }
       }
 
