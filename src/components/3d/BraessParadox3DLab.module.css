@@ -1,0 +1,442 @@
+.labContainer {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg-primary, #07090f);
+  border: 1px solid var(--color-border-default, #1e2638);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text-primary, #f9fafb);
+  user-select: none;
+  margin-bottom: var(--space-8, 32px);
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(520px, 64vh, 680px);
+  cursor: grab;
+  background: radial-gradient(circle at 50% 30%, #0d1726 0%, #05080f 100%);
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* ── Top Floating Header & Stats Cluster ── */
+.topHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitleBox {
+  background: rgba(11, 16, 26, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid #202d44;
+  border-radius: 8px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.labBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
+  margin-bottom: 2px;
+}
+
+.labTitle {
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.statsCluster {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  pointer-events: auto;
+}
+
+.statPill {
+  background: rgba(11, 16, 26, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid #202d44;
+  border-radius: 8px;
+  padding: 6px 14px;
+  display: flex;
+  flex-direction: column;
+  min-width: 125px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.statPillCrisis {
+  border-color: rgba(244, 63, 94, 0.6);
+  background: rgba(45, 10, 20, 0.9);
+}
+
+.statLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.statValue {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+}
+
+.statValueCyan {
+  color: #38bdf8;
+}
+
+.statValueEmerald {
+  color: #10b981;
+}
+
+.statValueRose {
+  color: #f43f5e;
+}
+
+.statValueAmber {
+  color: #f59e0b;
+}
+
+/* ── Road Network HUD Overlay ── */
+.networkHUD {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  background: rgba(11, 16, 26, 0.92);
+  backdrop-filter: blur(14px);
+  border: 1px solid #212f46;
+  border-radius: 10px;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.bypassToggleBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bypassBtn {
+  background: #192336;
+  border: 1px solid #2c3c58;
+  color: #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.bypassBtnOpen {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #f43f5e;
+  color: #fb7185;
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.3);
+}
+
+.bypassBtnClosed {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #34d399;
+}
+
+.networkLegend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDotNorth {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #38bdf8;
+}
+
+.legendDotSouth {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #a855f7;
+}
+
+.legendDotBypass {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f43f5e;
+}
+
+/* ── Primary Control Deck ── */
+.controlDeck {
+  background: #0a0e18;
+  border-top: 1px solid var(--color-border-default, #1e283d);
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tabsRow {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #1a2336;
+  padding-bottom: 12px;
+  overflow-x: auto;
+}
+
+.tabBtn {
+  background: #111827;
+  border: 1px solid #202d44;
+  color: #94a3b8;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  background: #1a253a;
+  color: #f1f5f9;
+  border-color: #2b3b59;
+}
+
+.tabBtnActive {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.controlsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 16px;
+}
+
+.controlCard {
+  background: #0f1624;
+  border: 1px solid #1d293f;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.cardSubtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+.sliderBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.sliderValue {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.rangeInput {
+  width: 100%;
+  accent-color: #38bdf8;
+  cursor: pointer;
+}
+
+/* ── Route Breakdown Table ── */
+.routeTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.routeTable th {
+  text-align: left;
+  padding: 6px 8px;
+  color: #94a3b8;
+  border-bottom: 1px solid #202d44;
+  font-size: 10.5px;
+  text-transform: uppercase;
+}
+
+.routeTable td {
+  padding: 8px;
+  border-bottom: 1px solid #182234;
+  color: #cbd5e1;
+}
+
+.routeActiveRow {
+  background: rgba(56, 189, 248, 0.1);
+  color: #f1f5f9;
+  font-weight: 700;
+}
+
+/* ── Real-World Case Cards (Mode 2) ── */
+.caseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.caseCard {
+  background: #141d2d;
+  border: 1px solid #233148;
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.caseCard:hover {
+  background: #1c273c;
+  border-color: #38bdf8;
+}
+
+.caseCardActive {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+}
+
+.caseTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 4px;
+}
+
+.caseDesc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* ── Action Buttons ── */
+.actionRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  border-top: 1px solid #1a2336;
+  padding-top: 14px;
+}
+
+.primaryBtn {
+  background: #38bdf8;
+  color: #032034;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.primaryBtn:hover {
+  background: #0ea5e9;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+
+.secondaryBtn {
+  background: #182234;
+  color: #e2e8f0;
+  border: 1px solid #283750;
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: #202d44;
+  color: #ffffff;
+  border-color: #344768;
+}

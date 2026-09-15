@@ -982,7 +982,7 @@ To maximize long-term utilitarian welfare across generations, modern systems des
     difficulty: 'intermediate',
     readTime: 5,
     summary: "Adding a brand-new, high-speed highway to a congested road network can counter-intuitively increase travel times for every single commuter. Explore the network routing paradox that plagues traffic engineers, power grids, and internet protocols.",
-    interactiveType: null,
+    interactiveType: 'BraessParadox',
     content: `## The German Mathematician of 1968
 
 In 1968, German mathematician Dietrich Braess was modeling transportation flow through road networks at the Ruhr University Bochum. He made an astonishing discovery that baffled urban planners:
