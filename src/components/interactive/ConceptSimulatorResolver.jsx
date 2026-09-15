@@ -20,6 +20,7 @@ const ConwaysGameOfLife3DLab = dynamic(() => import('@/components/3d/ConwaysGame
 const ChineseRoom3DLab = dynamic(() => import('@/components/3d/ChineseRoom3DLab'), { ssr: false });
 const RedQueen3DLab = dynamic(() => import('@/components/3d/RedQueen3DLab'), { ssr: false });
 const PrisonersDilemma3DLab = dynamic(() => import('@/components/3d/PrisonersDilemma3DLab'), { ssr: false });
+const TragedyOfCommons3DLab = dynamic(() => import('@/components/3d/TragedyOfCommons3DLab'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type }) {
   switch (type) {
@@ -59,6 +60,8 @@ export default function ConceptSimulatorResolver({ type }) {
       return <RedQueen3DLab />;
     case 'PrisonersDilemma':
       return <PrisonersDilemma3DLab />;
+    case 'TragedyOfCommons':
+      return <TragedyOfCommons3DLab />;
     default:
       return null;
   }

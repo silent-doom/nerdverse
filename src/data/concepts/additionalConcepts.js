@@ -908,7 +908,7 @@ In a state of nature without governance, rational self-interest descends into a 
     difficulty: 'intermediate',
     readTime: 6,
     summary: "When rational individuals acting freely within a shared, open-access resource inevitably deplete and destroy the very foundation of their livelihoods. Explore Garrett Hardin's 1968 paper, Elinor Ostrom's Nobel Prize-winning governance principles, and the global environmental crisis.",
-    interactiveType: null,
+    interactiveType: 'TragedyOfCommons',
     content: `## The English Pasture of 1968
 
 In December 1968, ecologist Garrett Hardin published an essay in *Science* titled *The Tragedy of the Commons*, capturing an existential pathology of collective human civilization.
