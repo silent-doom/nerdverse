@@ -1069,7 +1069,7 @@ To maximize net mobility and minimize wasted human hours, urban design must move
     difficulty: 'intermediate',
     readTime: 6,
     summary: "Why must organisms run as fast as they can just to stay in the same place? Discover Leigh Van Valen's 1973 evolutionary paradox explaining the necessity of sexual reproduction, parasite-host arms races, and the ceaseless struggle for survival.",
-    interactiveType: null,
+    interactiveType: 'RedQueen',
     content: `## The Chessboard of Oxford, 1871
 
 In Lewis Carroll's 1871 masterpiece *Through the Looking-Glass*, Alice takes the hand of the Red Queen and begins sprinting frantically across the landscape. Trees, hills, and brooks blur past at astonishing speeds.

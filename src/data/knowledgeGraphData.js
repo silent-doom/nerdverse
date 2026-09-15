@@ -444,7 +444,7 @@ export const GRAPH_NODES = [
     readTime: 6,
     coords: [-20, -6, -22],
     importance: 2.1,
-    hasInteractiveLab: false,
+    hasInteractiveLab: true,
     interactivePath: '/concepts/red-queen-hypothesis',
     citationsScore: 95,
     epistemicUtility: 'Evolutionary Adversarial Coadaptation',
