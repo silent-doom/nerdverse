@@ -311,6 +311,13 @@ export default function ConwaysGameOfLife3DLab() {
     }
   }, []);
 
+  // Sync step and toggle callbacks to refs for Three.js event listeners & loop
+  const stepGenerationRef = useRef(stepGeneration);
+  stepGenerationRef.current = stepGeneration;
+  const toggleCellRef = useRef(toggleCell);
+  toggleCellRef.current = toggleCell;
+  const hoveredCellRef = useRef(null);
+
   // ── Three.js Scene Setup ──
   useEffect(() => {
     const mount = mountRef.current;
@@ -336,7 +343,7 @@ export default function ConwaysGameOfLife3DLab() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
-    renderer.shadowMap.enabled = true;
+    if (renderer.shadowMap) renderer.shadowMap.enabled = true;
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -379,7 +386,6 @@ export default function ConwaysGameOfLife3DLab() {
 
     // 5. Instanced Mesh for Live Cells
     const cellGeo = new THREE.BoxGeometry(0.78, 0.72, 0.78);
-    // Add bevel or bevel-like edges via material
     const cellMat = new THREE.MeshStandardMaterial({
       roughness: 0.25,
       metalness: 0.35,
@@ -408,7 +414,7 @@ export default function ConwaysGameOfLife3DLab() {
     const starsMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.12, transparent: true, opacity: 0.45 });
     scene.add(new THREE.Points(starsGeo, starsMat));
 
-    // Load initial preset
+    // Load initial preset ONLY ONCE on mount
     loadPreset('gliderGun');
 
     // ── Mouse Raycasting for interactive cell toggling ──
@@ -421,7 +427,6 @@ export default function ConwaysGameOfLife3DLab() {
       const intersects = raycasterRef.current.intersectObject(floorMesh);
       if (intersects.length > 0) {
         const pt = intersects[0].point;
-        // Map world coordinates to grid indices
         const step = 0.9;
         const half = (GRID_SIZE * step) / 2;
         const gx = Math.floor((pt.x + half) / step);
@@ -439,13 +444,16 @@ export default function ConwaysGameOfLife3DLab() {
             }
           }
           const isAlive = current[gy][gx] === 1;
-          setHoveredCell({ x: gx, y: gy, isAlive, liveNeighbors });
+          const info = { x: gx, y: gy, isAlive, liveNeighbors };
+          hoveredCellRef.current = info;
+          setHoveredCell(info);
 
-          if (isMouseDownRef.current) {
-            toggleCell(gx, gy);
+          if (isMouseDownRef.current && toggleCellRef.current) {
+            toggleCellRef.current(gx, gy);
           }
         }
       } else {
+        hoveredCellRef.current = null;
         setHoveredCell(null);
       }
     };
@@ -453,8 +461,8 @@ export default function ConwaysGameOfLife3DLab() {
     const handlePointerDown = (e) => {
       if (e.button !== 0) return; // only left click
       isMouseDownRef.current = true;
-      if (hoveredCell) {
-        toggleCell(hoveredCell.x, hoveredCell.y);
+      if (hoveredCellRef.current && toggleCellRef.current) {
+        toggleCellRef.current(hoveredCellRef.current.x, hoveredCellRef.current.y);
       }
     };
 
@@ -489,7 +497,7 @@ export default function ConwaysGameOfLife3DLab() {
       // Simulation stepping
       const interval = 1000 / (simSpeedRef.current || 12);
       if (isPlayingRef.current && time - lastSimTime > interval) {
-        stepGeneration();
+        if (stepGenerationRef.current) stepGenerationRef.current();
         lastSimTime = time;
       }
 
@@ -512,18 +520,16 @@ export default function ConwaysGameOfLife3DLab() {
               dummy.position.set(wx, 0.36, wz);
               dummy.scale.set(1, 1, 1);
 
-              // Color gradient based on age
               if (age === 0) {
-                color.setHex(0x38bdf8); // Newborn: Electric Cyan
+                color.setHex(0x38bdf8); // Newborn: Cyan
               } else if (age < 4) {
-                color.setHex(0x10b981); // Youth: Emerald Green
+                color.setHex(0x10b981); // Youth: Green
               } else if (age < 9) {
                 color.setHex(0xa855f7); // Mature: Violet
               } else {
                 color.setHex(0xf59e0b); // Elder: Amber Gold
               }
             } else {
-              // Hide dead cell
               dummy.position.set(wx, -5, wz);
               dummy.scale.set(0, 0, 0);
               color.setHex(0x000000);
@@ -570,7 +576,7 @@ export default function ConwaysGameOfLife3DLab() {
         mount.removeChild(renderer.domElement);
       }
     };
-  }, [loadPreset, stepGeneration, toggleCell, hoveredCell]);
+  }, []);
 
   return (
     <div
