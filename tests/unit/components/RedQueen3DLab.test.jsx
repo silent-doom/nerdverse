@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import RedQueen3DLab from '@/components/3d/RedQueen3DLab';
 
 vi.mock('three', async (importOriginal) => {
@@ -19,6 +19,20 @@ vi.mock('three', async (importOriginal) => {
   };
 });
 
+vi.mock('three/examples/jsm/loaders/GLTFLoader.js', async () => {
+  const THREE = await import('three');
+  return {
+    GLTFLoader: class {
+      load(url, onLoad) {
+        if (typeof onLoad === 'function') {
+          const mockScene = new THREE.Group();
+          onLoad({ scene: mockScene });
+        }
+      }
+    },
+  };
+});
+
 vi.mock('@/lib/supabase/conceptRuns', () => ({
   recordConceptRun: vi.fn().mockResolvedValue({ id: 'test-bio-run-id' }),
 }));
@@ -34,65 +48,92 @@ describe('RedQueen3DLab', () => {
     });
   });
 
-  it('renders Red Queen 3D Lab with title and key telemetry metrics', () => {
+  it('renders Red Queen 3D Lab with title, quote, and key telemetry metrics', () => {
     render(<RedQueen3DLab />);
 
     expect(screen.getByTestId('red-queen-3d-lab')).toBeInTheDocument();
     expect(screen.getByText(/The Red Queen Hypothesis/i)).toBeInTheDocument();
-    expect(screen.getByText(/Infection Threat/i)).toBeInTheDocument();
-    expect(screen.getByText(/Immune Diversity Index/i)).toBeInTheDocument();
+    expect(screen.getByText(/takes all the running you can do/i)).toBeInTheDocument();
+    expect(screen.getByText(/Leopard Speed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Gazelle Agility/i)).toBeInTheDocument();
+    expect(screen.getByText(/Relative Gap \(Δx\)/i)).toBeInTheDocument();
     expect(screen.getByText(/Relative Velocity \(Δv\)/i)).toBeInTheDocument();
   });
 
-  it('switches between experimental tabs', () => {
+  it('switches camera presets and environment themes', () => {
     render(<RedQueen3DLab />);
 
-    // Default tab 1: Host-Parasite Arms Race
-    expect(screen.getByText(/Host Immune Mutation Rate/i)).toBeInTheDocument();
-    expect(screen.getByText(/Parasite Virulence & Adaptation/i)).toBeInTheDocument();
+    // Camera preset buttons
+    const predatorPovBtn = screen.getByRole('button', { name: /Leopard POV/i });
+    fireEvent.click(predatorPovBtn);
+    expect(predatorPovBtn.className).toMatch(/viewBtnActive/);
 
-    // Switch to tab 2: The Mystery of Sex
-    const sexTab = screen.getByRole('tab', { name: /2\. The Mystery of Sex/i });
-    fireEvent.click(sexTab);
-    expect(screen.getByText(/Select Reproduction Strategy/i)).toBeInTheDocument();
-    expect(screen.getByText(/Asexual Clones \(2× Reproduction\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Sexual Recombination \(Diversity\)/i)).toBeInTheDocument();
+    const preyPovBtn = screen.getByRole('button', { name: /Gazelle Rearview/i });
+    fireEvent.click(preyPovBtn);
+    expect(preyPovBtn.className).toMatch(/viewBtnActive/);
 
-    // Switch to tab 3: Cheetah vs Gazelle Locomotion
-    const cheetahTab = screen.getByRole('tab', { name: /3\. Cheetah vs Gazelle Locomotion/i });
-    fireEvent.click(cheetahTab);
-    expect(screen.getByText(/Cheetah Acceleration/i)).toBeInTheDocument();
-    expect(screen.getByText(/Gazelle Evasion Agility/i)).toBeInTheDocument();
+    // Environment stage theme buttons
+    const chessboardBtn = screen.getByRole('button', { name: /Looking-Glass Chessboard/i });
+    fireEvent.click(chessboardBtn);
+    expect(chessboardBtn.className).toMatch(/viewBtnActive/);
+
+    const savannahBtn = screen.getByRole('button', { name: /Serengeti Plains/i });
+    fireEvent.click(savannahBtn);
+    expect(savannahBtn.className).toMatch(/viewBtnActive/);
   });
 
-  it('adjusts host mutation slider in Tab 1', () => {
+  it('adjusts predator and prey speed sliders in Tab 1', () => {
     render(<RedQueen3DLab />);
 
+    const predSlider = screen.getByLabelText(/Predator Speed/i);
+    fireEvent.change(predSlider, { target: { value: '95' } });
+    expect(screen.getByText(/Cheetah Acceleration: 95 km\/h/i)).toBeInTheDocument();
+
+    const preySlider = screen.getByLabelText(/Prey Agility/i);
+    fireEvent.change(preySlider, { target: { value: '100' } });
+    expect(screen.getByText(/Gazelle Evasion Agility: 100 km\/h/i)).toBeInTheDocument();
+  });
+
+  it('switches to Host-Parasite tab and adjusts host mutation rate', () => {
+    render(<RedQueen3DLab />);
+
+    const hostTab = screen.getByRole('tab', { name: /Host-Parasite Arms Race/i });
+    fireEvent.click(hostTab);
+
+    expect(screen.getByText(/Host Immune Mutation Rate/i)).toBeInTheDocument();
     const slider = screen.getByLabelText(/Host Mutation Rate/i);
     fireEvent.change(slider, { target: { value: '90' } });
     expect(screen.getByText(/90% Speed/i)).toBeInTheDocument();
   });
 
-  it('toggles asexual vs sexual reproduction and updates parasite vulnerability', () => {
+  it('switches to The Mystery of Sex tab and toggles reproduction strategy', () => {
     render(<RedQueen3DLab />);
 
-    const sexTab = screen.getByRole('tab', { name: /2\. The Mystery of Sex/i });
+    const sexTab = screen.getByRole('tab', { name: /The Mystery of Sex/i });
     fireEvent.click(sexTab);
 
-    // Switch to Asexual
+    expect(screen.getByText(/Select Reproduction Strategy/i)).toBeInTheDocument();
     const asexualOption = screen.getByText(/Asexual Clones \(2× Reproduction\)/i);
     fireEvent.click(asexualOption);
     expect(screen.getByText(/92% Vulnerable/i)).toBeInTheDocument();
   });
 
-  it('triggers manual generational mutation pulse and records run', async () => {
+  it('triggers mutation surges, extinction test, and records evolutionary telemetry', async () => {
     render(<RedQueen3DLab />);
 
+    // Leopard mutation surge button
+    const surgeBtn = screen.getByRole('button', { name: /Leopard Mutation/i });
+    fireEvent.click(surgeBtn);
+
+    // Advance generation
     const stepBtn = screen.getByRole('button', { name: /Advance Generation/i });
     fireEvent.click(stepBtn);
     expect(screen.getByText(/Gen #2/i)).toBeInTheDocument();
 
+    // Record Telemetry
     const recordBtn = screen.getByRole('button', { name: /Record Evolutionary Telemetry/i });
-    fireEvent.click(recordBtn);
+    await act(async () => {
+      fireEvent.click(recordBtn);
+    });
   });
 });
