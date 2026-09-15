@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
 import { CATEGORIES } from '@/lib/constants/categories';
-import { getFeaturedConcepts } from '@/data/concepts';
+import { getFeaturedConcepts, getAllPublishedConcepts } from '@/data/concepts';
 import Card from '@/components/ui/Card/Card';
 import Badge from '@/components/ui/Badge/Badge';
 import Button from '@/components/ui/Button/Button';
@@ -13,6 +13,7 @@ import SolarSystemHeroCanvas from '@/components/3d/SolarSystemHeroCanvas';
 
 export default function HomePage() {
   const featured = getFeaturedConcepts();
+  const allPublished = getAllPublishedConcepts();
   const [isTextDimmed, setIsTextDimmed] = useState(false);
 
   return (
@@ -59,8 +60,8 @@ export default function HomePage() {
 
           <div className={styles.heroStats}>
             <div className={styles.stat}>
-              <span className={styles.statNumber}>5+</span>
-              <span className={styles.statLabel}>Playgrounds</span>
+              <span className={styles.statNumber}>{allPublished.length}</span>
+              <span className={styles.statLabel}>Interactive Labs</span>
             </div>
             <div className={styles.statDivider} />
             <div className={styles.stat}>

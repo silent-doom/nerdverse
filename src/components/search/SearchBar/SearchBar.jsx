@@ -2,8 +2,10 @@
 
 import React from 'react';
 import Icon from '@/components/common/Icon';
+import { getAllPublishedConcepts } from '@/data/concepts';
 
-export default function SearchBar({ onOpen, placeholder = 'Search all 19 concepts (⌘K)...' }) {
+export default function SearchBar({ onOpen, placeholder }) {
+  const displayPlaceholder = placeholder || `Search all ${getAllPublishedConcepts().length} concepts (⌘K)...`;
   return (
     <button
       type="button"
@@ -28,7 +30,7 @@ export default function SearchBar({ onOpen, placeholder = 'Search all 19 concept
     >
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
         <Icon name="search" size={15} color="#38bdf8" />
-        <span>{placeholder}</span>
+        <span>{displayPlaceholder}</span>
       </span>
       <kbd
         style={{

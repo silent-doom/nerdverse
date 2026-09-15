@@ -116,7 +116,7 @@ export default function SearchModal({ isOpen, onClose }) {
             ref={inputRef}
             type="text"
             className={styles.input}
-            placeholder="Search all 19 concepts, thought experiments, or paradoxes..."
+            placeholder={`Search all ${allConcepts.length} concepts, thought experiments, or paradoxes...`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search input"

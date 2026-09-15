@@ -30,12 +30,12 @@ describe('SearchModal', () => {
   it('renders search modal when isOpen is true', () => {
     render(<SearchModal isOpen={true} onClose={vi.fn()} />);
     expect(screen.getByTestId('search-modal')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Search all 19 concepts/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Search all.*concepts/i)).toBeInTheDocument();
   });
 
   it('filters concepts when search text is typed', () => {
     render(<SearchModal isOpen={true} onClose={vi.fn()} />);
-    const input = screen.getByPlaceholderText(/Search all 19 concepts/i);
+    const input = screen.getByPlaceholderText(/Search all.*concepts/i);
     
     // Type "demon"
     fireEvent.change(input, { target: { value: 'demon' } });
@@ -65,7 +65,7 @@ describe('SearchModal', () => {
   it('navigates when clicking a search result', () => {
     const onCloseMock = vi.fn();
     render(<SearchModal isOpen={true} onClose={onCloseMock} />);
-    const input = screen.getByPlaceholderText(/Search all 19 concepts/i);
+    const input = screen.getByPlaceholderText(/Search all.*concepts/i);
     fireEvent.change(input, { target: { value: 'Theseus' } });
 
     const item = screen.getByText('Ship of Theseus');
@@ -77,7 +77,7 @@ describe('SearchModal', () => {
 
   it('shows empty state when no concept matches query', () => {
     render(<SearchModal isOpen={true} onClose={vi.fn()} />);
-    const input = screen.getByPlaceholderText(/Search all 19 concepts/i);
+    const input = screen.getByPlaceholderText(/Search all.*concepts/i);
     fireEvent.change(input, { target: { value: 'xyzrandomnotfound999' } });
 
     expect(screen.getByText('No concepts found')).toBeInTheDocument();

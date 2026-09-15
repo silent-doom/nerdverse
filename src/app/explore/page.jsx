@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Icon from '@/components/common/Icon';
 import styles from './ExploreGraph.module.css';
+import { getAllPublishedConcepts } from '@/data/concepts';
 
 const KnowledgeGraph3D = dynamic(() => import('@/components/3d/KnowledgeGraph3D'), {
   ssr: false,
@@ -16,6 +17,8 @@ const KnowledgeGraph3D = dynamic(() => import('@/components/3d/KnowledgeGraph3D'
 });
 
 export default function ExplorePage() {
+  const publishedCount = getAllPublishedConcepts().length;
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -32,7 +35,7 @@ export default function ExplorePage() {
         <div className={styles.featuresStrip}>
           <Link href="/concepts" className={styles.catalogLinkPill}>
             <Icon name="layers" size={13} color="#38bdf8" />
-            <span>Browse Full Concepts Catalog (19 Ideas) →</span>
+            <span>Browse Full Concepts Catalog ({publishedCount} Concepts) →</span>
           </Link>
           <div className={styles.featurePill}>
             <Icon name="atom" size={13} color="#38bdf8" />
