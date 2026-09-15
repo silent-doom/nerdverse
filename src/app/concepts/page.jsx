@@ -85,7 +85,7 @@ export default async function ConceptsPage({ searchParams }) {
             </div>
             <span className={styles.chipCount}>{allPublished.length}</span>
           </Link>
-          {CATEGORIES.filter((cat) => (categoryCounts[cat.id] || 0) > 0).map((cat) => {
+          {CATEGORIES.map((cat) => {
             const count = categoryCounts[cat.id] || 0;
             const isActive = activeCategory === cat.id;
 

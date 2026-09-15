@@ -151,7 +151,7 @@ export default function SearchModal({ isOpen, onClose }) {
           >
             All Disciplines ({allConcepts.length})
           </button>
-          {CATEGORIES.filter((cat) => cat.id !== 'biology').map((cat) => {
+          {CATEGORIES.map((cat) => {
             const count = allConcepts.filter((c) => c.category === cat.id).length;
             const isActive = activeCategory === cat.id;
             return (

@@ -1,0 +1,432 @@
+.labContainer {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg-primary, #08090c);
+  border: 1px solid var(--color-border-default, #21232c);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text-primary, #f9fafb);
+  user-select: none;
+  margin-bottom: var(--space-8, 32px);
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(520px, 64vh, 680px);
+  cursor: grab;
+  background: radial-gradient(circle at 50% 30%, #17131e 0%, #08070d 100%);
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* ── Top Floating Header ── */
+.topHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitleBox {
+  background: rgba(15, 12, 20, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #2a2438);
+  border-radius: 8px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.labBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #f59e0b;
+  margin-bottom: 2px;
+}
+
+.labTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-primary, #f9fafb);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.statsCluster {
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  background: rgba(15, 12, 20, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-default, #2a2438);
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.statLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary, #94a3b8);
+  margin-bottom: 2px;
+}
+
+.statValue {
+  font-size: 16px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #f9fafb;
+}
+
+.statValueGold {
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+.statValueRed {
+  color: #f87171;
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.4);
+}
+
+.statValueCyan {
+  color: #38bdf8;
+}
+
+/* Floating Overlays */
+.perspectiveBadge {
+  position: absolute;
+  top: 76px;
+  left: 16px;
+  z-index: 10;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.pipelineHUD {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+  background: rgba(15, 12, 22, 0.94);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.pipelineStepInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pipelineStepTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pipelineStepDesc {
+  font-size: 12px;
+  color: #cbd5e1;
+  max-width: 540px;
+  line-height: 1.4;
+}
+
+/* ── Primary Control Deck ── */
+.controlDeck {
+  background: var(--color-bg-secondary, #0d0b13);
+  border-top: 1px solid var(--color-border-default, #261f33);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Tabs Row */
+.tabsRow {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border-default, #261f33);
+  padding-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabsRow::-webkit-scrollbar {
+  display: none;
+}
+
+.tabBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-secondary, #94a3b8);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tabBtn:hover {
+  color: #f9fafb;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tabBtnActive {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+/* Controls Grid */
+.controlsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.controlCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border-default, #261f33);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary, #f9fafb);
+}
+
+.cardSubtitle {
+  font-size: 11px;
+  color: var(--color-text-secondary, #94a3b8);
+  font-weight: 400;
+}
+
+/* Query Selection Buttons */
+.queryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.queryBtn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border-default, #261f33);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.queryBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: #fbbf24;
+  color: #ffffff;
+}
+
+.queryBtnActive {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+}
+
+.queryText {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.queryTranslation {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Action Buttons */
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: #0b0910;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  transition: all 0.2s ease;
+}
+
+.primaryBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border-default, #261f33);
+  color: #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #64748b;
+  color: #ffffff;
+}
+
+/* Dilemma Voting Grid */
+.pollGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.pollCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border-default, #261f33);
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pollCard:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: #fbbf24;
+}
+
+.pollCardSelected {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.pollTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.pollDesc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.pollPct {
+  font-size: 16px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #fbbf24;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .canvasWrapper {
+    height: 440px;
+  }
+  .controlsGrid {
+    grid-template-columns: 1fr;
+  }
+  .pollGrid {
+    grid-template-columns: 1fr;
+  }
+  .topHeader {
+    flex-direction: column;
+  }
+}

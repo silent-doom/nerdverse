@@ -295,7 +295,7 @@ export const GRAPH_NODES = [
     readTime: 6,
     coords: [0, 22, 8],
     importance: 1.9,
-    hasInteractiveLab: false,
+    hasInteractiveLab: true,
     interactivePath: '/concepts/chinese-room',
     citationsScore: 93,
     epistemicUtility: 'Syntax vs Semantics Disentanglement',
@@ -333,7 +333,7 @@ export const GRAPH_NODES = [
     readTime: 6,
     coords: [-4, 20, 14],
     importance: 1.8,
-    hasInteractiveLab: false,
+    hasInteractiveLab: true,
     interactivePath: '/concepts/conways-game-of-life',
     citationsScore: 95,
     epistemicUtility: 'Emergent Complexity Synthesis',
@@ -433,9 +433,50 @@ export const GRAPH_NODES = [
     paradoxCore: 'The deafening silence of the cosmos implies either extreme cosmic solitude (The Great Filter) or profound unseen cosmological constraints.',
     crossDomainBridge: 'Bridges Astrophysics to Evolutionary Biology, Artificial Intelligence Existential Risk, and anthropic reasoning.',
   },
+  {
+    id: 'red-queen-hypothesis',
+    slug: 'red-queen-hypothesis',
+    title: 'The Red Queen Hypothesis',
+    domain: 'biology',
+    domainName: 'Biology & Complexity',
+    year: '1973',
+    difficulty: 'intermediate',
+    readTime: 6,
+    coords: [-20, -6, -22],
+    importance: 2.1,
+    hasInteractiveLab: false,
+    interactivePath: '/concepts/red-queen-hypothesis',
+    citationsScore: 95,
+    epistemicUtility: 'Evolutionary Adversarial Coadaptation',
+    summary: 'Organisms must constantly run, evolve, and adapt at maximum speed merely to maintain their existing fitness equilibrium against evolving parasites and predators.',
+    paradoxCore: 'Ceaseless adaptation produces zero net absolute fitness gain; extinction probability remains strictly invariant across geological time.',
+    crossDomainBridge: 'Directly bridges Evolutionary Biology to Game Theory (Prisoner Dilemma arms races), Cybernetic Automata, and Artificial Intelligence security.',
+  },
 ];
 
 export const GRAPH_LINKS = [
+  // ── Biology & Evolution Connections ──
+  {
+    source: 'red-queen-hypothesis',
+    target: 'prisoners-dilemma',
+    weight: 0.92,
+    label: 'Coevolutionary Arms Race',
+    rationale: 'Predator-prey and host-parasite coevolution mirrors an iterated Prisoner Dilemma where both sides continually invest resources to maintain equilibrium.',
+  },
+  {
+    source: 'red-queen-hypothesis',
+    target: 'conways-game-of-life',
+    weight: 0.85,
+    label: 'Emergent Evolutionary Dynamics',
+    rationale: 'Both systems demonstrate that complex macroscopic survival patterns and arms races emerge from simple deterministic local rules.',
+  },
+  {
+    source: 'red-queen-hypothesis',
+    target: 'fermi-paradox',
+    weight: 0.81,
+    label: 'The Great Filter Hazard',
+    rationale: 'Constant pathogen coevolution presents a severe continuous extinction hazard for developing planetary civilizations.',
+  },
   // ── Math & Probability Connections ──
   {
     source: 'monty-hall',
