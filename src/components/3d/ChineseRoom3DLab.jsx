@@ -431,7 +431,7 @@ export default function ChineseRoom3DLab() {
         <div className={styles.perspectiveBadge}>
           <Icon name="eye" size={13} />
           {perspective === 'inside'
-            ? 'Operator Perspective: Pure Syntax ($S_1 \\to S_2$)'
+            ? 'Operator Perspective: Pure Syntax (S₁ → S₂)'
             : perspective === 'outside'
             ? 'External Evaluator: Apparent Semantics (Fluency)'
             : 'The Systems Reply: Integrated Architecture'}

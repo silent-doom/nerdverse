@@ -959,7 +959,7 @@ export default function HaltingProblem3DLab() {
             >
               <div style={{ fontSize: '13px', color: '#cbd5e1' }}>
                 <strong style={{ color: '#fbbf24' }}>⚡ Alan Turing&apos;s 1936 Thought Experiment:</strong>
-                {' '}Can a general machine $H$ read any program tape and predict whether it halts or loops forever?
+                {' '}Can a general machine H read any program tape and predict whether it halts or loops forever?
               </div>
               <button
                 type="button"
@@ -1141,7 +1141,7 @@ export default function HaltingProblem3DLab() {
                 </div>
 
                 <div style={{ marginTop: '12px', fontSize: '12px', color: '#94a3b8' }}>
-                  <strong>Conclusion:</strong> The assumption that a universal halting analyzer can exist leads to mathematical contradiction ($H(g, g) \neq g(g)$). Thus, the Halting Problem is fundamentally <strong>undecidable</strong>.
+                  <strong>Conclusion:</strong> The assumption that a universal halting analyzer can exist leads to mathematical contradiction (H(g, g) ≠ g(g)). Thus, the Halting Problem is fundamentally <strong>undecidable</strong>.
                 </div>
               </div>
 
