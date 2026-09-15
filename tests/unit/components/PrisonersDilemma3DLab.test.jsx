@@ -19,6 +19,20 @@ vi.mock('three', async (importOriginal) => {
   };
 });
 
+vi.mock('three/examples/jsm/loaders/GLTFLoader.js', async () => {
+  const THREE = await import('three');
+  return {
+    GLTFLoader: class {
+      load(url, onLoad) {
+        if (typeof onLoad === 'function') {
+          const mockScene = new THREE.Group();
+          onLoad({ scene: mockScene });
+        }
+      }
+    },
+  };
+});
+
 vi.mock('@/lib/supabase/conceptRuns', () => ({
   recordConceptRun: vi.fn().mockResolvedValue({ id: 'test-dilemma-run-id' }),
 }));
