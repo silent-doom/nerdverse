@@ -829,7 +829,7 @@ From an ethical and utilitarian standpoint, the answer to Searle's riddle dictat
     difficulty: 'beginner',
     readTime: 6,
     summary: "When two rational individuals acting strictly in their own self-interest produce an outcome disastrous for both. The foundational matrix of game theory that explains nuclear arms races, corporate price wars, and evolutionary altruism.",
-    interactiveType: null,
+    interactiveType: 'PrisonersDilemma',
     content: `## The RAND Corporation Basement of 1950
 
 In 1950, at the height of Cold War nuclear tensions, two mathematicians at the RAND Corporation in Santa Monica—Merrill Flood and Melvin Dresher—were testing game theory algorithms designed to analyze nuclear strategy between the United States and the Soviet Union.
