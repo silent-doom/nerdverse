@@ -6,6 +6,62 @@ import styles from './HaltingProblem3DLab.module.css';
 import Icon from '@/components/common/Icon';
 import { recordConceptRun } from '@/lib/supabase/conceptRuns';
 
+// Audio Synthesizer for Authentic Mechanical Turing Machine
+function playTuringSound(type = 'step', freq = 320) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    if (type === 'stamp') {
+      // Typewriter hammer punch
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.06);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.06);
+    } else if (type === 'bell') {
+      // Vintage carriage bell on HALT
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1318.5, ctx.currentTime); // E6
+      gain.gain.setValueAtTime(0.22, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } else if (type === 'chatter') {
+      // Paradox relay chatter
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    } else {
+      // Ratchet stepper click
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(420, ctx.currentTime);
+      gain.gain.setValueAtTime(0.07, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.035);
+    }
+  } catch {
+    // Audio context may require user gesture
+  }
+}
+
 // Pre-programmed Turing Machine Transition Tables
 const PROGRAMS = {
   binaryIncrement: {
@@ -96,6 +152,7 @@ export default function HaltingProblem3DLab() {
   const [oraclePrediction, setOraclePrediction] = useState('HALTS'); // 'HALTS' | 'LOOPS'
   const [inverterActive, setInverterActive] = useState(true);
   const [isParadoxOverload, setIsParadoxOverload] = useState(true);
+  const [activeHypothesis, setActiveHypothesis] = useState('hypothesisA'); // 'hypothesisA' | 'hypothesisB'
 
   // ── Mode 3: Busy Beaver States ──
   const [busyBeaverN, setBusyBeaverN] = useState(3);
@@ -110,6 +167,9 @@ export default function HaltingProblem3DLab() {
   const isParadoxRef = useRef(isParadoxOverload);
   const oraclePredRef = useRef(oraclePrediction);
   const inverterActiveRef = useRef(inverterActive);
+  const headPosRef = useRef(headPos);
+  const stateRef = useRef(state);
+  const tapeRef = useRef(tape);
 
   useEffect(() => { modeRef.current = activeMode; }, [activeMode]);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
@@ -118,22 +178,24 @@ export default function HaltingProblem3DLab() {
   useEffect(() => { isParadoxRef.current = isParadoxOverload; }, [isParadoxOverload]);
   useEffect(() => { oraclePredRef.current = oraclePrediction; }, [oraclePrediction]);
   useEffect(() => { inverterActiveRef.current = inverterActive; }, [inverterActive]);
+  useEffect(() => { headPosRef.current = headPos; }, [headPos]);
+  useEffect(() => { stateRef.current = state; }, [state]);
+  useEffect(() => { tapeRef.current = tape; }, [tape]);
 
   // Three.js object references
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
-  const flywheelRef = useRef(null);
-  const gearMainRef = useRef(null);
-  const gearInverterRef = useRef(null);
-  const brakeClampRef = useRef(null);
-  const scannerLaserRef = useRef(null);
-  const holographicCoreRef = useRef(null);
+  const carriageGroupRef = useRef(null);
+  const stampHeadRef = useRef(null);
+  const stateDrumRef = useRef(null);
+  const tapeCellsGroupRef = useRef(null);
+  const leftSpoolRef = useRef(null);
+  const rightSpoolRef = useRef(null);
   const greenBulbRef = useRef(null);
   const redBulbRef = useRef(null);
-  const sparkParticlesRef = useRef(null);
-  const greenLightRef = useRef(null);
-  const redLightRef = useRef(null);
+  const paradoxArcRef = useRef(null);
+  const rockerArmRef = useRef(null);
 
   // Select Program
   const handleSelectProgram = useCallback((progKey) => {
@@ -151,9 +213,10 @@ export default function HaltingProblem3DLab() {
       setInverterActive(true);
     } else {
       setIsParadoxOverload(false);
-      setIsHalted(prog.guaranteedHalt);
+      setIsHalted(false);
       setOraclePrediction(prog.predictedOutcome);
     }
+    playTuringSound('step');
   }, []);
 
   // Single Step Execution
@@ -163,6 +226,7 @@ export default function HaltingProblem3DLab() {
     if (selectedProgram === 'oppositeParadox') {
       setIsParadoxOverload((prev) => !prev);
       setStepCount((prev) => prev + 1);
+      playTuringSound('chatter', Math.random() > 0.5 ? 400 : 280);
       return;
     }
 
@@ -181,6 +245,7 @@ export default function HaltingProblem3DLab() {
         setState('qHalt');
       }
       setStepCount((prev) => prev + 1);
+      playTuringSound('bell');
       return;
     }
 
@@ -200,12 +265,15 @@ export default function HaltingProblem3DLab() {
     setHeadPos(nextHead);
     setState(rule.next);
     setStepCount((prev) => prev + 1);
+
+    // Mechanical audio
+    playTuringSound('stamp');
   }, [isHalted, selectedProgram, tape, headPos, state]);
 
   // Autoplay ticker
   useEffect(() => {
     if (!isPlaying || isHalted) return;
-    const intervalTime = Math.max(160, 600 / speedMultiplier);
+    const intervalTime = Math.max(160, 650 / speedMultiplier);
     const timer = setInterval(() => {
       handleStep();
     }, intervalTime);
@@ -215,19 +283,129 @@ export default function HaltingProblem3DLab() {
   // Trigger Oracle Scan Analysis
   const handleRunAnalysis = () => {
     setIsAnalyzing(true);
+    playTuringSound('step', 500);
 
     setTimeout(() => {
       if (selectedProgram === 'oppositeParadox') {
         setIsParadoxOverload(true);
+        playTuringSound('chatter', 350);
       } else {
         setIsParadoxOverload(false);
         setOraclePrediction(PROGRAMS[selectedProgram].predictedOutcome);
+        playTuringSound('step', 600);
       }
       setIsAnalyzing(false);
-    }, 900);
+    }, 850);
   };
 
-  // ── Three.js Simulation Setup ──
+  // ── Helper to build 3D Tape Cells with visible printed symbols ──
+  const updateTapeCellsIn3D = useCallback((scene, tapeData, activeHead) => {
+    if (!tapeCellsGroupRef.current) return;
+    const group = tapeCellsGroupRef.current;
+
+    // Remove existing cell meshes
+    while (group.children.length > 0) {
+      const child = group.children[0];
+      group.remove(child);
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) {
+        if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+        else child.material.dispose();
+      }
+    }
+
+    const cellWidth = 0.82;
+    const totalCells = tapeData.length;
+    const tapeLength = Math.max(8, totalCells * cellWidth + 1.2);
+
+    // 1. Continuous Paper Ribbon
+    const paperMat = new THREE.MeshStandardMaterial({
+      color: 0xfbf7eb,
+      roughness: 0.8,
+      metalness: 0.05,
+    });
+    const ribbonGeo = new THREE.BoxGeometry(tapeLength, 0.02, 0.68);
+    const ribbon = new THREE.Mesh(ribbonGeo, paperMat);
+    ribbon.position.set(0, 0.51, 0);
+    ribbon.receiveShadow = true;
+    group.add(ribbon);
+
+    // 2. Individual cells with printed border and 3D symbol marker
+    const startX = -((totalCells - 1) * cellWidth) / 2;
+
+    tapeData.forEach((sym, idx) => {
+      const cellX = startX + idx * cellWidth;
+      const isHead = idx === activeHead;
+
+      // Cell border square
+      const borderGeo = new THREE.BoxGeometry(0.74, 0.025, 0.6);
+      const borderMat = new THREE.MeshStandardMaterial({
+        color: isHead ? 0xf59e0b : 0xe2d9c0,
+        roughness: 0.7,
+        metalness: 0.1,
+      });
+      const borderMesh = new THREE.Mesh(borderGeo, borderMat);
+      borderMesh.position.set(cellX, 0.52, 0);
+      group.add(borderMesh);
+
+      // 3D Symbol Representation
+      // '1' = High-contrast dark brass bar
+      // '0' = Ring torus
+      // 'B' = Subtle blank indentation
+      // 'P' = Paradox diamond
+      if (sym === '1') {
+        const barGeo = new THREE.BoxGeometry(0.12, 0.04, 0.36);
+        const barMat = new THREE.MeshStandardMaterial({
+          color: isHead ? 0x0f172a : 0x1e293b,
+          roughness: 0.3,
+          metalness: 0.8,
+        });
+        const barMesh = new THREE.Mesh(barGeo, barMat);
+        barMesh.position.set(cellX, 0.54, 0);
+        group.add(barMesh);
+      } else if (sym === '0') {
+        const ringGeo = new THREE.TorusGeometry(0.16, 0.04, 8, 20);
+        const ringMat = new THREE.MeshStandardMaterial({
+          color: isHead ? 0x0f172a : 0x475569,
+          roughness: 0.4,
+          metalness: 0.6,
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 2;
+        ringMesh.position.set(cellX, 0.54, 0);
+        group.add(ringMesh);
+      } else if (sym === 'P') {
+        // Paradox Gödel Token
+        const diaGeo = new THREE.ConeGeometry(0.16, 0.22, 4);
+        const diaMat = new THREE.MeshStandardMaterial({
+          color: 0xef4444,
+          emissive: 0xef4444,
+          emissiveIntensity: 0.6,
+          metalness: 0.8,
+        });
+        const diaMesh = new THREE.Mesh(diaGeo, diaMat);
+        diaMesh.rotation.y = Math.PI / 4;
+        diaMesh.position.set(cellX, 0.58, 0);
+        group.add(diaMesh);
+      } else {
+        // Blank cell 'B' dash
+        const dashGeo = new THREE.BoxGeometry(0.2, 0.02, 0.05);
+        const dashMat = new THREE.MeshStandardMaterial({ color: 0xc8bba0, roughness: 0.9 });
+        const dash = new THREE.Mesh(dashGeo, dashMat);
+        dash.position.set(cellX, 0.53, 0);
+        group.add(dash);
+      }
+    });
+  }, []);
+
+  // Update 3D tape when tape state changes
+  useEffect(() => {
+    if (sceneRef.current) {
+      updateTapeCellsIn3D(sceneRef.current, tape, headPos);
+    }
+  }, [tape, headPos, updateTapeCellsIn3D]);
+
+  // ── Three.js Simulation Setup (Realistic 1936 Electro-Mechanical Machine) ──
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
@@ -235,14 +413,14 @@ export default function HaltingProblem3DLab() {
     // 1. Scene & Camera
     const scene = new THREE.Scene();
     sceneRef.current = scene;
-    scene.background = new THREE.Color(0x060810);
-    scene.fog = new THREE.FogExp2(0x060810, 0.012);
+    scene.background = new THREE.Color(0x0a0c14);
+    scene.fog = new THREE.FogExp2(0x0a0c14, 0.015);
 
     const width = mount.clientWidth;
     const height = mount.clientHeight || 580;
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.set(0, 4.2, 8.8);
-    camera.lookAt(0, 0.5, 0);
+    camera.position.set(0, 4.4, 7.8);
+    camera.lookAt(0, 0.6, 0);
     cameraRef.current = camera;
 
     // 2. WebGL Renderer
@@ -250,219 +428,252 @@ export default function HaltingProblem3DLab() {
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.3;
+    if (renderer.shadowMap) renderer.shadowMap.enabled = true;
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // 3. Cinematic Studio Lighting
-    const ambientLight = new THREE.AmbientLight(0x1e293b, 1.4);
+    // ── 3. Realistic Studio & Banker's Lamp Lighting ──
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
     scene.add(ambientLight);
 
-    // Warm Key Light (Golden-Amber Spotlight illuminating brass mechanisms)
-    const keySpot = new THREE.SpotLight(0xf59e0b, 3.8, 25, Math.PI / 3.5, 0.35, 1.1);
-    keySpot.position.set(4.5, 9, 6);
-    keySpot.castShadow = true;
-    scene.add(keySpot);
+    // Warm Banker's Lamp Spotlight (Vintage Emerald Glass Desk Lamp casting a warm cone)
+    const deskLampSpot = new THREE.SpotLight(0xfef08a, 4.2, 14, Math.PI / 3.8, 0.35, 1.1);
+    deskLampSpot.position.set(0, 4.6, 1.8);
+    deskLampSpot.target.position.set(0, 0.5, 0);
+    deskLampSpot.castShadow = true;
+    scene.add(deskLampSpot);
+    scene.add(deskLampSpot.target);
 
-    // Cool Rim Light (Cyan metallic edge definition)
-    const rimSpot = new THREE.SpotLight(0x38bdf8, 2.6, 22, Math.PI / 3, 0.4, 1.2);
-    rimSpot.position.set(-6, 7, -4);
-    scene.add(rimSpot);
+    // Cool Cyan Rim Light (Highlights polished steel guide rails and brass spools)
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.4);
+    rimLight.position.set(-6, 6, -4);
+    scene.add(rimLight);
 
-    // Violet Bottom Glow
-    const baseGlow = new THREE.PointLight(0x6366f1, 1.2, 14);
-    baseGlow.position.set(0, -1, 2);
-    scene.add(baseGlow);
+    const warmFill = new THREE.DirectionalLight(0xf59e0b, 1.0);
+    warmFill.position.set(6, 4, 3);
+    scene.add(warmFill);
 
-    // Dynamic Oracle Indicator Point Lights
-    const greenLight = new THREE.PointLight(0x10b981, 0, 10);
-    greenLight.position.set(-1.8, 2.4, 0);
+    // Dynamic Indicator Lights
+    const greenLight = new THREE.PointLight(0x10b981, 0, 8);
+    greenLight.position.set(-2.2, 2.0, 0.5);
     scene.add(greenLight);
-    greenLightRef.current = greenLight;
 
-    const redLight = new THREE.PointLight(0xef4444, 0, 10);
-    redLight.position.set(1.8, 2.4, 0);
+    const redLight = new THREE.PointLight(0xef4444, 0, 8);
+    redLight.position.set(2.2, 2.0, 0.5);
     scene.add(redLight);
-    redLightRef.current = redLight;
 
-    // 4. Laboratory Pedestal & Grid
-    const grid = new THREE.GridHelper(26, 26, 0x1e293b, 0x0f172a);
-    grid.position.y = -0.01;
-    scene.add(grid);
-
-    // Master Apparatus Base
-    const baseGeo = new THREE.BoxGeometry(6.4, 0.4, 3.4);
-    const baseMat = new THREE.MeshStandardMaterial({
-      color: 0x0c0f17,
-      roughness: 0.35,
-      metalness: 0.9,
+    // ── 4. Polished Walnut / Teak Laboratory Workbench ──
+    const benchGeo = new THREE.BoxGeometry(8.2, 0.4, 4.2);
+    const benchMat = new THREE.MeshStandardMaterial({
+      color: 0x1f1510,
+      roughness: 0.65,
+      metalness: 0.15,
     });
-    const mainChassis = new THREE.Mesh(baseGeo, baseMat);
-    mainChassis.position.set(0, 0.2, 0);
-    scene.add(mainChassis);
+    const bench = new THREE.Mesh(benchGeo, benchMat);
+    bench.position.set(0, 0.2, 0);
+    bench.receiveShadow = true;
+    scene.add(bench);
 
-    // Polished Brass Trim Rails
-    const brassTrimMat = new THREE.MeshStandardMaterial({
-      color: 0xe5a93c,
-      roughness: 0.22,
+    // Cast Iron Chassis Plate
+    const chassisGeo = new THREE.BoxGeometry(7.0, 0.1, 2.8);
+    const chassisMat = new THREE.MeshStandardMaterial({
+      color: 0x111622,
+      roughness: 0.4,
+      metalness: 0.85,
+    });
+    const chassis = new THREE.Mesh(chassisGeo, chassisMat);
+    chassis.position.set(0, 0.45, 0);
+    scene.add(chassis);
+
+    // Solid Brass Materials
+    const brassMat = new THREE.MeshStandardMaterial({
+      color: 0xdfa037,
+      roughness: 0.28,
+      metalness: 0.92,
+    });
+    const steelMat = new THREE.MeshStandardMaterial({
+      color: 0xd1d5db,
+      roughness: 0.2,
       metalness: 0.95,
     });
-    for (const z of [-1.55, 1.55]) {
-      const railGeo = new THREE.CylinderGeometry(0.05, 0.05, 6.4, 16);
-      const rail = new THREE.Mesh(railGeo, brassTrimMat);
+
+    // ── 5. Twin Brass Tape Reels (Feed & Takeup Spools) ──
+    const createSpool = (x) => {
+      const g = new THREE.Group();
+      g.position.set(x, 0.9, 0);
+
+      // Center Spindle
+      const spindle = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.7, 24), steelMat);
+      g.add(spindle);
+
+      // Flange Plates (Top & Bottom Discs)
+      for (const y of [-0.3, 0.3]) {
+        const flange = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.72, 0.04, 32), brassMat);
+        flange.position.y = y;
+        g.add(flange);
+      }
+
+      // Rolled paper ribbon core
+      const rollMat = new THREE.MeshStandardMaterial({ color: 0xf3ede0, roughness: 0.8 });
+      const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.55, 32), rollMat);
+      g.add(roll);
+
+      // Mount bracket
+      const mount = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.6, 0.3), chassisMat);
+      mount.position.set(0, -0.4, 0);
+      g.add(mount);
+
+      scene.add(g);
+      return g;
+    };
+
+    leftSpoolRef.current = createSpool(-3.1);
+    rightSpoolRef.current = createSpool(3.1);
+
+    // ── 6. Paper Tape Group (Dynamic 3D Cells) ──
+    const tapeCellsGroup = new THREE.Group();
+    scene.add(tapeCellsGroup);
+    tapeCellsGroupRef.current = tapeCellsGroup;
+
+    // Initial 3D tape generation
+    updateTapeCellsIn3D(scene, tapeRef.current, headPosRef.current);
+
+    // ── 7. Guide Rails & Scanner Carriage (Turing Read/Write Head) ──
+    // Twin Polished Steel Guide Rails
+    for (const z of [-0.6, 0.6]) {
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 6.2, 16), steelMat);
       rail.rotation.z = Math.PI / 2;
-      rail.position.set(0, 0.42, z);
+      rail.position.set(0, 1.25, z);
       scene.add(rail);
     }
 
-    // ── Chamber A: The Oracle Holographic Core (Center) ──
-    const oracleGroup = new THREE.Group();
-    oracleGroup.position.set(0, 0.4, 0);
-    scene.add(oracleGroup);
+    // The Mechanical Carriage Group (Moves along the rails to match headPos)
+    const carriage = new THREE.Group();
+    carriage.position.set(0, 1.25, 0);
+    scene.add(carriage);
+    carriageGroupRef.current = carriage;
 
-    // Cylindrical Laser Chamber Glass
-    const glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0x94a3b8,
-      transparent: true,
-      opacity: 0.25,
-      roughness: 0.05,
-      transmission: 0.85,
-      thickness: 0.6,
-    });
-    const glassCylinderGeo = new THREE.CylinderGeometry(0.9, 0.9, 1.8, 32);
-    const glassCylinder = new THREE.Mesh(glassCylinderGeo, glassMat);
-    glassCylinder.position.set(0, 1.0, 0);
-    oracleGroup.add(glassCylinder);
+    // Carriage Body Block (Heavy Brass & Steel Crosshead)
+    const carriageBody = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.32, 1.4), brassMat);
+    carriageBody.position.set(0, 0, 0);
+    carriage.add(carriageBody);
 
-    // Inner Glowing Hologram Ring
-    const holoGeo = new THREE.TorusGeometry(0.55, 0.04, 16, 48);
-    const holoMat = new THREE.MeshStandardMaterial({
-      color: 0xf59e0b,
-      emissive: 0xf59e0b,
-      emissiveIntensity: 2.5,
-      roughness: 0.2,
-    });
-    const holoRing = new THREE.Mesh(holoGeo, holoMat);
-    holoRing.rotation.x = Math.PI / 2;
-    holoRing.position.set(0, 1.0, 0);
-    oracleGroup.add(holoRing);
-    holographicCoreRef.current = holoRing;
+    // Carriage Bushings on rails
+    for (const z of [-0.6, 0.6]) {
+      const bushing = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.4, 16), brassMat);
+      bushing.rotation.z = Math.PI / 2;
+      bushing.position.set(0, 0, z);
+      carriage.add(bushing);
+    }
 
-    // Laser Scan Disc (Moves up/down during analysis)
-    const laserDiscGeo = new THREE.CylinderGeometry(0.75, 0.75, 0.02, 32);
-    const laserDiscMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.7,
-      blending: THREE.AdditiveBlending,
-    });
-    const laserDisc = new THREE.Mesh(laserDiscGeo, laserDiscMat);
-    laserDisc.position.set(0, 1.0, 0);
-    oracleGroup.add(laserDisc);
-    scannerLaserRef.current = laserDisc;
+    // Vertical Stamping Stylus / Hammer
+    const stampGroup = new THREE.Group();
+    stampGroup.position.set(0, -0.16, 0);
+    carriage.add(stampGroup);
+    stampHeadRef.current = stampGroup;
 
-    // ── Dual Decision Bulbs: Left = HALT (Green), Right = LOOP (Red) ──
-    function createIndicatorBulb(x, labelColor) {
+    const stampShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.6, 16), steelMat);
+    stampShaft.position.set(0, -0.2, 0);
+    stampGroup.add(stampShaft);
+
+    const stampHead = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.12, 16), brassMat);
+    stampHead.position.set(0, -0.48, 0);
+    stampGroup.add(stampHead);
+
+    // Cylindrical Mechanical State Drum (Geneva State Register atop carriage)
+    const drumGroup = new THREE.Group();
+    drumGroup.position.set(0, 0.4, 0);
+    carriage.add(drumGroup);
+    stateDrumRef.current = drumGroup;
+
+    const drumGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.45, 24);
+    const drumMesh = new THREE.Mesh(drumGeo, brassMat);
+    drumMesh.rotation.z = Math.PI / 2;
+    drumGroup.add(drumMesh);
+
+    // State Indicator Window Bezel
+    const bezelGeo = new THREE.BoxGeometry(0.35, 0.18, 0.22);
+    const bezel = new THREE.Mesh(bezelGeo, chassisMat);
+    bezel.position.set(0, 0, 0.32);
+    drumGroup.add(bezel);
+
+    // ── 8. The Halting Problem Analyzer & Inverter Linkage (Rear Console) ──
+    const analyzerModule = new THREE.Group();
+    analyzerModule.position.set(0, 0.5, -1.2);
+    scene.add(analyzerModule);
+
+    // Analyzer Housing with Louvers
+    const housing = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.4, 0.75), chassisMat);
+    housing.position.set(0, 0.7, 0);
+    analyzerModule.add(housing);
+
+    // Engraved Brass Nameplate: "DECISION ORACLE H (TURING 1936)"
+    const plaqueMat = new THREE.MeshStandardMaterial({ color: 0xdfa037, metalness: 0.9, roughness: 0.25 });
+    const plaque = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.25, 0.04), plaqueMat);
+    plaque.position.set(0, 1.15, 0.39);
+    analyzerModule.add(plaque);
+
+    // Dual Semaphore Signal Flags / Indicator Bulbs:
+    // Left = HALT (Green), Right = LOOP FOREVER (Red)
+    const createIndicator = (x, colorHex, label) => {
       const g = new THREE.Group();
-      g.position.set(x, 0.4, 0.8);
+      g.position.set(x, 1.4, 0);
 
-      const pedestalGeo = new THREE.CylinderGeometry(0.28, 0.32, 0.25, 24);
-      const pedestal = new THREE.Mesh(pedestalGeo, brassTrimMat);
-      g.add(pedestal);
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.45, 12), brassMat);
+      g.add(post);
 
-      const bulbGeo = new THREE.SphereGeometry(0.26, 24, 24);
       const bulbMat = new THREE.MeshStandardMaterial({
-        color: labelColor,
-        emissive: labelColor,
-        emissiveIntensity: 0.5,
-        roughness: 0.1,
+        color: colorHex,
+        emissive: colorHex,
+        emissiveIntensity: 0.4,
+        roughness: 0.2,
       });
-      const bulb = new THREE.Mesh(bulbGeo, bulbMat);
-      bulb.position.y = 0.35;
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 20, 20), bulbMat);
+      bulb.position.y = 0.25;
       g.add(bulb);
 
-      scene.add(g);
+      analyzerModule.add(g);
       return bulb;
+    };
+
+    greenBulbRef.current = createIndicator(-1.2, 0x10b981, 'HALT');
+    redBulbRef.current = createIndicator(1.2, 0xef4444, 'LOOP');
+
+    // Diagonal Inverter Rocker Arm (Mechanical feedback linkage)
+    const rockerArm = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.08, 0.12), steelMat);
+    rockerArm.position.set(0, 0.9, 0.45);
+    analyzerModule.add(rockerArm);
+    rockerArmRef.current = rockerArm;
+
+    // Paradox Contradiction Lightning Arc (Active in paradox overload)
+    const arcGeo = new THREE.BufferGeometry();
+    const arcCount = 20;
+    const arcPositions = new Float32Array(arcCount * 3);
+    for (let i = 0; i < arcCount * 3; i += 3) {
+      arcPositions[i] = (Math.random() - 0.5) * 1.8;
+      arcPositions[i + 1] = 0.8 + Math.random() * 0.8;
+      arcPositions[i + 2] = -0.5 + Math.random() * 0.5;
     }
-
-    greenBulbRef.current = createIndicatorBulb(-1.8, 0x10b981);
-    redBulbRef.current = createIndicatorBulb(1.8, 0xef4444);
-
-    // ── Chamber B: Physical Execution Mechanism (Kinetic Flywheel & Inverter Brake) ──
-    const mechGroup = new THREE.Group();
-    mechGroup.position.set(0, 0.4, -0.6);
-    scene.add(mechGroup);
-
-    // Massive Brass Flywheel
-    const flywheelGeo = new THREE.TorusGeometry(0.85, 0.14, 24, 48);
-    const flywheel = new THREE.Mesh(flywheelGeo, brassTrimMat);
-    flywheel.position.set(0, 1.0, 0);
-    mechGroup.add(flywheel);
-    flywheelRef.current = flywheel;
-
-    // Flywheel Spokes
-    for (let i = 0; i < 3; i++) {
-      const spokeGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.6, 12);
-      const spoke = new THREE.Mesh(spokeGeo, brassTrimMat);
-      spoke.rotation.z = (i * Math.PI) / 3;
-      spoke.position.set(0, 1.0, 0);
-      mechGroup.add(spoke);
-    }
-
-    // Kinetic Gears (Turing Stepper)
-    const gearGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.1, 24);
-    const gearMain = new THREE.Mesh(gearGeo, brassTrimMat);
-    gearMain.position.set(-1.8, 1.0, 0);
-    gearMain.rotation.x = Math.PI / 2;
-    mechGroup.add(gearMain);
-    gearMainRef.current = gearMain;
-
-    const gearInverter = new THREE.Mesh(gearGeo, brassTrimMat);
-    gearInverter.position.set(1.8, 1.0, 0);
-    gearInverter.rotation.x = Math.PI / 2;
-    mechGroup.add(gearInverter);
-    gearInverterRef.current = gearInverter;
-
-    // Emergency Brake Clamp Shoe (Drops onto flywheel to force HALT)
-    const brakeGeo = new THREE.BoxGeometry(0.5, 0.22, 0.35);
-    const brakeMat = new THREE.MeshStandardMaterial({
-      color: 0xe2e8f0,
-      metalness: 0.95,
-      roughness: 0.18,
-    });
-    const brakeClamp = new THREE.Mesh(brakeGeo, brakeMat);
-    brakeClamp.position.set(0, 2.05, 0);
-    mechGroup.add(brakeClamp);
-    brakeClampRef.current = brakeClamp;
-
-    // Spark Particles for Paradox State
-    const particleCount = 140;
-    const particleGeo = new THREE.BufferGeometry();
-    const particlePos = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      particlePos[i] = (Math.random() - 0.5) * 2.4;
-      particlePos[i + 1] = 0.8 + Math.random() * 1.6;
-      particlePos[i + 2] = (Math.random() - 0.5) * 1.8;
-    }
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
-    const particleMat = new THREE.PointsMaterial({
-      size: 0.06,
-      color: 0xf59e0b,
+    arcGeo.setAttribute('position', new THREE.BufferAttribute(arcPositions, 3));
+    const arcMat = new THREE.LineBasicMaterial({
+      color: 0xef4444,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.8,
       blending: THREE.AdditiveBlending,
     });
-    const sparkParticles = new THREE.Points(particleGeo, particleMat);
-    scene.add(sparkParticles);
-    sparkParticlesRef.current = sparkParticles;
+    const paradoxArc = new THREE.Line(arcGeo, arcMat);
+    paradoxArc.visible = false;
+    scene.add(paradoxArc);
+    paradoxArcRef.current = paradoxArc;
 
     // ── Mouse Drag Orbit Controls ──
     let isDragging = false;
     let prevMouseX = 0;
     let prevMouseY = 0;
     let sphericalTheta = Math.PI / 2;
-    let sphericalPhi = 0.42;
-    const radius = 9.2;
+    let sphericalPhi = 0.48;
+    const radius = 8.5;
 
     const onMouseDown = (e) => {
       isDragging = true;
@@ -476,12 +687,12 @@ export default function HaltingProblem3DLab() {
       const dy = (e.clientY - prevMouseY) * 0.005;
 
       sphericalTheta -= dx;
-      sphericalPhi = Math.max(0.18, Math.min(Math.PI / 2 - 0.05, sphericalPhi + dy));
+      sphericalPhi = Math.max(0.2, Math.min(Math.PI / 2 - 0.05, sphericalPhi + dy));
 
       camera.position.x = radius * Math.sin(sphericalPhi) * Math.sin(sphericalTheta);
       camera.position.y = radius * Math.cos(sphericalPhi);
       camera.position.z = radius * Math.sin(sphericalPhi) * Math.cos(sphericalTheta);
-      camera.lookAt(0, 0.5, 0);
+      camera.lookAt(0, 0.6, 0);
 
       prevMouseX = e.clientX;
       prevMouseY = e.clientY;
@@ -505,90 +716,81 @@ export default function HaltingProblem3DLab() {
       prevTime = now;
       const elapsed = (now - startTime) / 1000;
 
-      // Laser Scanner Sweep
-      if (scannerLaserRef.current) {
-        scannerLaserRef.current.position.y = 1.0 + Math.sin(elapsed * 4.5) * 0.55;
+      // 1. Carriage Smooth Horizontal Interpolation to active headPos
+      if (carriageGroupRef.current) {
+        const cellWidth = 0.82;
+        const totalCells = tapeRef.current.length;
+        const startX = -((totalCells - 1) * cellWidth) / 2;
+        const targetX = startX + headPosRef.current * cellWidth;
+
+        carriageGroupRef.current.position.x += (targetX - carriageGroupRef.current.position.x) * 0.22;
       }
 
-      // Holographic Ring Rotation
-      if (holographicCoreRef.current) {
-        holographicCoreRef.current.rotation.z += delta * 1.8;
+      // 2. Tape Spools Rotation during tape motion
+      if (leftSpoolRef.current && rightSpoolRef.current) {
+        if (isPlayingRef.current) {
+          const spin = delta * 2.5 * (speedRef.current || 1);
+          leftSpoolRef.current.rotation.y += spin;
+          rightSpoolRef.current.rotation.y += spin;
+        }
       }
 
-      // Physical Mechanism Dynamics
+      // 3. State Drum Rotation when state changes
+      if (stateDrumRef.current) {
+        const stateStr = stateRef.current;
+        let targetRot = 0;
+        if (stateStr === 'q1' || stateStr === 'qB') targetRot = Math.PI / 2;
+        else if (stateStr === 'qC' || stateStr === 'qLoopB') targetRot = Math.PI;
+        else if (stateStr === 'qHalt') targetRot = Math.PI * 1.5;
+
+        stateDrumRef.current.rotation.x += (targetRot - stateDrumRef.current.rotation.x) * 0.2;
+      }
+
+      // 4. Stamping pin vertical strike animation
+      if (stampHeadRef.current) {
+        // Quick subtle bob on steps
+        const bob = Math.sin(elapsed * 12) * 0.04;
+        stampHeadRef.current.position.y = -0.16 + (isPlayingRef.current ? bob : 0);
+      }
+
+      // 5. Halting Problem Paradox & Indicator Logic
       const isParadox = isParadoxRef.current;
       const pred = oraclePredRef.current;
-      const inverterOn = inverterActiveRef.current;
 
       if (isParadox) {
-        // Paradox Overload: Flywheel stutters, brake chatters rapidly, indicators strobe
-        const strobe = Math.sin(elapsed * 16) > 0;
-        if (greenBulbRef.current) {
-          greenBulbRef.current.material.emissiveIntensity = strobe ? 4.5 : 0.2;
-        }
-        if (redBulbRef.current) {
-          redBulbRef.current.material.emissiveIntensity = !strobe ? 4.5 : 0.2;
-        }
-        if (greenLightRef.current) greenLightRef.current.intensity = strobe ? 3.5 : 0;
-        if (redLightRef.current) redLightRef.current.intensity = !strobe ? 3.5 : 0;
+        // Contradiction Deadlock: Rocker arm oscillates wildly, indicators strobe
+        const strobe = Math.sin(elapsed * 18) > 0;
+        if (greenBulbRef.current) greenBulbRef.current.material.emissiveIntensity = strobe ? 4.5 : 0.2;
+        if (redBulbRef.current) redBulbRef.current.material.emissiveIntensity = !strobe ? 4.5 : 0.2;
+        if (greenLight) greenLight.intensity = strobe ? 3.0 : 0;
+        if (redLight) redLight.intensity = !strobe ? 3.0 : 0;
 
-        if (flywheelRef.current) {
-          flywheelRef.current.rotation.z += delta * (Math.sin(elapsed * 12) * 8);
-        }
-        if (gearMainRef.current) gearMainRef.current.rotation.z += delta * 6;
-        if (gearInverterRef.current) gearInverterRef.current.rotation.z -= delta * 6;
-
-        if (brakeClampRef.current) {
-          brakeClampRef.current.position.y = 1.85 + Math.sin(elapsed * 24) * 0.15;
+        if (rockerArmRef.current) {
+          rockerArmRef.current.rotation.z = Math.sin(elapsed * 24) * 0.35;
         }
 
-        // Active Sparks
-        if (sparkParticlesRef.current) {
-          sparkParticlesRef.current.visible = true;
-          const pos = sparkParticlesRef.current.geometry.attributes.position.array;
+        if (paradoxArcRef.current) {
+          paradoxArcRef.current.visible = true;
+          const pos = paradoxArcRef.current.geometry.attributes.position.array;
           for (let i = 0; i < pos.length; i += 3) {
-            pos[i + 1] += delta * (1.2 + Math.random() * 0.8);
-            if (pos[i + 1] > 2.4) pos[i + 1] = 0.8;
+            pos[i] = (Math.random() - 0.5) * 1.8;
+            pos[i + 1] = 0.8 + Math.random() * 0.8;
           }
-          sparkParticlesRef.current.geometry.attributes.position.needsUpdate = true;
+          paradoxArcRef.current.geometry.attributes.position.needsUpdate = true;
         }
       } else {
-        // Stable State: Oracle prediction lighting
         const willHalt = pred === 'HALTS';
-        const machineRuns = !willHalt || (inverterOn && willHalt);
+        if (greenBulbRef.current) greenBulbRef.current.material.emissiveIntensity = willHalt ? 4.0 : 0.2;
+        if (redBulbRef.current) redBulbRef.current.material.emissiveIntensity = !willHalt ? 4.0 : 0.2;
+        if (greenLight) greenLight.intensity = willHalt ? 3.0 : 0.2;
+        if (redLight) redLight.intensity = !willHalt ? 3.0 : 0.2;
 
-        if (greenBulbRef.current) {
-          greenBulbRef.current.material.emissiveIntensity = willHalt ? 4.0 : 0.3;
-        }
-        if (redBulbRef.current) {
-          redBulbRef.current.material.emissiveIntensity = !willHalt ? 4.0 : 0.3;
-        }
-        if (greenLightRef.current) greenLightRef.current.intensity = willHalt ? 3.0 : 0.2;
-        if (redLightRef.current) redLightRef.current.intensity = !willHalt ? 3.0 : 0.2;
-
-        if (sparkParticlesRef.current) {
-          sparkParticlesRef.current.visible = false;
+        if (rockerArmRef.current) {
+          const targetAngle = willHalt ? 0.25 : -0.25;
+          rockerArmRef.current.rotation.z += (targetAngle - rockerArmRef.current.rotation.z) * 0.15;
         }
 
-        // Brake Position
-        if (brakeClampRef.current) {
-          const targetY = willHalt && !inverterOn ? 1.72 : 2.15;
-          brakeClampRef.current.position.y += (targetY - brakeClampRef.current.position.y) * 0.1;
-        }
-
-        // Flywheel Spin
-        if (flywheelRef.current) {
-          const spinSpeed = machineRuns ? 4.5 * (speedRef.current || 1) : 0;
-          flywheelRef.current.rotation.z += delta * spinSpeed;
-        }
-        if (gearMainRef.current) {
-          const spinSpeed = machineRuns ? 4.5 * (speedRef.current || 1) : 0;
-          gearMainRef.current.rotation.z += delta * spinSpeed;
-        }
-        if (gearInverterRef.current) {
-          const spinSpeed = machineRuns ? 4.5 * (speedRef.current || 1) : 0;
-          gearInverterRef.current.rotation.z -= delta * spinSpeed;
-        }
+        if (paradoxArcRef.current) paradoxArcRef.current.visible = false;
       }
 
       renderer.render(scene, camera);
@@ -618,7 +820,7 @@ export default function HaltingProblem3DLab() {
       }
       renderer.dispose();
     };
-  }, []);
+  }, [updateTapeCellsIn3D]);
 
   // Record Telemetry
   const handleRecordRun = useCallback(async () => {
@@ -648,393 +850,381 @@ export default function HaltingProblem3DLab() {
   const bbStats = getBusyBeaverStats(busyBeaverN);
 
   return (
-    <div className={styles.labContainer} data-testid="halting-problem-3d-lab">
+    <div
+      className={styles.labContainer}
+      aria-label="Turing Halting Problem 3D Interactive Lab"
+      data-testid="halting-problem-3d-lab"
+    >
+      {/* 3D Canvas Area */}
       <div className={styles.canvasContainer}>
-        {/* Top Floating Header */}
+        <div ref={mountRef} className={styles.canvasWrapper} />
+
+        {/* Top Floating Header & Realtime Telemetry Badges */}
         <div className={styles.topHeader}>
           <div className={styles.headerTitleBox}>
             <div className={styles.labBadge}>
-              <Icon name="code" size={13} />
-              <span>Theoretical Computer Science &amp; Decidability</span>
+              <Icon name="cpu" size={13} />
+              Alan Turing 1936 Computability Apparatus
             </div>
             <h2 className={styles.labTitle}>Turing Halting Problem — The Incomputable Horizon</h2>
           </div>
 
           <div className={styles.statsCluster}>
-            <div className={`${styles.statPill} ${isHalted ? styles.statPillHalted : isParadoxOverload ? styles.statPillParadox : styles.statPillLoop}`}>
+            <div className={`${styles.statPill} ${isHalted ? styles.statPillHalted : ''}`}>
               <span className={styles.statLabel}>Machine Status</span>
-              <span className={`${styles.statValue} ${isHalted ? styles.statValueHalted : isParadoxOverload ? styles.statValueParadox : styles.statValueLoop}`}>
-                {isParadoxOverload ? 'PARADOX BREAKDOWN' : isHalted ? 'HALTED (Normal Exit)' : 'EXECUTING (Looping)'}
+              <span className={styles.statValue}>
+                {isParadoxOverload
+                  ? 'PARADOX DEADLOCK (H ≠ g)'
+                  : isHalted
+                  ? 'HALTED (Terminal State)'
+                  : isPlaying
+                  ? 'COMPUTING CYCLE...'
+                  : 'READY'}
               </span>
             </div>
             <div className={styles.statPill}>
               <span className={styles.statLabel}>Internal State / Clock Steps</span>
               <span className={styles.statValue}>
-                {state} · {stepCount} Steps
+                <span className={styles.stateChip}>{state}</span> | {stepCount} Steps
               </span>
             </div>
           </div>
         </div>
 
-        {/* Mode Selector Tabs */}
-        <div className={styles.modeTabs}>
-          <button
-            type="button"
-            className={`${styles.modeTab} ${activeMode === 'tapeEngine' ? styles.modeTabActive : ''}`}
-            onClick={() => setActiveMode('tapeEngine')}
-          >
-            <Icon name="layers" size={13} />
-            <span>1. Mechanical Tape Engine (1936)</span>
-          </button>
-          <button
-            type="button"
-            className={`${styles.modeTab} ${activeMode === 'paradoxProof' ? styles.modeTabActive : ''}`}
-            onClick={() => setActiveMode('paradoxProof')}
-          >
-            <Icon name="alert" size={13} />
-            <span>2. The Opposite(Opposite) Paradox</span>
-          </button>
-          <button
-            type="button"
-            className={`${styles.modeTab} ${activeMode === 'undecidability' ? styles.modeTabActive : ''}`}
-            onClick={() => setActiveMode('undecidability')}
-          >
-            <Icon name="network" size={13} />
-            <span>3. Busy Beaver &amp; Rice&apos;s Theorem</span>
-          </button>
-        </div>
-
-        {/* 3D WebGL Canvas */}
-        <div ref={mountRef} className={styles.canvasWrapper} />
-
-        {/* Floating In-Canvas Badges */}
-        <div className={`${styles.inCanvasBadge} ${styles.badgeHighlightLeft}`}>
-          <Icon name="eye" size={12} />
-          <span>Oracle Core: {isParadoxOverload ? 'CONTRADICTION DETECTED' : `PREDICTS ${oraclePrediction}`}</span>
-        </div>
-        <div className={`${styles.inCanvasBadge} ${styles.badgeHighlightCenter}`}>
-          <Icon name="code" size={12} />
-          <span>Code: {PROGRAMS[selectedProgram]?.name}</span>
-        </div>
-        <div className={`${styles.inCanvasBadge} ${styles.badgeHighlightRight}`}>
-          <Icon name="zap" size={12} />
-          <span>Decidability: {isParadoxOverload ? '0% (Logically Impossible)' : '100% (Pre-evaluated)'}</span>
+        {/* 3D Scene Controls Overlay */}
+        <div className={styles.overlayControls}>
+          <div className={styles.tapeFeedCard}>
+            <span className={styles.tapeFeedLabel}>Infinite Tape (Paper Strip) Head Position: Cell [{headPos}]</span>
+            <div className={styles.tapeStripVisual}>
+              {tape.map((symbol, idx) => (
+                <div
+                  key={`tape-cell-${idx}`}
+                  className={`${styles.tapeCell} ${idx === headPos ? styles.tapeCellActive : ''}`}
+                >
+                  <span className={styles.cellSymbol}>{symbol}</span>
+                  <span className={styles.cellIndex}>{idx}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Interactive Controls Panel */}
-      <div className={styles.controlPanel}>
-        {/* Mode 2: Paradox Breakdown Controls (Primary Simplified View) */}
-        {activeMode === 'paradoxProof' && (
-          <>
-            <div className={styles.paradoxBox}>
-              <div className={styles.paradoxTitle}>
-                <Icon name="alert" size={15} />
-                <span>Alan Turing&apos;s 1936 Diagonalization Proof</span>
-              </div>
-              <div className={styles.paradoxFormula}>
-                def Opposite(X): if Halt(X, X) == TRUE: loop_forever() else: halt()
-              </div>
-              <p className={styles.paradoxExplain}>
-                Can we build a master program <strong>Halt(P, I)</strong> that inspects any code and predicts whether it finishes or runs forever?
-                Alan Turing constructed a troublemaker program called <strong>Opposite</strong> that asks the Oracle what it will do, and then deliberately does the reverse.
-              </p>
-            </div>
+      {/* Primary Control Deck */}
+      <div className={styles.controlDeck}>
+        {/* Navigation Tabs */}
+        <div className={styles.tabsRow}>
+          <button
+            type="button"
+            className={`${styles.tabBtn} ${activeMode === 'tapeEngine' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveMode('tapeEngine')}
+          >
+            <Icon name="cpu" size={14} />
+            1. Mechanical Tape Engine (1936)
+          </button>
+          <button
+            type="button"
+            className={`${styles.tabBtn} ${activeMode === 'paradoxProof' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveMode('paradoxProof')}
+          >
+            <Icon name="zap" size={14} />
+            2. The Opposite(Opposite) Paradox
+          </button>
+          <button
+            type="button"
+            className={`${styles.tabBtn} ${activeMode === 'undecidability' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveMode('undecidability')}
+          >
+            <Icon name="code" size={14} />
+            3. Busy Beaver & Rice&apos;s Theorem
+          </button>
+        </div>
 
-            <div className={styles.controlRow}>
-              {/* Hypothesis Selection */}
-              <div className={styles.sliderCard}>
-                <div className={styles.sliderHeader}>
-                  <span className={styles.sliderLabel}>Oracle Hypothesis: What Does Halt() Predict?</span>
-                  <span className={styles.sliderValue} style={{ color: oraclePrediction === 'HALTS' ? '#34d399' : '#f87171' }}>
-                    {oraclePrediction}
-                  </span>
-                </div>
-                <div className={styles.presetRow}>
-                  <button
-                    type="button"
-                    className={`${styles.presetBtn} ${oraclePrediction === 'HALTS' && !isParadoxOverload ? styles.presetBtnActive : ''}`}
-                    onClick={() => {
-                      setOraclePrediction('HALTS');
-                      setIsParadoxOverload(false);
-                      setIsHalted(true);
-                    }}
-                  >
-                    <Icon name="check" size={13} />
-                    <span>Hypothesis A: Halt says Opposite will HALT</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.presetBtn} ${oraclePrediction === 'LOOPS' && !isParadoxOverload ? styles.presetBtnActive : ''}`}
-                    onClick={() => {
-                      setOraclePrediction('LOOPS');
-                      setIsParadoxOverload(false);
-                      setIsHalted(false);
-                    }}
-                  >
-                    <Icon name="rotate-ccw" size={13} />
-                    <span>Hypothesis B: Halt says Opposite will LOOP</span>
-                  </button>
-                </div>
-                <p className={styles.sliderDesc}>
-                  {oraclePrediction === 'HALTS'
-                    ? '⚠️ If Halt returns TRUE, Opposite executes "while True: pass" and runs forever. Therefore, Halt was WRONG.'
-                    : '⚠️ If Halt returns FALSE, Opposite immediately returns 0 and halts. Therefore, Halt was WRONG AGAIN.'}
-                </p>
-
-                {/* Paradox Overload Trigger */}
-                <div style={{ marginTop: '14px' }}>
-                  <button
-                    type="button"
-                    className={styles.btnPrimary}
-                    style={{ width: '100%', justifyContent: 'center', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}
-                    onClick={() => {
-                      setIsParadoxOverload(true);
-                      handleSelectProgram('oppositeParadox');
-                    }}
-                  >
-                    <Icon name="zap" size={14} />
-                    <span>Feed Opposite into Itself: Opposite(Opposite)</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Mathematical Conclusion */}
-              <div className={styles.sliderCard}>
-                <div className={styles.sliderHeader}>
-                  <span className={styles.sliderLabel}>Mathematical Conclusion</span>
-                  <span className={styles.sliderValue} style={{ color: '#ef4444' }}>
-                    Contradiction Absolute
-                  </span>
-                </div>
-                <p className={styles.sliderDesc}>
-                  Because Halt() fails in both cases, the initial premise is false. <strong>No general algorithm can ever exist that solves the Halting Problem for all programs.</strong>
-                </p>
-                <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    className={styles.btnSecondary}
-                    onClick={handleStep}
-                  >
-                    <Icon name="arrow-right" size={13} />
-                    <span>Step Cycle (1 Step)</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.btnSecondary}
-                    onClick={handleRunAnalysis}
-                    disabled={isAnalyzing}
-                  >
-                    <Icon name="search" size={13} />
-                    <span>{isAnalyzing ? 'Scanning Holographic Core...' : 'Re-Analyze Oracle'}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Mode 1: Tape Engine Controls (Mechanical Implementation Details) */}
+        {/* ── MODE 1: Mechanical Tape Engine (1936) ── */}
         {activeMode === 'tapeEngine' && (
-          <>
-            <div className={styles.presetContainer}>
-              <span className={styles.presetLabel}>Select Classical Program</span>
-              <div className={styles.presetRow}>
-                {Object.values(PROGRAMS).map((prog) => (
-                  <button
-                    key={prog.id}
-                    type="button"
-                    className={`${styles.presetBtn} ${selectedProgram === prog.id ? styles.presetBtnActive : ''}`}
-                    onClick={() => handleSelectProgram(prog.id)}
-                  >
-                    <Icon name={prog.guaranteedHalt ? 'check' : prog.guaranteedHalt === false ? 'rotate-ccw' : 'alert'} size={13} />
-                    <span>{prog.name}</span>
-                  </button>
-                ))}
+          <div className={styles.modeSection}>
+            {/* Quick Banner for the Paradox */}
+            <div
+              style={{
+                background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(56, 189, 248, 0.08) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ fontSize: '13px', color: '#cbd5e1' }}>
+                <strong style={{ color: '#fbbf24' }}>⚡ Alan Turing&apos;s 1936 Thought Experiment:</strong>
+                {' '}Can a general machine $H$ read any program tape and predict whether it halts or loops forever?
               </div>
+              <button
+                type="button"
+                className={styles.secondaryBtn}
+                onClick={() => setActiveMode('paradoxProof')}
+                style={{ borderColor: '#f59e0b', color: '#fbbf24', fontSize: '12px', padding: '6px 12px' }}
+              >
+                Inspect Paradox Proof →
+              </button>
             </div>
 
-            {/* Tape Ribbon Visualizer */}
-            <div className={styles.tapeRibbonContainer}>
-              <div className={styles.tapeHeader}>
-                <span>Infinite Tape Cells</span>
-                <span>Active Symbol: &apos;{tape[headPos] || 'B'}&apos;</span>
-              </div>
-              <div className={styles.tapeTrack}>
-                {tape.map((sym, idx) => (
-                  <div
-                    key={idx}
-                    className={`${styles.tapeCell} ${idx === headPos ? styles.tapeCellActive : ''}`}
-                  >
-                    {idx === headPos && <span className={styles.tapeHeadArrow}>▼</span>}
-                    {sym}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Playback Controls & Speed */}
-            <div className={styles.controlRow}>
-              <div className={styles.sliderCard}>
-                <div className={styles.sliderHeader}>
-                  <span className={styles.sliderLabel}>Execution Engine Controls</span>
-                  <span className={styles.sliderValue}>{speedMultiplier}x Speed</span>
+            <div className={styles.controlsGrid}>
+              {/* Program Selector Card */}
+              <div className={styles.controlCard}>
+                <div className={styles.cardHeader}>
+                  <span>Select Turing Program Tape</span>
+                  <span className={styles.cardSubtitle}>Historical & Theoretical Machines</span>
                 </div>
-                <div className={styles.playbackRow}>
+                <div className={styles.programGrid}>
+                  {Object.entries(PROGRAMS).map(([key, prog]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className={`${styles.progBtn} ${selectedProgram === key ? styles.progBtnActive : ''}`}
+                      onClick={() => handleSelectProgram(key)}
+                    >
+                      <div className={styles.progBtnTitle}>{prog.name}</div>
+                      <div className={styles.progBtnDesc}>{prog.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Execution Controls Card */}
+              <div className={styles.controlCard}>
+                <div className={styles.cardHeader}>
+                  <span>Execution Controls</span>
+                  <span className={styles.cardSubtitle}>Mechanical Stepping</span>
+                </div>
+
+                <div className={styles.actionRow}>
                   <button
                     type="button"
-                    className={styles.btnPrimary}
-                    onClick={() => setIsPlaying((p) => !p)}
-                    disabled={isHalted}
+                    className={`${styles.primaryBtn} ${isPlaying ? styles.paused : ''}`}
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    disabled={isHalted && selectedProgram !== 'oppositeParadox'}
                   >
-                    <Icon name={isPlaying ? 'pause' : 'play'} size={14} />
-                    <span>{isPlaying ? 'Pause' : 'Run Clock'}</span>
+                    <Icon name={isPlaying ? 'pause' : 'play'} size={15} />
+                    {isPlaying ? 'Halt Clock' : 'Run Clock (Auto-Step)'}
                   </button>
 
                   <button
                     type="button"
-                    className={styles.btnSecondary}
+                    className={styles.secondaryBtn}
                     onClick={handleStep}
-                    disabled={isHalted}
+                    disabled={isPlaying || (isHalted && selectedProgram !== 'oppositeParadox')}
                   >
-                    <Icon name="arrow-right" size={14} />
-                    <span>Step Cycle (1 Step)</span>
+                    <Icon name="chevron-right" size={15} />
+                    Step Cycle (1 Step)
                   </button>
 
                   <button
                     type="button"
-                    className={styles.btnSecondary}
+                    className={styles.secondaryBtn}
                     onClick={() => handleSelectProgram(selectedProgram)}
                   >
-                    <Icon name="rotate-ccw" size={14} />
-                    <span>Reset Tape</span>
+                    <Icon name="refresh" size={15} />
+                    Reset Tape
                   </button>
                 </div>
+
+                {/* Speed Slider */}
+                <div className={styles.sliderBox}>
+                  <div className={styles.sliderHeader}>
+                    <span>Clock Speed Multiplier</span>
+                    <span className={styles.sliderValue}>{speedMultiplier}x Speed</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={speedMultiplier}
+                    onChange={(e) => setSpeedMultiplier(Number(e.target.value))}
+                    className={styles.rangeInput}
+                    aria-label="Speed Multiplier"
+                  />
+                </div>
+
+                {/* Oracle Scan Trigger */}
+                <button
+                  type="button"
+                  className={styles.oracleBtn}
+                  onClick={handleRunAnalysis}
+                  disabled={isAnalyzing}
+                >
+                  <Icon name="sparkles" size={14} />
+                  {isAnalyzing ? 'Scanning Blueprint Tape...' : 'Consult Oracle Machine H'}
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.secondaryBtn}
+                  onClick={handleRecordRun}
+                  style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}
+                >
+                  <Icon name="check" size={14} />
+                  {hasRecorded ? 'Turing State Synchronized to Cloud Database' : 'Record Undecidability Telemetry'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODE 2: The Opposite(Opposite) Paradox ── */}
+        {activeMode === 'paradoxProof' && (
+          <div className={styles.modeSection}>
+            <div className={styles.paradoxBanner}>
+              <div className={styles.paradoxTitle}>
+                <Icon name="alert-triangle" size={18} />
+                Alan Turing&apos;s 1936 Diagonalization Proof
+              </div>
+              <p className={styles.paradoxExplanation}>
+                Assume a hypothetical oracle algorithm <code>Halt(P, I)</code> exists that infallibly determines whether any program <code>P</code> with input <code>I</code> halts.
+                We construct a malicious diagonal program <code>Opposite(P)</code> that queries <code>Halt(P, P)</code> and deliberately does the exact opposite:
+              </p>
+            </div>
+
+            <div className={styles.controlsGrid}>
+              <div className={styles.controlCard}>
+                <div className={styles.cardHeader}>
+                  <span>The Contradiction Inverter</span>
+                  <span className={styles.cardSubtitle}>Test the Self-Referential Deadlock</span>
+                </div>
+
+                <div className={styles.hypothesisSelector}>
+                  <button
+                    type="button"
+                    className={`${styles.hypoBtn} ${activeHypothesis === 'hypothesisA' ? styles.hypoBtnActive : ''}`}
+                    onClick={() => {
+                      setActiveHypothesis('hypothesisA');
+                      setOraclePrediction('HALTS');
+                      setIsParadoxOverload(true);
+                      playTuringSound('chatter', 420);
+                    }}
+                  >
+                    Hypothesis A: Halt says Opposite will HALT
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.hypoBtn} ${activeHypothesis === 'hypothesisB' ? styles.hypoBtnActive : ''}`}
+                    onClick={() => {
+                      setActiveHypothesis('hypothesisB');
+                      setOraclePrediction('LOOPS');
+                      setIsParadoxOverload(true);
+                      playTuringSound('chatter', 300);
+                    }}
+                  >
+                    Hypothesis B: Halt says Opposite will LOOP
+                  </button>
+                </div>
+
+                <div className={styles.contradictionBox}>
+                  <div className={styles.contradictionHeader}>
+                    <Icon name="x-circle" size={16} />
+                    Contradiction Absolute
+                  </div>
+                  {activeHypothesis === 'hypothesisA' ? (
+                    <p style={{ margin: 0, fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }}>
+                      If Halt returns TRUE (Opposite halts), the code executes <code>while (true) {}</code> and loops forever.
+                      Therefore, Halt lied: <strong>it does not halt!</strong>
+                    </p>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }}>
+                      If Halt returns FALSE, Opposite immediately returns 0 and halts.
+                      Therefore, Halt lied: <strong>it halts!</strong>
+                    </p>
+                  )}
+                </div>
+
+                <div style={{ marginTop: '12px', fontSize: '12px', color: '#94a3b8' }}>
+                  <strong>Conclusion:</strong> The assumption that a universal halting analyzer can exist leads to mathematical contradiction ($H(g, g) \neq g(g)$). Thus, the Halting Problem is fundamentally <strong>undecidable</strong>.
+                </div>
+              </div>
+
+              <div className={styles.controlCard}>
+                <div className={styles.cardHeader}>
+                  <span>The Barber Paradox of Computing</span>
+                  <span className={styles.cardSubtitle}>Epistemic Diagonalization</span>
+                </div>
+                <div style={{ fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.5', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <p style={{ margin: 0 }}>
+                    Turing&apos;s proof is computationally equivalent to:
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: '18px', color: '#94a3b8' }}>
+                    <li><strong>Russell&apos;s Barber Paradox:</strong> The barber shaves all men in town who do not shave themselves. Who shaves the barber?</li>
+                    <li><strong>Gödel&apos;s Incompleteness Theorem:</strong> &ldquo;This mathematical statement cannot be proven within this formal system.&rdquo;</li>
+                    <li><strong>The Liar Paradox:</strong> &ldquo;This statement is false.&rdquo;</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODE 3: Busy Beaver & Rice's Theorem ── */}
+        {activeMode === 'undecidability' && (
+          <div className={styles.modeSection}>
+            <div className={styles.controlsGrid}>
+              <div className={styles.controlCard}>
+                <div className={styles.cardHeader}>
+                  <span>Busy Beaver State Count (n)</span>
+                  <span className={styles.sliderValue}>n = {busyBeaverN} States</span>
+                </div>
+
                 <input
                   type="range"
-                  min="0.5"
-                  max="4"
-                  step="0.5"
-                  value={speedMultiplier}
-                  onChange={(e) => setSpeedMultiplier(parseFloat(e.target.value))}
+                  min="1"
+                  max="5"
+                  step="1"
+                  value={busyBeaverN}
+                  onChange={(e) => setBusyBeaverN(Number(e.target.value))}
                   className={styles.rangeInput}
-                  aria-label="Speed multiplier"
+                  aria-label="Busy Beaver States"
                 />
-              </div>
 
-              <div className={styles.sliderCard}>
-                <div className={styles.sliderHeader}>
-                  <span className={styles.sliderLabel}>Program Description</span>
-                  <span className={styles.sliderValue} style={{ color: PROGRAMS[selectedProgram].guaranteedHalt ? '#34d399' : '#fbbf24' }}>
-                    {PROGRAMS[selectedProgram].guaranteedHalt ? 'Halts Cleanly' : 'Infinite Loop / Undecidable'}
-                  </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px', fontSize: '13px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '6px' }}>
+                    <span style={{ color: '#94a3b8' }}>Max Steps Before Halting:</span>
+                    <strong style={{ color: '#38bdf8' }}>{bbStats.steps}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '6px' }}>
+                    <span style={{ color: '#94a3b8' }}>Max 1s Written on Tape:</span>
+                    <strong style={{ color: '#10b981' }}>{bbStats.ones}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#94a3b8' }}>Status:</span>
+                    <strong style={{ color: '#fbbf24' }}>{bbStats.status}</strong>
+                  </div>
                 </div>
-                <p className={styles.sliderDesc}>
-                  {PROGRAMS[selectedProgram].desc}
+              </div>
+
+              <div className={styles.controlCard}>
+                <div className={styles.cardHeader}>
+                  <span>Rice&apos;s Theorem (1953)</span>
+                  <span className={styles.cardSubtitle}>Generalization of Halting</span>
+                </div>
+                <p style={{ fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.5', margin: 0 }}>
+                  Rice&apos;s theorem proves that <strong>any non-trivial semantic property</strong> of a computer program is undecidable.
+                  No compiler or antivirus can ever determine with 100% mathematical certainty whether an arbitrary program will crash, divide by zero, or contain a security exploit without executing it.
                 </p>
-              </div>
-            </div>
-          </>
-        )}
 
-        {/* Mode 3: Busy Beaver & Rice's Theorem Controls */}
-        {activeMode === 'undecidability' && (
-          <div className={styles.controlRow}>
-            <div className={styles.sliderCard}>
-              <div className={styles.sliderHeader}>
-                <span className={styles.sliderLabel}>Busy Beaver State Count (n)</span>
-                <span className={styles.sliderValue}>n = {busyBeaverN} States</span>
+                <button
+                  type="button"
+                  className={styles.primaryBtn}
+                  onClick={handleRecordRun}
+                  style={{ marginTop: '12px' }}
+                >
+                  <Icon name="check" size={14} />
+                  {hasRecorded ? 'Turing State Synchronized to Cloud Database' : 'Record Undecidability Telemetry'}
+                </button>
               </div>
-              <input
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                value={busyBeaverN}
-                onChange={(e) => setBusyBeaverN(parseInt(e.target.value, 10))}
-                className={styles.rangeInput}
-                aria-label="Busy beaver state count"
-              />
-              <p className={styles.sliderDesc}>
-                The Busy Beaver function measures the maximum number of steps an n-state Turing machine can execute before halting. It grows faster than ANY computable function.
-              </p>
-            </div>
-
-            <div className={styles.sliderCard}>
-              <div className={styles.sliderHeader}>
-                <span className={styles.sliderLabel}>Max Halting Steps / Status</span>
-                <span className={styles.sliderValue} style={{ color: busyBeaverN === 5 ? '#ef4444' : '#38bdf8' }}>
-                  {bbStats.steps} Steps ({bbStats.status})
-                </span>
-              </div>
-              <p className={styles.sliderDesc}>
-                {busyBeaverN <= 4
-                  ? `For n=${busyBeaverN}, all machines have been exhaustively simulated and proven to halt in at most ${bbStats.steps} steps.`
-                  : 'For n=5, the step count explodes beyond 47 million. Proving whether the remaining candidate machines ever halt requires resolving open mathematical conjectures!'}
-              </p>
             </div>
           </div>
         )}
-
-        {/* 3-Card Pedagogical Walkthrough Grid */}
-        <div className={styles.pedagogyGrid}>
-          <div className={styles.pedagogyCard}>
-            <span className={styles.pedagogyStep}>Act I · The Universal Machine</span>
-            <h4 className={styles.pedagogyTitle}>Hilbert&apos;s Dream</h4>
-            <p className={styles.pedagogyText}>
-              In 1900, David Hilbert asked if an automatic mechanical procedure could decide the truth of any mathematical statement. Turing answered with the Universal Machine.
-            </p>
-          </div>
-          <div className={styles.pedagogyCard}>
-            <span className={styles.pedagogyStep}>Act II · Self-Reference</span>
-            <h4 className={styles.pedagogyTitle}>The Diagonal Trap</h4>
-            <p className={styles.pedagogyText}>
-              By feeding a program its own code, Turing mirrored Gödel&apos;s incompleteness: systems cannot be completely consistent and completely self-analyzing.
-            </p>
-          </div>
-          <div className={styles.pedagogyCard}>
-            <span className={styles.pedagogyStep}>Act III · Modern Security</span>
-            <h4 className={styles.pedagogyTitle}>Rice&apos;s Theorem</h4>
-            <p className={styles.pedagogyText}>
-              Every non-trivial property of software is undecidable. Antivirus software and static code analyzers can never be 100% bug-free by mathematical law.
-            </p>
-          </div>
-        </div>
-
-        {/* Philosophical Insight Card */}
-        <div className={styles.insightCard}>
-          <strong>Douglas Hofstadter (Gödel, Escher, Bach):</strong> <em>&quot;No matter what formal system you construct, there will always be true statements that escape its proof machinery.&quot;</em> Turing did not discover a failure of engineering; he uncovered the foundational topology of logic.
-        </div>
-
-        {/* Action Bar */}
-        <div className={styles.actionBar}>
-          <div className={styles.actionBtnGroup}>
-            <button
-              type="button"
-              className={styles.btnSecondary}
-              onClick={() => handleSelectProgram('binaryIncrement')}
-            >
-              <Icon name="rotate-ccw" size={14} />
-              <span>Reset to Standard Machine</span>
-            </button>
-
-            <button
-              type="button"
-              className={styles.btnPrimary}
-              onClick={handleRecordRun}
-            >
-              <Icon name="zap" size={14} />
-              <span>Record Undecidability Telemetry</span>
-            </button>
-          </div>
-
-          {hasRecorded && (
-            <span className={styles.actionFeedback}>
-              <Icon name="check" size={14} />
-              <span>Turing State Synchronized to Cloud Database</span>
-            </span>
-          )}
-        </div>
       </div>
     </div>
   );
