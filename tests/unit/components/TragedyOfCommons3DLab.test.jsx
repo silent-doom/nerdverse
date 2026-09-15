@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import TragedyOfCommons3DLab from '@/components/3d/TragedyOfCommons3DLab';
 
 vi.mock('three', async (importOriginal) => {
@@ -15,6 +15,20 @@ vi.mock('three', async (importOriginal) => {
       setPixelRatio() {}
       render() {}
       dispose() {}
+    },
+  };
+});
+
+vi.mock('three/examples/jsm/loaders/GLTFLoader.js', async () => {
+  const THREE = await import('three');
+  return {
+    GLTFLoader: class {
+      load(url, onLoad) {
+        if (typeof onLoad === 'function') {
+          const mockScene = new THREE.Group();
+          onLoad({ scene: mockScene });
+        }
+      }
     },
   };
 });
@@ -42,6 +56,30 @@ describe('TragedyOfCommons3DLab', () => {
     expect(screen.getByText(/Village Herd Size/i)).toBeInTheDocument();
     expect(screen.getByText(/Pasture Biomass/i)).toBeInTheDocument();
     expect(screen.getByText(/Pasture Ecological Health/i)).toBeInTheDocument();
+  });
+
+  it('switches camera presets and livestock flock species', () => {
+    render(<TragedyOfCommons3DLab />);
+
+    // Camera buttons
+    const flockCam = screen.getByRole('button', { name: /Flock Level/i });
+    fireEvent.click(flockCam);
+    expect(flockCam.className).toMatch(/viewBtnActive/);
+
+    const ostromCam = screen.getByRole('button', { name: /Ostrom Paddocks/i });
+    fireEvent.click(ostromCam);
+    expect(ostromCam.className).toMatch(/viewBtnActive/);
+
+    // Livestock flock species buttons
+    const sheepBtn = screen.getByRole('button', { name: /Suffolk Sheep/i });
+    fireEvent.click(sheepBtn);
+    expect(sheepBtn.className).toMatch(/viewBtnActive/);
+    expect(screen.getByText(/Grazing \(sheep\)/i)).toBeInTheDocument();
+
+    const goatBtn = screen.getByRole('button', { name: /Alpine Goats/i });
+    fireEvent.click(goatBtn);
+    expect(goatBtn.className).toMatch(/viewBtnActive/);
+    expect(screen.getByText(/Grazing \(goat\)/i)).toBeInTheDocument();
   });
 
   it('adjusts herd size in Tab 1 (Hardin Unmanaged Commons)', () => {
@@ -106,7 +144,7 @@ describe('TragedyOfCommons3DLab', () => {
     expect(screen.getByText(/Emitting carbon yields private industrial profit/i)).toBeInTheDocument();
   });
 
-  it('resets the commons and records telemetry', () => {
+  it('resets the commons and records telemetry', async () => {
     render(<TragedyOfCommons3DLab />);
 
     const resetBtn = screen.getByRole('button', { name: /Reset Commons/i });
@@ -114,6 +152,8 @@ describe('TragedyOfCommons3DLab', () => {
     expect(screen.getAllByText(/30 Cattle/i).length).toBeGreaterThan(0);
 
     const recordBtn = screen.getByRole('button', { name: /Record Commons Telemetry/i });
-    fireEvent.click(recordBtn);
+    await act(async () => {
+      fireEvent.click(recordBtn);
+    });
   });
 });
