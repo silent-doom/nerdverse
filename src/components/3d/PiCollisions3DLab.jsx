@@ -394,11 +394,11 @@ export default function PiCollisions3DLab() {
           }
 
           let tBlock = Infinity;
-          const closingSpeed = sim.v1 - sim.v2;
+          const relVel = sim.v1 - sim.v2; // Positive when blocks are closing in
           const contactDist = (sim.x2 - sim.x1) - (sim.w1 + sim.w2) / 2;
 
-          if (closingSpeed < -1e-6 && contactDist >= -1e-5) {
-            tBlock = Math.max(0, contactDist / (-closingSpeed));
+          if (relVel > 1e-6) {
+            tBlock = Math.max(0, contactDist / relVel);
           }
 
           const tNext = Math.min(tWall, tBlock);
@@ -440,7 +440,8 @@ export default function PiCollisions3DLab() {
               });
             }
 
-            if (sim.v2 >= sim.v1 && sim.v1 >= 0 && sim.x1 > 1.0) {
+            // Clean termination: both moving right away from wall and big block faster
+            if (sim.v2 > 0 && sim.v1 >= 0 && sim.v2 >= sim.v1) {
               sim.finished = true;
               setIsFinished(true);
               setIsRunning(false);
