@@ -103,7 +103,7 @@ export default function Footer() {
               onClick={handleSchrodingerClick}
               title="Click to collapse Schrödinger's cat wavefunction"
             >
-              <span>📦</span>
+              <Icon name="portal" size={13} />
               <span>Schrödinger&apos;s Box</span>
             </button>
             <button
@@ -112,11 +112,12 @@ export default function Footer() {
               onClick={handleMurphyClick}
               title="Murphy's Law: Do not click this button"
             >
-              <span>⚠️</span>
+              <Icon name="alert" size={13} />
               <span>DO NOT PRESS</span>
             </button>
             <span className={styles.eggBtn} title="Speed of light in vacuum">
-              <span>⚡ c = 299,792,458 m/s</span>
+              <Icon name="zap" size={13} />
+              <span>c = 299,792,458 m/s</span>
             </span>
           </div>
 

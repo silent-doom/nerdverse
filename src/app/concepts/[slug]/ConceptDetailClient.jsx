@@ -126,7 +126,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
           <div className={styles.hookGrid}>
             <div className={styles.hookCol}>
               <div className={styles.hookColHeader}>
-                <span className={styles.hookColIcon}>⚡</span>
+                <Icon name="zap" size={16} color="#eab308" />
                 <span className={styles.hookColTitle}>The Premise</span>
               </div>
               <p className={styles.hookColBody}>{concept.hook.premise}</p>
@@ -134,7 +134,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
 
             <div className={styles.hookCol}>
               <div className={styles.hookColHeader}>
-                <span className={styles.hookColIcon}>🧠</span>
+                <Icon name="brain" size={16} color="#38bdf8" />
                 <span className={styles.hookColTitle}>Common Intuition</span>
               </div>
               <p className={styles.hookColBody}>{concept.hook.intuition}</p>
@@ -142,7 +142,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
 
             <div className={`${styles.hookCol} ${styles.hookColHighlight}`}>
               <div className={styles.hookColHeader}>
-                <span className={styles.hookColIcon}>💥</span>
+                <Icon name="sparkles" size={16} color="#f59e0b" />
                 <span className={styles.hookColTitle}>The Mind-Bending Twist</span>
               </div>
               <p className={styles.hookColBody}>{concept.hook.twist}</p>
@@ -151,7 +151,10 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
 
           {concept.takeaway && (
             <div className={styles.takeawayBanner}>
-              <span className={styles.takeawayLabel}>💡 Core Mental Model:</span>
+              <span className={styles.takeawayLabel}>
+                <Icon name="lightbulb" size={15} color="#fef08a" />
+                <span>Core Mental Model:</span>
+              </span>
               <span className={styles.takeawayText}>{concept.takeaway}</span>
             </div>
           )}
@@ -189,7 +192,8 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                   </div>
                   {challenges[selectedChallenge].actionLabel && (
                     <div className={styles.challengeActionHint}>
-                      👉 Suggested Action: <code>{challenges[selectedChallenge].actionLabel}</code> in the lab below
+                      <Icon name="arrow-right" size={12} />
+                      <span>Suggested Action: <code>{challenges[selectedChallenge].actionLabel}</code> in the lab below</span>
                     </div>
                   )}
                 </div>

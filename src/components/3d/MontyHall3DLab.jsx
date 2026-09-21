@@ -14,7 +14,7 @@ const PRACTICAL_APPLICATIONS = [
   {
     id: 'vc',
     title: 'Venture Capital Portfolio Strategy',
-    icon: '🦄',
+    iconName: 'trending-up',
     category: 'Power-Law Finance',
     description:
       'You invest initial seed checks across parallel startups. A lead syndicate audit discovers and liquidates a zero-traction failure among your unselected bets. Because the audit selectively pruned a known dud from the non-invested batch, concentrating follow-on capital on the surviving candidate doubles the probability of capturing the 100x decacorn.',
@@ -23,7 +23,7 @@ const PRACTICAL_APPLICATIONS = [
   {
     id: 'medical',
     title: 'Clinical Diagnostic Triage',
-    icon: '🎯',
+    iconName: 'target',
     category: 'Acute Epidemiology',
     description:
       'An emergency patient presents with acute distress with 3 viable differential pathogen hypotheses. Initial empiric therapy targets Pathogen 1. An emergency biomarker assay rules out Pathogen 3. Under Bayesian probability rules, Pathogen 2 now carries a 66.7% probability of being the true causative agent. Pivoting therapy preserves Quality-Adjusted Life Years (QALYs).',
@@ -32,7 +32,7 @@ const PRACTICAL_APPLICATIONS = [
   {
     id: 'cloud',
     title: 'Distributed Systems & Incident Response',
-    icon: '⚡',
+    iconName: 'zap',
     category: 'Site Reliability Engineering',
     description:
       'During a high-severity cloud outage, 3 upstream clusters are candidate root causes. An on-call SRE routes triage scripts to Cluster 1. Automated eBPF kernel tracing proves Cluster 3 has zero packet loss. Redirecting remediation resources to Cluster 2 yields twice the likelihood of clearing the outage cascade.',
@@ -787,10 +787,12 @@ export default function MontyHall3DLab() {
           <div className={styles.stageOverlayTop}>
             <div className={styles.contextBanner}>
               <div className={styles.contextPrize}>
-                <span>🏎️ Target: Sports Car ($120k)</span>
+                <Icon name="car" size={14} color="#e5a93c" />
+                <span>Target: Sports Car ($120k)</span>
               </div>
               <div className={styles.contextDud}>
-                <span>🐐 Dud: Booby Prize Goat ($0)</span>
+                <Icon name="alert" size={14} color="#9ca3af" />
+                <span>Dud: Booby Prize Goat ($0)</span>
               </div>
             </div>
 
@@ -887,7 +889,15 @@ export default function MontyHall3DLab() {
                   onClick={() => handleSelectInitialDoor(dIdx)}
                 >
                   <span className={styles.doorBtnNum}>DOOR 0{dIdx + 1}</span>
-                  <span className={styles.doorBtnLabel}>{isRevealed ? '🐐' : isWinner ? '🏎️' : '🚪'}</span>
+                  <span className={styles.doorBtnLabel}>
+                    {isRevealed ? (
+                      <Icon name="alert" size={18} color="#94a3b8" />
+                    ) : isWinner ? (
+                      <Icon name="car" size={18} color="#eab308" />
+                    ) : (
+                      <Icon name="door" size={18} color="#cbd5e1" />
+                    )}
+                  </span>
                   <span className={styles.doorBtnStatus}>{statusLabel}</span>
                 </button>
               );
@@ -980,7 +990,9 @@ export default function MontyHall3DLab() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: 'var(--color-text-primary, #f9fafb)' }}>
-                <span style={{ fontSize: '1.25rem' }}>{item.icon}</span>
+                <span style={{ display: 'inline-flex' }}>
+                  <Icon name={item.iconName} size={18} color="var(--color-brand-light, #e5a93c)" />
+                </span>
                 <span>{item.title}</span>
               </div>
               <span style={{ fontSize: '0.6875rem', color: 'var(--color-brand-light, #e5a93c)', fontFamily: 'var(--font-mono, monospace)' }}>
@@ -1027,8 +1039,11 @@ export default function MontyHall3DLab() {
             fontWeight: 600,
           }}
         >
-          <span>💡 Still feels counter-intuitive? Expand the 100-Door Shortcut</span>
-          <span>{show100Doors ? '▲ Close' : '▼ Expand'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon name="lightbulb" size={16} color="#e5a93c" />
+            <span>Still feels counter-intuitive? Expand the 100-Door Shortcut</span>
+          </div>
+          <span>{show100Doors ? 'Close' : 'Expand'}</span>
         </button>
 
         {show100Doors && (

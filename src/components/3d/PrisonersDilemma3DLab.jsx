@@ -920,28 +920,32 @@ export default function PrisonersDilemma3DLab() {
             className={`${styles.scenarioQuickBtn} ${player1Choice === 'cooperate' && player2Choice === 'cooperate' ? styles.scenarioQuickBtnActive : ''}`}
             onClick={() => { handleP1Select('cooperate'); handleP2Select('cooperate'); }}
           >
-            🤝 Mutual Silence (1 yr each)
+            <Icon name="handshake" size={13} />
+            <span>Mutual Silence (1 yr each)</span>
           </button>
           <button
             type="button"
             className={`${styles.scenarioQuickBtn} ${player1Choice === 'defect' && player2Choice === 'cooperate' ? styles.scenarioQuickBtnActive : ''}`}
             onClick={() => { handleP1Select('defect'); handleP2Select('cooperate'); }}
           >
-            😈 You Betray, Bob Silent (You: 0, Bob: 3)
+            <Icon name="swords" size={13} />
+            <span>You Betray, Bob Silent (You: 0, Bob: 3)</span>
           </button>
           <button
             type="button"
             className={`${styles.scenarioQuickBtn} ${player1Choice === 'defect' && player2Choice === 'defect' ? styles.scenarioQuickBtnActive : ''}`}
             onClick={() => { handleP1Select('defect'); handleP2Select('defect'); }}
           >
-            💥 Both Betray (Nash Trap: 2 yrs each)
+            <Icon name="zap" size={13} />
+            <span>Both Betray (Nash Trap: 2 yrs each)</span>
           </button>
           <button
             type="button"
             className={`${styles.scenarioQuickBtn} ${player1Choice === 'cooperate' && player2Choice === 'defect' ? styles.scenarioQuickBtnActive : ''}`}
             onClick={() => { handleP1Select('cooperate'); handleP2Select('defect'); }}
           >
-            😢 Bob Betrays You (You: 3, Bob: 0)
+            <Icon name="alert" size={13} />
+            <span>Bob Betrays You (You: 3, Bob: 0)</span>
           </button>
         </div>
       </div>
@@ -1203,7 +1207,10 @@ export default function PrisonersDilemma3DLab() {
                   role="button"
                   tabIndex={0}
                 >
-                  <div className={styles.scenarioTitle}>☢️ Cold War Nuclear Arms Race</div>
+                  <div className={styles.scenarioTitle}>
+                    <Icon name="radiation" size={14} color="#f87171" />
+                    <span>Cold War Nuclear Arms Race</span>
+                  </div>
                   <div className={styles.scenarioDesc}>
                     Disarm (Cooperate) vs Arm (Defect). Both sides spend trillions to avoid unilateral domination.
                   </div>
@@ -1215,7 +1222,10 @@ export default function PrisonersDilemma3DLab() {
                   role="button"
                   tabIndex={0}
                 >
-                  <div className={styles.scenarioTitle}>💰 Corporate Price Wars</div>
+                  <div className={styles.scenarioTitle}>
+                    <Icon name="dollar" size={14} color="#fbbf24" />
+                    <span>Corporate Price Wars</span>
+                  </div>
                   <div className={styles.scenarioDesc}>
                     Maintain Margins (Cooperate) vs Undercut Prices (Defect). Can lead to mutual zero-profit ruin.
                   </div>
@@ -1227,7 +1237,10 @@ export default function PrisonersDilemma3DLab() {
                   role="button"
                   tabIndex={0}
                 >
-                  <div className={styles.scenarioTitle}>🌍 Global Carbon Accord</div>
+                  <div className={styles.scenarioTitle}>
+                    <Icon name="globe" size={14} color="#34d399" />
+                    <span>Global Carbon Accord</span>
+                  </div>
                   <div className={styles.scenarioDesc}>
                     Abate Emissions (Cooperate) vs Free-Ride (Defect). Explains treaty non-compliance challenges.
                   </div>

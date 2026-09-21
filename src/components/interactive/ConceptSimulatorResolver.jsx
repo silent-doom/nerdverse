@@ -7,14 +7,14 @@ const GrandfatherSpacetime3D = dynamic(() => import('@/components/3d/Grandfather
 const SchrodingersCat3DLab = dynamic(() => import('@/components/3d/SchrodingersCat3DLab'), { ssr: false });
 const MontyHall3DLab = dynamic(() => import('@/components/3d/MontyHall3DLab'), { ssr: false });
 const TrolleyProblem3DLab = dynamic(() => import('@/components/3d/TrolleyProblem3DLab'), { ssr: false });
-const BayesTheorem3DLab = dynamic(() => import('@/components/3d/BayesTheorem3DLab'), { ssr: false });
-const SimpsonsParadox3DLab = dynamic(() => import('@/components/3d/SimpsonsParadox3DLab'), { ssr: false });
+const BayesTheorem2DLab = dynamic(() => import('@/components/interactive/BayesTheorem2DLab'), { ssr: false });
+const SimpsonsParadox2DLab = dynamic(() => import('@/components/interactive/SimpsonsParadox2DLab'), { ssr: false });
 const StPetersburg3DLab = dynamic(() => import('@/components/3d/StPetersburg3DLab'), { ssr: false });
 const MaxwellsDemon3DLab = dynamic(() => import('@/components/3d/MaxwellsDemon3DLab'), { ssr: false });
 const FermiParadox3DLab = dynamic(() => import('@/components/3d/FermiParadox3DLab'), { ssr: false });
 const LaplacesDemon3DLab = dynamic(() => import('@/components/3d/LaplacesDemon3DLab'), { ssr: false });
 const ShipOfTheseus3DLab = dynamic(() => import('@/components/3d/ShipOfTheseus3DLab'), { ssr: false });
-const CognitiveDissonance3DLab = dynamic(() => import('@/components/3d/CognitiveDissonance3DLab'), { ssr: false });
+const CognitiveDissonance2DLab = dynamic(() => import('@/components/interactive/CognitiveDissonance2DLab'), { ssr: false });
 const HaltingProblem3DLab = dynamic(() => import('@/components/3d/HaltingProblem3DLab'), { ssr: false });
 const ConwaysGameOfLife3DLab = dynamic(() => import('@/components/3d/ConwaysGameOfLife3DLab'), { ssr: false });
 const ChineseRoom3DLab = dynamic(() => import('@/components/3d/ChineseRoom3DLab'), { ssr: false });
@@ -36,9 +36,9 @@ export default function ConceptSimulatorResolver({ type }) {
     case 'TrolleyProblem':
       return <TrolleyProblem3DLab />;
     case 'BayesTheorem':
-      return <BayesTheorem3DLab />;
+      return <BayesTheorem2DLab />;
     case 'SimpsonsParadox':
-      return <SimpsonsParadox3DLab />;
+      return <SimpsonsParadox2DLab />;
     case 'StPetersburg':
       return <StPetersburg3DLab />;
     case 'MaxwellsDemon':
@@ -50,7 +50,7 @@ export default function ConceptSimulatorResolver({ type }) {
     case 'ShipOfTheseus':
       return <ShipOfTheseus3DLab />;
     case 'CognitiveDissonance':
-      return <CognitiveDissonance3DLab />;
+      return <CognitiveDissonance2DLab />;
     case 'HaltingProblem':
       return <HaltingProblem3DLab />;
     case 'ConwaysGameOfLife':
