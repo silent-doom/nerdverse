@@ -911,6 +911,63 @@ export default function PrisonersDilemma3DLab() {
         </div>
       </div>
 
+      {/* Fast 1-Click Scenario Presets */}
+      <div className={styles.scenarioBar}>
+        <span className={styles.scenarioBarLabel}>Instant Presets:</span>
+        <div className={styles.scenarioButtonsRow}>
+          <button
+            type="button"
+            className={`${styles.scenarioQuickBtn} ${player1Choice === 'cooperate' && player2Choice === 'cooperate' ? styles.scenarioQuickBtnActive : ''}`}
+            onClick={() => { handleP1Select('cooperate'); handleP2Select('cooperate'); }}
+          >
+            🤝 Mutual Silence (1 yr each)
+          </button>
+          <button
+            type="button"
+            className={`${styles.scenarioQuickBtn} ${player1Choice === 'defect' && player2Choice === 'cooperate' ? styles.scenarioQuickBtnActive : ''}`}
+            onClick={() => { handleP1Select('defect'); handleP2Select('cooperate'); }}
+          >
+            😈 You Betray, Bob Silent (You: 0, Bob: 3)
+          </button>
+          <button
+            type="button"
+            className={`${styles.scenarioQuickBtn} ${player1Choice === 'defect' && player2Choice === 'defect' ? styles.scenarioQuickBtnActive : ''}`}
+            onClick={() => { handleP1Select('defect'); handleP2Select('defect'); }}
+          >
+            💥 Both Betray (Nash Trap: 2 yrs each)
+          </button>
+          <button
+            type="button"
+            className={`${styles.scenarioQuickBtn} ${player1Choice === 'cooperate' && player2Choice === 'defect' ? styles.scenarioQuickBtnActive : ''}`}
+            onClick={() => { handleP1Select('cooperate'); handleP2Select('defect'); }}
+          >
+            😢 Bob Betrays You (You: 3, Bob: 0)
+          </button>
+        </div>
+      </div>
+
+      {/* Core Paradox Insight Box */}
+      <div className={styles.insightBox}>
+        <div className={styles.insightHeader}>
+          <Icon name="zap" size={14} />
+          <span>The Core Paradox Insight</span>
+        </div>
+        <p className={styles.insightText}>
+          {player1Choice === 'defect' && player2Choice === 'defect' && (
+            <><strong>The Nash Trap:</strong> Even though mutual silence yields only 1 year each, both suspects rationally deduce that defecting is strictly dominant (0 &lt; 1 and 2 &lt; 3). Local rational self-interest inexorably forces both into mutual disaster (2 years each).</>
+          )}
+          {player1Choice === 'cooperate' && player2Choice === 'cooperate' && (
+            <><strong>The Fragile Ideal:</strong> Mutual silence produces the best collective outcome (1 year each). But without binding contracts, both feel an irresistible temptation to defect (walk free in 0 years) and terror of being exploited (3 years).</>
+          )}
+          {player1Choice === 'defect' && player2Choice === 'cooperate' && (
+            <><strong>Temptation Payoff:</strong> You confess and walk out a free person (0 years), leaving Bob to serve the maximum 3-year term. This asymmetric reward is what breaks trust in single-round interactions.</>
+          )}
+          {player1Choice === 'cooperate' && player2Choice === 'defect' && (
+            <><strong>Exploited (Sucker&apos;s Payoff):</strong> You trusted Bob and stayed silent, but Bob confessed and walked free. You take the full 3-year sentence. This fear is why rational players preemptively defect.</>
+          )}
+        </p>
+      </div>
+
       {/* Primary Control Deck */}
       <div className={styles.controlDeck}>
         {/* Navigation Tabs */}

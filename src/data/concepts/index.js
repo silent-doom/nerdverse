@@ -455,10 +455,30 @@ From a welfare-maximizing standpoint, this asymmetric regret is purely irrationa
   },
 ];
 
-export const concepts = [...coreConcepts, ...additionalConcepts];
+import { getConceptHook, CONCEPT_HOOKS } from './conceptHooks';
+
+export { getConceptHook, CONCEPT_HOOKS };
+
+export const concepts = [...coreConcepts, ...additionalConcepts].map((c) => {
+  const hookData = getConceptHook(c.slug);
+  return {
+    ...c,
+    hook: hookData.hook,
+    takeaway: hookData.takeaway,
+    challenges: hookData.challenges,
+  };
+});
 
 export function getConceptBySlug(slug) {
-  return concepts.find((c) => c.slug === slug);
+  const concept = concepts.find((c) => c.slug === slug);
+  if (!concept) return undefined;
+  const hookData = getConceptHook(slug);
+  return {
+    ...concept,
+    hook: concept.hook || hookData.hook,
+    takeaway: concept.takeaway || hookData.takeaway,
+    challenges: concept.challenges || hookData.challenges,
+  };
 }
 
 export function getConceptsByCategory(categoryId) {
@@ -480,3 +500,4 @@ export function getRelatedConcepts(slug) {
     .map((s) => getConceptBySlug(s))
     .filter(Boolean);
 }
+
