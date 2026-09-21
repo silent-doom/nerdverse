@@ -22,6 +22,7 @@ const RedQueen3DLab = dynamic(() => import('@/components/3d/RedQueen3DLab'), { s
 const PrisonersDilemma3DLab = dynamic(() => import('@/components/3d/PrisonersDilemma3DLab'), { ssr: false });
 const TragedyOfCommons3DLab = dynamic(() => import('@/components/3d/TragedyOfCommons3DLab'), { ssr: false });
 const BraessParadox3DLab = dynamic(() => import('@/components/3d/BraessParadox3DLab'), { ssr: false });
+const ConceptLabPlaceholder = dynamic(() => import('@/components/interactive/ConceptLabPlaceholder'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type }) {
   switch (type) {
@@ -66,6 +67,6 @@ export default function ConceptSimulatorResolver({ type }) {
     case 'BraessParadox':
       return <BraessParadox3DLab />;
     default:
-      return null;
+      return <ConceptLabPlaceholder conceptType={type} />;
   }
 }

@@ -466,6 +466,374 @@ export const CONCEPT_HOOKS = {
       },
     ],
   },
+
+  'pi-collisions': {
+    hook: {
+      premise: 'Two frictionless blocks sit in front of a rigid wall. A large block collides with a smaller block between it and the wall.',
+      intuition: 'The number of bounces should depend on messy initial velocities or fizzle out randomly.',
+      twist: 'If the large block has mass 100^N times the small block, the total number of elastic collisions (between blocks and wall) counts the exact first N+1 digits of π: 3, 31, 314, 3,141, and so on! Kinetic energy conservation maps elastic bounces onto a circle in velocity space.',
+    },
+    takeaway: 'Hidden symmetries connect seemingly unrelated universes: Newtonian block mechanics computes π through the geometry of energy conservation.',
+    challenges: [
+      {
+        id: 'ratio-100',
+        title: 'Challenge 1: The 100:1 Digit Extraction',
+        prompt: 'Slide the mass ratio to 100:1. Verify that exactly 31 collisions occur before the large block escapes forever.',
+        actionLabel: 'Test 100:1 Ratio',
+      },
+      {
+        id: 'ratio-10000',
+        title: 'Challenge 2: Scaling to 10,000:1',
+        prompt: 'Scale mass ratio to 10,000:1 to extract 314 collisions and witness phase space circle geometry.',
+        actionLabel: 'Test 10,000:1 Ratio',
+      },
+    ],
+  },
+
+  'eulers-number': {
+    hook: {
+      premise: 'You invest $1 at a 100% annual interest rate. If interest is compounded continuously every microsecond, do you become infinitely rich?',
+      intuition: 'Compounding more and more frequently should cause your money to explode toward infinity.',
+      twist: 'The returns hit a strict, immutable ceiling discovered by Jacob Bernoulli and Leonhard Euler: lim (1 + 1/n)^n = e ≈ 2.71828. Nature\'s ultimate constant of continuous growth and decay.',
+    },
+    takeaway: 'Exponential growth is bound by fundamental limits: e is the unique mathematical scale where rate of change equals state of being.',
+    challenges: [
+      {
+        id: 'continuous-compounding',
+        title: 'Challenge 1: The Continuous Limit',
+        prompt: 'Increase compounding intervals from annual to continuous. Observe how returns converge strictly on e.',
+        actionLabel: 'Maximize Compounding',
+      },
+      {
+        id: 'derangements',
+        title: 'Challenge 2: The Derangement Paradox',
+        prompt: 'Test the hat-check permutation problem: the probability that 100 people pick someone else\'s hat converges precisely to 1/e ≈ 36.8%.',
+        actionLabel: 'Test Derangements',
+      },
+    ],
+  },
+
+  'cap-theorem': {
+    hook: {
+      premise: 'You are architecting a planetary distributed database spanning servers across North America, Europe, and Asia.',
+      intuition: 'With enough redundant fiber cables, modern engineering can guarantee instant consistency, 100% uptime, and fault tolerance simultaneously.',
+      twist: 'Eric Brewer proved you can only pick two out of three: Consistency, Availability, and Partition Tolerance. Because physical networks invariably drop packets, you must choose between stale data or failed requests!',
+    },
+    takeaway: 'Physics enforces trade-offs in distributed systems: when networks partition, you must sacrifice either absolute truth (Consistency) or universal response (Availability).',
+    challenges: [
+      {
+        id: 'split-brain',
+        title: 'Challenge 1: The Split-Brain Crucible',
+        prompt: 'Sever the transatlantic fiber link. Decide whether your cluster refuses writes (CP) or serves conflicting data (AP).',
+        actionLabel: 'Trigger Partition',
+      },
+      {
+        id: 'consensus-latency',
+        title: 'Challenge 2: Linearizability vs Latency',
+        prompt: 'Enable strict synchronous consensus (Paxos/Raft) and measure the unavoidable latency penalty.',
+        actionLabel: 'Enforce Strict CP',
+      },
+    ],
+  },
+
+  'teslers-law': {
+    hook: {
+      premise: 'You are redesigning a convoluted enterprise software tool into a sleek, 1-click consumer application.',
+      intuition: 'Brilliant design can eliminate all the inherent complexity from the problem domain.',
+      twist: 'Larry Tesler proved that every application possesses an irreducible baseline complexity. You cannot eliminate it; you only shift who suffers from it—the end user, or the software engineer writing millions of lines of code behind the scenes.',
+    },
+    takeaway: 'Complexity is conserved like energy: simplifying user workflows inevitably pushes immense engineering burden under the hood.',
+    challenges: [
+      {
+        id: 'shift-burden',
+        title: 'Challenge 1: The 1-Click Illusion',
+        prompt: 'Increase user simplification from 20% to 90%. Watch the behind-the-scenes edge cases and compiler heuristics explode.',
+        actionLabel: 'Simplify User UI',
+      },
+      {
+        id: 'complexity-debt',
+        title: 'Challenge 2: Shifting the Burden',
+        prompt: 'Evaluate the maintenance overhead when supporting magical user abstractions over legacy APIs.',
+        actionLabel: 'Audit Complexity Debt',
+      },
+    ],
+  },
+
+  'brouwers-fixed-point-theorem': {
+    hook: {
+      premise: 'You gently stir a cup of coffee with a spoon, swirling every drop of liquid without splashing.',
+      intuition: 'Every single molecule of coffee has been moved to a brand new position in the cup.',
+      twist: 'Topologist L.E.J. Brouwer proved that in any continuous deformation of a compact convex space, at least one point must remain in its exact original coordinates! Similarly, crumple a city map and drop it on the sidewalk: one point on the map sits directly above its real-world twin.',
+    },
+    takeaway: 'Continuity enforces invariance: no matter how complex the transformation, fixed points are topological inevitabilities.',
+    challenges: [
+      {
+        id: 'coffee-stir',
+        title: 'Challenge 1: The Coffee Cup Stir',
+        prompt: 'Stir the liquid medium across varying speeds. Trace the continuous vector field to locate the invariant stationary molecule.',
+        actionLabel: 'Stir Fluid Grid',
+      },
+      {
+        id: 'crumpled-map',
+        title: 'Challenge 2: The Crumpled Map Invariant',
+        prompt: 'Deform a 2D topographical map. Locate the exact coordinate that sits directly over its identical un-crumpled position.',
+        actionLabel: 'Crumple Coordinate Map',
+      },
+    ],
+  },
+
+  'parkinsons-law': {
+    hook: {
+      premise: 'Your engineering team has an estimated 2 weeks of work. Management gives you a generous 8-week deadline to guarantee high quality.',
+      intuition: 'With 6 extra weeks of buffer, the project will finish early and be thoroughly polished.',
+      twist: 'Cyril Parkinson showed that work expands to fill the exact time allotted for its completion. Extra time spawns bloated specifications, bikeshedding, and unnecessary redesigns, finishing at the deadline with equal or worse quality!',
+    },
+    takeaway: 'Deadlines dictate effort density: unbounded schedules breed bureaucracy, overengineering, and artificial complexity.',
+    challenges: [
+      {
+        id: 'deadline-dilation',
+        title: 'Challenge 1: The Deadline Dilation Test',
+        prompt: 'Double the schedule buffer from 4 weeks to 8 weeks. Watch scope creep and administrative meetings consume the surplus.',
+        actionLabel: 'Expand Schedule',
+      },
+      {
+        id: 'tight-constraints',
+        title: 'Challenge 2: Tight Constraint Velocity',
+        prompt: 'Compress the project horizon to 2 weeks. Observe how artificial gold-plating falls away while core essentials ship.',
+        actionLabel: 'Enforce Tight Deadline',
+      },
+    ],
+  },
+
+  'hofstadters-law': {
+    hook: {
+      premise: 'You break an engineering project into fine-grained tasks and calculate a completion time of exactly 3 weeks.',
+      intuition: 'Accounting for unexpected delays and adding contingency buffers should guarantee an accurate delivery date.',
+      twist: 'Douglas Hofstadter formulated the recursive law: "It always takes longer than you expect, even when you take into account Hofstadter\'s Law." Every subtask contains recursive unknown-unknowns.',
+    },
+    takeaway: 'Engineering estimation is fractally recursive: complex systems conceal emergent dependencies that cannot be foreseen from the blueprint.',
+    challenges: [
+      {
+        id: 'fractal-subtasks',
+        title: 'Challenge 1: The Fractal Subtask Trap',
+        prompt: 'Decompose a feature into 5 subtasks. Watch each subtask spawn 2 unexpected hidden dependency branches.',
+        actionLabel: 'Decompose Tasks',
+      },
+      {
+        id: 'recursive-recursion',
+        title: 'Challenge 2: Applying Hofstadter Recursion',
+        prompt: 'Apply recursive compensation multipliers. Discover why the estimate still fails to converge without scope reduction.',
+        actionLabel: 'Apply Recursive Multiplier',
+      },
+    ],
+  },
+
+  'hanlons-razor': {
+    hook: {
+      premise: 'A cloud provider deployment breaks your production server on a Friday afternoon right before a major launch.',
+      intuition: 'Someone in the vendor\'s operations team must have intentionally sabotaged you or disregarded your account out of malice.',
+      twist: 'Robert J. Hanlon advised: "Never attribute to malice that which is adequately explained by stupidity or incompetence." Human minds are prone to hostile attribution bias, fabricating conspiracies when tired humans simply made an honest blunder.',
+    },
+    takeaway: 'Filter for systemic noise before assuming conspiracy: incompetence, cognitive overload, and poor communication cause 99% of organizational catastrophes.',
+    challenges: [
+      {
+        id: 'attribution-filter',
+        title: 'Challenge 1: The Attribution Filter',
+        prompt: 'Toggle an outage scenario from malicious attack to configuration fatigue. Calculate the Bayesian posterior likelihood of malice vs noise.',
+        actionLabel: 'Evaluate Attribution',
+      },
+      {
+        id: 'defuse-paranoia',
+        title: 'Challenge 2: Defusing Organizational Paranoia',
+        prompt: 'Simulate a communication breakdown between cross-functional teams and trace how innocent blunders morph into toxic feuds.',
+        actionLabel: 'Simulate Blunder Spiral',
+      },
+    ],
+  },
+
+  'pareto-principle': {
+    hook: {
+      premise: 'You are analyzing 10,000 customer bug reports submitted to an operating system development team.',
+      intuition: 'Bugs should be evenly distributed across thousands of separate files and engineering teams.',
+      twist: 'Vilfredo Pareto and Joseph Juran demonstrated that roughly 80% of system crashes stem from just 20% of code defects. Power-law distributions govern wealth, network hubs, language word frequencies, and software failures.',
+    },
+    takeaway: 'Complex systems are fundamentally non-linear: focusing relentless attention on the vital 20% yields 80% of all real-world impact.',
+    challenges: [
+      {
+        id: 'patch-vital',
+        title: 'Challenge 1: The 80/20 Crash Resolution',
+        prompt: 'Fix the top 20% of root-cause bugs. Measure the disproportionate 80% plunge in customer crashes.',
+        actionLabel: 'Patch Vital 20% Bugs',
+      },
+      {
+        id: 'diminishing-returns',
+        title: 'Challenge 2: The Power-Law Tail',
+        prompt: 'Examine the remaining 80% long-tail edge cases to understand the law of diminishing returns in perfectionism.',
+        actionLabel: 'Audit Diminishing Returns',
+      },
+    ],
+  },
+
+  'peter-principle': {
+    hook: {
+      premise: 'A stellar software engineer with peerless architectural skills is promoted to engineering manager.',
+      intuition: 'People who excel in their current role will naturally excel in the next level up the corporate hierarchy.',
+      twist: 'Laurence J. Peter observed that employees are promoted based on competence in their current job until they reach a role they are incompetent at—where they remain permanently stuck.',
+    },
+    takeaway: 'Competence in one domain does not generalize: organizations naturally fill leadership posts with people who have reached their terminal incompetence ceiling.',
+    challenges: [
+      {
+        id: 'promotion-ladder',
+        title: 'Challenge 1: The Promotion Simulation',
+        prompt: 'Promote top individual contributors up the corporate ladder. Observe how competence scores plateau across management tiers.',
+        actionLabel: 'Simulate Promotions',
+      },
+      {
+        id: 'dual-tracks',
+        title: 'Challenge 2: Dual Career Ladders',
+        prompt: 'Implement dual IC / Management tracks to keep stellar talent thriving in their zone of genius without forced management promotions.',
+        actionLabel: 'Enable Dual Track',
+      },
+    ],
+  },
+
+  'hicks-law': {
+    hook: {
+      premise: 'You land on an e-commerce checkout page with 30 different navigation links, discount buttons, and upsell menus.',
+      intuition: 'Giving users maximum choice and flexibility empowers them to find what they want faster.',
+      twist: 'William Hick and Ray Hyman proved cognitive reaction time scales logarithmically with choice count: T = b · log₂(n + 1). Too many options paralyzes decision-making and spikes abandonment.',
+    },
+    takeaway: 'Every added choice imposes an information-theoretic tax: simplicity is not an aesthetic choice, but a cognitive performance imperative.',
+    challenges: [
+      {
+        id: 'decision-latency',
+        title: 'Challenge 1: The Decision Latency Curve',
+        prompt: 'Increase menu choices from 3 to 24 options. Watch cognitive reaction latency surge logarithmically.',
+        actionLabel: 'Add Menu Options',
+      },
+      {
+        id: 'progressive-tiers',
+        title: 'Challenge 2: Progressive Disclosure Reduction',
+        prompt: 'Group options into categorical progressive disclosure tiers. Measure the reduction in user hesitation time.',
+        actionLabel: 'Group into Tiers',
+      },
+    ],
+  },
+
+  'goodharts-law': {
+    hook: {
+      premise: 'A software company evaluates and bonuses engineers based on the exact number of pull requests and lines of code they commit.',
+      intuition: 'Tying financial rewards directly to measurable productivity metrics will produce more software output.',
+      twist: 'Charles Goodhart showed that the moment a measure becomes an explicit target, it ceases to be a good measure. Engineers split simple fixes into 20 bloated pull requests, corrupting the metric while degrading code quality!',
+    },
+    takeaway: 'Optimization pressure distorts proxies: any metric tied to rewards will be gamed at the direct expense of underlying truth.',
+    challenges: [
+      {
+        id: 'cobra-effect',
+        title: 'Challenge 1: The Cobra Effect Incentive',
+        prompt: 'Tie compensation to test code coverage percentages. Watch developers commit vacuous assertions without tests.',
+        actionLabel: 'Enforce 100% Coverage Target',
+      },
+      {
+        id: 'balancing-metrics',
+        title: 'Challenge 2: Counter-Gaming Balancing Metrics',
+        prompt: 'Pair quantity targets with adversarial quality checks (e.g., bug regression rates) to mitigate metric degradation.',
+        actionLabel: 'Add Balancing Metric',
+      },
+    ],
+  },
+
+  'dunning-kruger-effect': {
+    hook: {
+      premise: 'A novice coder finishes a 2-hour tutorial and confidently declares they are ready to build a distributed banking platform.',
+      intuition: 'People who know the least should naturally be the most aware of their vast ignorance.',
+      twist: 'David Dunning and Justin Kruger discovered that the skills needed to produce correct answers are the exact same skills needed to evaluate competence! Novices suffer a double curse: they make mistakes, and lack the metacognition to know it.',
+    },
+    takeaway: 'Ignorance breeds confidence more frequently than knowledge: the early slope of learning creates an illusion of complete mastery.',
+    challenges: [
+      {
+        id: 'mount-stupid',
+        title: 'Challenge 1: Mount Stupid to Valley of Despair',
+        prompt: 'Increase domain knowledge from beginner to intermediate. Observe confidence plunge as the vastness of the field is revealed.',
+        actionLabel: 'Advance Knowledge Level',
+      },
+      {
+        id: 'calibrate-competence',
+        title: 'Challenge 2: Calibrating Competence',
+        prompt: 'Track how true experts tend to underestimate their relative ability, assuming tasks easy for them are easy for everyone.',
+        actionLabel: 'Benchmark Expertise',
+      },
+    ],
+  },
+
+  'occams-razor': {
+    hook: {
+      premise: 'You hear strange scratching noises in your kitchen wall at midnight.',
+      intuition: 'It could be tiny mice, or a sophisticated foreign surveillance drone equipped with claw sensors, or an interdimensional rodent ghost.',
+      twist: 'William of Ockham established: entities should not be multiplied beyond necessity. Among competing explanations that account for the evidence, the hypothesis with the fewest unproven assumptions is overwhelmingly more likely to be true.',
+    },
+    takeaway: 'Parsimony protects against epistemic overfitting: penalize models and theories that require multiplying extraordinary assumptions.',
+    challenges: [
+      {
+        id: 'parameter-penalty',
+        title: 'Challenge 1: Model Parameter Penalization',
+        prompt: 'Add free parameters to a curve-fitting model. Watch Bayesian Occam factors penalize overfit models that lack generalizability.',
+        actionLabel: 'Add Free Parameters',
+      },
+      {
+        id: 'competing-theories',
+        title: 'Challenge 2: Evaluating Competing Theories',
+        prompt: 'Compare medical diagnostic hypotheses: test when a single common ailment explains 3 symptoms vs invoking 3 rare diseases.',
+        actionLabel: 'Compare Diagnostic Priors',
+      },
+    ],
+  },
+
+  'chestertons-fence': {
+    hook: {
+      premise: 'A newly hired software engineer finds an obscure 50-millisecond sleep loop inside a database connection pool and deletes it because it looks redundant.',
+      intuition: 'Removing apparently useless or poorly commented legacy code makes the system cleaner and faster.',
+      twist: 'G.K. Chesterton formulated the rule of reform: Never tear down a fence until you know why it was built in the first place. Deleting the sleep loop immediately caused race-condition deadlocks under peak load!',
+    },
+    takeaway: 'Respect unseen constraints: apparent inefficiencies in surviving systems often conceal hard-won defenses against catastrophic second-order failure.',
+    challenges: [
+      {
+        id: 'deletion-trap',
+        title: 'Challenge 1: The Deletion Trap',
+        prompt: 'Delete an un-commented rate-limiter gate. Run high concurrency telemetry to witness the latent cascade failure it was built to prevent.',
+        actionLabel: 'Remove Legacy Constraint',
+      },
+      {
+        id: 'git-blame-arch',
+        title: 'Challenge 2: Archeological Git Blame',
+        prompt: 'Perform git history archeology to uncover the historical incident that necessitated the constraint before attempting refactoring.',
+        actionLabel: 'Audit Historical PR',
+      },
+    ],
+  },
+
+  'brooks-law': {
+    hook: {
+      premise: 'A flagship software project is 2 months behind schedule. Management hires 10 new senior engineers to get back on track.',
+      intuition: 'Adding more workforce to a project with clear specifications should divide the remaining work and accelerate delivery.',
+      twist: 'Fred Brooks demonstrated that adding manpower to a late software project makes it later! New hires require onboarding from existing seniors, while communication channels scale quadratically: n(n - 1)/2.',
+    },
+    takeaway: 'Engineering throughput is communication-bound, not headcount-bound: complex cognitive work cannot be divided linearly across human bodies.',
+    challenges: [
+      {
+        id: 'quadratic-drag',
+        title: 'Challenge 1: The Quadratic Communication Drag',
+        prompt: 'Increase team headcount from 4 to 12 engineers. Watch pairwise communication channels explode from 6 to 66 links.',
+        actionLabel: 'Add 8 Engineers',
+      },
+      {
+        id: 'onboarding-drag',
+        title: 'Challenge 2: Onboarding Drag vs Task Partitioning',
+        prompt: 'Measure senior developer coding hours lost to training newcomers during the critical late-stage crunch.',
+        actionLabel: 'Calculate Onboarding Penalty',
+      },
+    ],
+  },
 };
 
 /**
