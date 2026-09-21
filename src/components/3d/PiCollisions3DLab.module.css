@@ -1,0 +1,401 @@
+.labContainer {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg-primary, #07090f);
+  border: 1px solid var(--color-border-default, #1e2638);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text-primary, #f9fafb);
+  user-select: none;
+  margin-bottom: var(--space-8, 32px);
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(500px, 62vh, 640px);
+  cursor: grab;
+  background: radial-gradient(circle at 50% 30%, #0d1726 0%, #05080f 100%);
+}
+
+.canvasWrapper:active {
+  cursor: grabbing;
+}
+
+/* ── Top Floating Header & Stats Cluster ── */
+.topHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.headerTitleBox {
+  background: rgba(11, 16, 26, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid #202d44;
+  border-radius: 8px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.labBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #f59e0b;
+  margin-bottom: 2px;
+}
+
+.headerTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.headerSubtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 2px 0 0 0;
+}
+
+/* ── Pi Extraction Live Card ── */
+.piBannerCard {
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(12px);
+  border: 1px solid #f59e0b55;
+  border-radius: 8px;
+  padding: 8px 16px;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.15);
+}
+
+.piLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.piCountBig {
+  font-size: 24px;
+  font-weight: 900;
+  color: #f59e0b;
+  font-family: var(--font-mono, monospace);
+  line-height: 1;
+}
+
+.piFormulaEquiv {
+  font-size: 13px;
+  color: #cbd5e1;
+  font-family: var(--font-mono, monospace);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #334155;
+}
+
+.piGoldHighlight {
+  color: #f59e0b;
+  font-weight: 800;
+}
+
+/* ── Phase Space Radar Overlay (Top-Right) ── */
+.radarContainer {
+  position: absolute;
+  top: 76px;
+  right: 16px;
+  z-index: 10;
+  background: rgba(11, 16, 26, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid #202d44;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.radarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.radarCanvas {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #070b14;
+  border: 1px solid #1e293b;
+}
+
+.radarFooter {
+  font-size: 10px;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+}
+
+/* ── Floating Status Indicators Over Canvas ── */
+.simulationStatusBadge {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 10;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e2e8f0;
+  pointer-events: none;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.statusRunning {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+
+.statusFinished {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+}
+
+.statusPaused {
+  background: #64748b;
+}
+
+/* ── HUD Telemetry Strip ── */
+.telemetryBar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  padding: 12px 16px;
+  background: #090e1a;
+  border-top: 1px solid #1e2638;
+  border-bottom: 1px solid #1e2638;
+}
+
+.telemetryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.telemetryLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.telemetryVal {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: #f1f5f9;
+}
+
+.telemetryHighlight {
+  color: #f59e0b;
+}
+
+/* ── Interactive Controls Toolbar ── */
+.controlsBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  background: #080c16;
+}
+
+.primaryControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.actionBtn:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
+.actionBtnPrimary {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #05080f;
+  font-weight: 700;
+}
+
+.actionBtnPrimary:hover {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.actionBtnActive {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+/* ── Mass Ratio Preset Buttons ── */
+.ratioPresets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ratioLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-right: 4px;
+}
+
+.presetBtn {
+  background: #111827;
+  border: 1px solid #1f2937;
+  color: #9ca3af;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.presetBtn:hover {
+  background: #1f2937;
+  color: #f3f4f6;
+}
+
+.presetBtnActive {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+/* ── Speed Slider ── */
+.speedSliderGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speedLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.speedSlider {
+  width: 90px;
+  accent-color: #f59e0b;
+  cursor: pointer;
+}
+
+/* ── Explanatory Callout Footer ── */
+.explanationStrip {
+  padding: 14px 18px;
+  background: #060911;
+  border-top: 1px solid #151d2f;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+.explanationStrip strong {
+  color: #f8fafc;
+}
+
+.mathPill {
+  display: inline-block;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #f59e0b;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+}
+
+@media (max-width: 860px) {
+  .radarContainer {
+    display: none;
+  }
+  .controlsBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ratioPresets {
+    flex-wrap: wrap;
+  }
+}
