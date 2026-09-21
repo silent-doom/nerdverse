@@ -1238,6 +1238,7 @@ Bouncing classical blocks on a kitchen table execute the exact geometric rotatio
 ## The Revolution of $\\pi$: The Universal Nexus
 
 Galperin's collisions illustrate the profound revolution of $\\pi$: it is not merely a geometric property of wheels and pie crusts. $\\pi$ is the universal invariant of:
+
 - **Harmonic Oscillations:** The period of pendulums, alternating currents, and sound waves ($T = 2\\pi \\sqrt{L/g}$).
 - **Quantum Mechanics:** Heisenberg's uncertainty principle $\\Delta x \\Delta p \\ge \\hbar / 2 = h / 4\\pi$.
 - **Probability:** The Gaussian normal bell curve distribution $\\frac{1}{\\sigma \\sqrt{2\\pi}} e^{-(x-\\mu)^2/2\\sigma^2}$.

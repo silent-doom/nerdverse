@@ -7,18 +7,81 @@ import Icon from '@/components/common/Icon';
 import { CATEGORIES } from '@/lib/constants/categories';
 
 export default function CommunityPage() {
-  // Interactive RFC Builder State
+  const [activeWorkspace, setActiveWorkspace] = useState('issue'); // 'issue' | 'rfc'
+
+
+  // ── 1. Interactive Issue Desk State ──
+  const [issueTitle, setIssueTitle] = useState('');
+  const [issueCategory, setIssueCategory] = useState('math-notation');
+  const [issuePage, setIssuePage] = useState('/concepts/pi-collisions');
+  const [customPageUrl, setCustomPageUrl] = useState('');
+  const [issueDesc, setIssueDesc] = useState('');
+  const [issueSteps, setIssueSteps] = useState('1. Navigate to /concepts/pi-collisions\n2. Scroll down to "The Revolution of π: The Universal Nexus"\n3. Observe the formula notation');
+  const [issueExpected, setIssueExpected] = useState('Equations and symbols like π, √, Δ, and e^(iπ) should render as formatted mathematical formulas.');
+  const [issueObserved, setIssueObserved] = useState('Formula symbols are displaying as raw text or LaTeX markup.');
+  const [issueAuthor, setIssueAuthor] = useState('');
+  const [issueEnv, setIssueEnv] = useState('macOS / Chrome Browser');
+  const [showIssuePreview, setShowIssuePreview] = useState(false);
+  const [issueCopied, setIssueCopied] = useState(false);
+
+  // Formatted Issue Markdown Output
+  const resolvedPage = issuePage === 'custom' ? (customPageUrl || 'Custom Page') : issuePage;
+  const categoryLabels = {
+    'math-notation': '📐 Math / Formula Notation Error',
+    'bug': '🐛 Bug / Functional Defect',
+    '3d-lab': '⚡ 3D Lab / Simulation Glitch',
+    'content': '📖 Content Typo / Inaccuracy',
+    'enhancement': '🚀 Feature Request / Enhancement',
+  };
+
+  const generatedIssueMarkdown = `### [${categoryLabels[issueCategory] || issueCategory}]: ${issueTitle || 'Issue Summary'}
+
+**Target Page / Component**: \`${resolvedPage}\`
+**Category**: ${categoryLabels[issueCategory] || issueCategory}
+**Reported by**: @${issueAuthor || 'community-contributor'}
+
+#### 1. Description of the Issue
+${issueDesc || 'Describe the bug, formula rendering error, 3D simulation glitch, or visual defect.'}
+
+#### 2. Steps to Reproduce
+${issueSteps || '1. Go to page\n2. Perform action\n3. Observe problem'}
+
+#### 3. Expected Behavior
+${issueExpected || 'What should have happened or how the formula should be rendered.'}
+
+#### 4. Observed Behavior
+${issueObserved || 'What actually occurred or what incorrect text was displayed.'}
+
+#### 5. Environment & System Details
+- **Environment**: ${issueEnv || 'Web Browser'}
+- **Platform**: NerdVerse Web Client
+- **Timestamp**: ${new Date().toISOString()}`;
+
+  const handleCopyIssue = () => {
+    navigator.clipboard.writeText(generatedIssueMarkdown);
+    setIssueCopied(true);
+    setTimeout(() => setIssueCopied(false), 2400);
+  };
+
+  const handleOpenGitHubIssue = () => {
+    const titleParam = encodeURIComponent(`[${issueCategory}]: ${issueTitle || 'Issue Report on ' + resolvedPage}`);
+    const bodyParam = encodeURIComponent(generatedIssueMarkdown);
+    const labelParam = encodeURIComponent(issueCategory);
+    window.open(`https://github.com/silent-doom/nerdverse/issues/new?title=${titleParam}&body=${bodyParam}&labels=${labelParam}`, '_blank');
+  };
+
+  // ── 2. Interactive RFC Builder State ──
   const [rfcTitle, setRfcTitle] = useState('');
   const [rfcCategory, setRfcCategory] = useState('physics');
   const [rfcParadox, setRfcParadox] = useState('');
   const [rfcFormula, setRfcFormula] = useState('');
   const [rfc3DIdea, setRfc3DIdea] = useState('');
   const [authorHandle, setAuthorHandle] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [showRfcPreview, setShowRfcPreview] = useState(false);
+  const [rfcCopied, setRfcCopied] = useState(false);
 
-  // Formatted Markdown Output
-  const generatedMarkdown = `### Concept RFC Proposal: ${rfcTitle || '[Concept Title]'}
+  // Formatted RFC Markdown Output
+  const generatedRfcMarkdown = `### Concept RFC Proposal: ${rfcTitle || '[Concept Title]'}
 **Domain**: ${CATEGORIES.find((c) => c.id === rfcCategory)?.name || rfcCategory}
 **Proposed by**: @${authorHandle || 'anonymous'}
 
@@ -36,16 +99,16 @@ ${rfc3DIdea || 'Describe the interactive physical apparatus (e.g., balance scale
 #### 4. Historical Reference & Literature
 - Primary Source: [Author, Year, Paper Title]`;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(generatedMarkdown);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2400);
+  const handleCopyRfc = () => {
+    navigator.clipboard.writeText(generatedRfcMarkdown);
+    setRfcCopied(true);
+    setTimeout(() => setRfcCopied(false), 2400);
   };
 
-  const handleOpenGitHub = () => {
+  const handleOpenGitHubRfc = () => {
     const issueTitle = encodeURIComponent(`[Concept RFC]: ${rfcTitle || 'New Concept Proposal'}`);
-    const issueBody = encodeURIComponent(generatedMarkdown);
-    window.open(`https://github.com/silent-doom/nerdverse/issues/new?title=${issueTitle}&body=${issueBody}`, '_blank');
+    const issueBody = encodeURIComponent(generatedRfcMarkdown);
+    window.open(`https://github.com/silent-doom/nerdverse/issues/new?title=${issueTitle}&body=${issueBody}&labels=concept-rfc`, '_blank');
   };
 
   return (
@@ -59,15 +122,19 @@ ${rfc3DIdea || 'Describe the interactive physical apparatus (e.g., balance scale
         <h1 className={styles.title}>Community &amp; Contribution Hub</h1>
         <p className={styles.subtitle}>
           NerdVerse is an open-source commons dedicated to decoding the universe&apos;s deepest ideas.
-          Discover how to propose new thought experiments, build 3D interactive laboratories, and collaborate with researchers.
+          Report notation issues and bugs, propose new thought experiments, and collaborate on 3D interactive laboratories.
         </p>
       </header>
 
       {/* Jump Navigation Bar */}
       <nav className={styles.navBar} aria-label="Community Sections">
-        <a href="#rfc-builder" className={styles.navPill}>
+        <a href="#workspace" className={styles.navPill} onClick={() => setActiveWorkspace('issue')}>
           <Icon name="zap" size={14} />
-          <span>RFC Proposal Builder</span>
+          <span>Issue &amp; Bug Desk</span>
+        </a>
+        <a href="#workspace" className={styles.navPill} onClick={() => setActiveWorkspace('rfc')}>
+          <Icon name="atom" size={14} />
+          <span>Concept RFC Builder</span>
         </a>
         <a href="#methods" className={styles.navPill}>
           <Icon name="layers" size={14} />
@@ -87,122 +154,330 @@ ${rfc3DIdea || 'Describe the interactive physical apparatus (e.g., balance scale
         </a>
       </nav>
 
-      {/* ── 1. Interactive Concept RFC Builder ── */}
-      <section id="rfc-builder" className={styles.builderSection}>
-        <h2 className={styles.sectionHeading}>
-          <Icon name="zap" size={20} color="#38bdf8" />
-          <span>Propose a New Thought Experiment (RFC Builder)</span>
-        </h2>
-        <p className={styles.sectionDesc}>
-          Have an idea for a profound scientific paradox, economic dilemma, or mathematical proof?
-          Draft your proposal below to generate an official formatted GitHub Request for Comments (RFC).
-        </p>
+      {/* ── Interactive Workspace (Issue Desk vs RFC Builder) ── */}
+      <div id="workspace" className={styles.workspaceTabs} role="tablist">
+        <button
+          type="button"
+          className={`${styles.workspaceTabBtn} ${activeWorkspace === 'issue' ? styles.workspaceTabBtnActiveAmber : ''}`}
+          onClick={() => setActiveWorkspace('issue')}
+          role="tab"
+          aria-selected={activeWorkspace === 'issue'}
+        >
+          <Icon name="zap" size={16} />
+          <span>Report an Issue / Notation Bug</span>
+        </button>
+        <button
+          type="button"
+          className={`${styles.workspaceTabBtn} ${activeWorkspace === 'rfc' ? styles.workspaceTabBtnActive : ''}`}
+          onClick={() => setActiveWorkspace('rfc')}
+          role="tab"
+          aria-selected={activeWorkspace === 'rfc'}
+        >
+          <Icon name="atom" size={16} />
+          <span>Propose New Concept (RFC Builder)</span>
+        </button>
+      </div>
 
-        <div className={styles.formGrid}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Concept / Thought Experiment Title</label>
-            <input
-              type="text"
-              placeholder="e.g. Levinthal's Paradox, Red Queen Hypothesis, Arrow's Impossibility"
-              value={rfcTitle}
-              onChange={(e) => setRfcTitle(e.target.value)}
-              className={styles.input}
-            />
+      {/* ── 1. Interactive Issue & Bug Desk ── */}
+      {activeWorkspace === 'issue' && (
+        <section id="issue-reporter" className={`${styles.builderSection} ${styles.builderSectionAmber}`}>
+          <h2 className={styles.sectionHeading}>
+            <Icon name="zap" size={20} color="#f59e0b" />
+            <span>NerdVerse Issue Desk: Raise a GitHub Issue</span>
+          </h2>
+          <p className={styles.sectionDesc}>
+            Spotted a mathematical formula typo, raw LaTeX leakage, 3D simulation glitch, or broken animation?
+            Fill out the structured template below to open a pre-formatted GitHub issue directly in our repository.
+          </p>
+
+          <div className={styles.formGrid}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Issue Category</label>
+              <select
+                value={issueCategory}
+                onChange={(e) => setIssueCategory(e.target.value)}
+                className={styles.select}
+                data-testid="issue-category-select"
+              >
+                <option value="math-notation">📐 Mathematical / Formula Notation Error</option>
+                <option value="bug">🐛 Bug / Functional Defect</option>
+                <option value="3d-lab">⚡ 3D Lab / Simulation Glitch</option>
+                <option value="content">📖 Content Typo / Inaccuracy</option>
+                <option value="enhancement">🚀 Feature Request / Enhancement</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Target Page / Component</label>
+              <select
+                value={issuePage}
+                onChange={(e) => setIssuePage(e.target.value)}
+                className={styles.select}
+                data-testid="issue-page-select"
+              >
+                <option value="/concepts/pi-collisions">/concepts/pi-collisions (Galperin's Pi Collisions)</option>
+                <option value="/concepts/eulers-number">/concepts/eulers-number (Euler's Number)</option>
+                <option value="/concepts/murphys-law">/concepts/murphys-law (Murphy's Law)</option>
+                <option value="/concepts/schrodingers-cat">/concepts/schrodingers-cat (Schrödinger's Cat)</option>
+                <option value="/concepts/simpsons-paradox">/concepts/simpsons-paradox (Simpson's Paradox)</option>
+                <option value="/concepts/monty-hall-problem">/concepts/monty-hall-problem (Monty Hall)</option>
+                <option value="/concepts/prisoners-dilemma">/concepts/prisoners-dilemma (Prisoner's Dilemma)</option>
+                <option value="/explore">/explore (3D Knowledge Graph)</option>
+                <option value="/about">/about (About Page)</option>
+                <option value="/community">/community (Community Hub)</option>
+                <option value="custom">Custom Page / URL...</option>
+              </select>
+            </div>
+
+            {issuePage === 'custom' && (
+              <div className={styles.formGroupFull}>
+                <label className={styles.label}>Custom Page URL or Path</label>
+                <input
+                  type="text"
+                  placeholder="e.g. /concepts/your-concept or specific section"
+                  value={customPageUrl}
+                  onChange={(e) => setCustomPageUrl(e.target.value)}
+                  className={styles.input}
+                />
+              </div>
+            )}
+
+            <div className={styles.formGroupFull}>
+              <label className={styles.label}>Issue Title / Summary</label>
+              <input
+                type="text"
+                placeholder="e.g. Formula Error: \pi displayed as raw text in heading on pi-collisions"
+                value={issueTitle}
+                onChange={(e) => setIssueTitle(e.target.value)}
+                className={styles.input}
+                data-testid="issue-title-input"
+              />
+            </div>
+
+            <div className={styles.formGroupFull}>
+              <label className={styles.label}>1. Detailed Description of the Issue</label>
+              <textarea
+                placeholder="Describe what went wrong, which formula is broken, or what simulation bug you encountered."
+                value={issueDesc}
+                onChange={(e) => setIssueDesc(e.target.value)}
+                className={styles.textarea}
+              />
+            </div>
+
+            <div className={styles.formGroupFull}>
+              <label className={styles.label}>2. Steps to Reproduce (if any)</label>
+              <textarea
+                placeholder="1. Go to page&#10;2. Scroll to section&#10;3. Observe problem"
+                value={issueSteps}
+                onChange={(e) => setIssueSteps(e.target.value)}
+                className={styles.textarea}
+                rows={3}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>3. Expected Behavior</label>
+              <textarea
+                placeholder="e.g. Equations and symbols should render as formatted mathematical formulas."
+                value={issueExpected}
+                onChange={(e) => setIssueExpected(e.target.value)}
+                className={styles.textarea}
+                rows={2}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>4. Observed Behavior</label>
+              <textarea
+                placeholder="e.g. Raw LaTeX text like \pi or \sqrt{L/g} is visible."
+                value={issueObserved}
+                onChange={(e) => setIssueObserved(e.target.value)}
+                className={styles.textarea}
+                rows={2}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Your GitHub Handle (Optional)</label>
+              <input
+                type="text"
+                placeholder="e.g. your_github_username"
+                value={issueAuthor}
+                onChange={(e) => setIssueAuthor(e.target.value)}
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Device / Environment</label>
+              <input
+                type="text"
+                placeholder="e.g. macOS / Chrome / 1470x802"
+                value={issueEnv}
+                onChange={(e) => setIssueEnv(e.target.value)}
+                className={styles.input}
+              />
+            </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Intellectual Discipline</label>
-            <select
-              value={rfcCategory}
-              onChange={(e) => setRfcCategory(e.target.value)}
-              className={styles.select}
+          <div className={styles.builderActions}>
+            <button
+              type="button"
+              className={styles.btnSecondary}
+              onClick={() => setShowIssuePreview((p) => !p)}
             >
-              {CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              <Icon name="eye" size={14} />
+              <span>{showIssuePreview ? 'Hide Preview' : 'Preview Issue Markdown'}</span>
+            </button>
+
+            <button
+              type="button"
+              className={styles.btnSecondary}
+              onClick={handleCopyIssue}
+              data-testid="copy-issue-btn"
+            >
+              <Icon name="clipboard" size={14} />
+              <span>{issueCopied ? 'Copied to Clipboard!' : 'Copy Template'}</span>
+            </button>
+
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              onClick={handleOpenGitHubIssue}
+              data-testid="submit-github-issue-btn"
+            >
+              <Icon name="external-link" size={14} />
+              <span>Submit Issue on GitHub</span>
+            </button>
           </div>
 
-          <div className={styles.formGroupFull}>
-            <label className={styles.label}>The Core Paradox / Mind-Bender</label>
-            <textarea
-              placeholder="Explain the counter-intuitive friction or dilemma. What makes this thought experiment profound?"
-              value={rfcParadox}
-              onChange={(e) => setRfcParadox(e.target.value)}
-              className={styles.textarea}
-            />
+          {showIssuePreview && (
+            <div className={styles.previewBox}>
+              <pre className={styles.previewCode}>{generatedIssueMarkdown}</pre>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ── 2. Interactive Concept RFC Builder ── */}
+      {activeWorkspace === 'rfc' && (
+        <section id="rfc-builder" className={styles.builderSection}>
+          <h2 className={styles.sectionHeading}>
+            <Icon name="atom" size={20} color="#38bdf8" />
+            <span>Propose a New Thought Experiment (RFC Builder)</span>
+          </h2>
+          <p className={styles.sectionDesc}>
+            Have an idea for a profound scientific paradox, economic dilemma, or mathematical proof?
+            Draft your proposal below to generate an official formatted GitHub Request for Comments (RFC).
+          </p>
+
+          <div className={styles.formGrid}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Concept / Thought Experiment Title</label>
+              <input
+                type="text"
+                placeholder="e.g. Levinthal's Paradox, Red Queen Hypothesis, Arrow's Impossibility"
+                value={rfcTitle}
+                onChange={(e) => setRfcTitle(e.target.value)}
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Intellectual Discipline</label>
+              <select
+                value={rfcCategory}
+                onChange={(e) => setRfcCategory(e.target.value)}
+                className={styles.select}
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.formGroupFull}>
+              <label className={styles.label}>The Core Paradox / Mind-Bender</label>
+              <textarea
+                placeholder="Explain the counter-intuitive friction or dilemma. What makes this thought experiment profound?"
+                value={rfcParadox}
+                onChange={(e) => setRfcParadox(e.target.value)}
+                className={styles.textarea}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Mathematical / Theoretical Formalism</label>
+              <input
+                type="text"
+                placeholder="e.g. H(X) = -Σ p(x) log p(x), Δx Δp ≥ ℏ/2"
+                value={rfcFormula}
+                onChange={(e) => setRfcFormula(e.target.value)}
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Your GitHub / Author Handle</label>
+              <input
+                type="text"
+                placeholder="e.g. richard_feynman"
+                value={authorHandle}
+                onChange={(e) => setAuthorHandle(e.target.value)}
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.formGroupFull}>
+              <label className={styles.label}>Proposed 3D Visualization / Physical Apparatus</label>
+              <textarea
+                placeholder="What 3D apparatus should be modeled (e.g. in Blender / Three.js)? What sliders, buttons, or lenses should users manipulate?"
+                value={rfc3DIdea}
+                onChange={(e) => setRfc3DIdea(e.target.value)}
+                className={styles.textarea}
+              />
+            </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Mathematical / Theoretical Formalism</label>
-            <input
-              type="text"
-              placeholder="e.g. H(X) = -Σ p(x) log p(x), Δx Δp ≥ ℏ/2"
-              value={rfcFormula}
-              onChange={(e) => setRfcFormula(e.target.value)}
-              className={styles.input}
-            />
+          <div className={styles.builderActions}>
+            <button
+              type="button"
+              className={styles.btnSecondary}
+              onClick={() => setShowRfcPreview((p) => !p)}
+            >
+              <Icon name="eye" size={14} />
+              <span>{showRfcPreview ? 'Hide Preview' : 'Preview RFC Markdown'}</span>
+            </button>
+
+            <button
+              type="button"
+              className={styles.btnSecondary}
+              onClick={handleCopyRfc}
+            >
+              <Icon name="clipboard" size={14} />
+              <span>{rfcCopied ? 'Copied to Clipboard!' : 'Copy Markdown'}</span>
+            </button>
+
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              onClick={handleOpenGitHubRfc}
+            >
+              <Icon name="external-link" size={14} />
+              <span>Submit RFC on GitHub Issues</span>
+            </button>
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Your GitHub / Author Handle</label>
-            <input
-              type="text"
-              placeholder="e.g. richard_feynman"
-              value={authorHandle}
-              onChange={(e) => setAuthorHandle(e.target.value)}
-              className={styles.input}
-            />
-          </div>
+          {showRfcPreview && (
+            <div className={styles.previewBox}>
+              <pre className={styles.previewCode}>{generatedRfcMarkdown}</pre>
+            </div>
+          )}
+        </section>
+      )}
 
-          <div className={styles.formGroupFull}>
-            <label className={styles.label}>Proposed 3D Visualization / Physical Apparatus</label>
-            <textarea
-              placeholder="What 3D apparatus should be modeled (e.g. in Blender / Three.js)? What sliders, buttons, or lenses should users manipulate?"
-              value={rfc3DIdea}
-              onChange={(e) => setRfc3DIdea(e.target.value)}
-              className={styles.textarea}
-            />
-          </div>
-        </div>
-
-        <div className={styles.builderActions}>
-          <button
-            type="button"
-            className={styles.btnSecondary}
-            onClick={() => setShowPreview((p) => !p)}
-          >
-            <Icon name="eye" size={14} />
-            <span>{showPreview ? 'Hide Preview' : 'Preview RFC Markdown'}</span>
-          </button>
-
-          <button
-            type="button"
-            className={styles.btnSecondary}
-            onClick={handleCopy}
-          >
-            <Icon name="clipboard" size={14} />
-            <span>{copied ? 'Copied to Clipboard!' : 'Copy Markdown'}</span>
-          </button>
-
-          <button
-            type="button"
-            className={styles.btnPrimary}
-            onClick={handleOpenGitHub}
-          >
-            <Icon name="external-link" size={14} />
-            <span>Submit RFC on GitHub Issues</span>
-          </button>
-        </div>
-
-        {showPreview && (
-          <div className={styles.previewBox}>
-            <pre className={styles.previewCode}>{generatedMarkdown}</pre>
-          </div>
-        )}
-      </section>
 
       {/* ── 2. The 5-Pillar NerdVerse Contribution Methods ── */}
       <section id="methods" className={styles.pillarsSection}>

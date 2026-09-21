@@ -8,55 +8,7 @@ import Badge from '@/components/ui/Badge/Badge';
 import Card from '@/components/ui/Card/Card';
 import Icon from '@/components/common/Icon';
 import styles from './ConceptDetail.module.css';
-
-function formatInline(text) {
-  if (!text) return '';
-  return text
-    .replace(/\\text\{([^}]+)\}/g, '$1')
-    .replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>')
-    .replace(/\\approx/g, '≈')
-    .replace(/\\cdot/g, '·')
-    .replace(/\\times/g, '×')
-    .replace(/\\to/g, '→')
-    .replace(/\\neg\s*/g, '¬')
-    .replace(/\\ge/g, '≥')
-    .replace(/\\le/g, '≤')
-    .replace(/\\hbar/g, 'ℏ')
-    .replace(/\\Delta/g, 'Δ')
-    .replace(/\\sum/g, 'Σ')
-    .replace(/\\infty/g, '∞')
-    .replace(/\\dots/g, '...')
-    .replace(/\\ln/g, 'ln')
-    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 / $2')
-    .replace(/\$([^$]+)\$/g, '<em>$1</em>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
-}
-
-function cleanDisplayFormula(raw) {
-  let f = raw.replace(/^\$\$\s*/, '').replace(/\s*\$\$$/, '');
-  f = f
-    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 / $2')
-    .replace(/\\text\{([^}]+)\}/g, '$1')
-    .replace(/\\mathbf\{([^}]+)\}/g, '$1')
-    .replace(/\\quad/g, '  ')
-    .replace(/\\Delta/g, 'Δ')
-    .replace(/\\cdot/g, '·')
-    .replace(/\\ge/g, '≥')
-    .replace(/\\le/g, '≤')
-    .replace(/\\hbar/g, 'ℏ')
-    .replace(/\\approx/g, '≈')
-    .replace(/\\infty/g, '∞')
-    .replace(/\\sum_\{[^}]+\}\^\{[^}]+\}/g, 'Σ')
-    .replace(/\\sum/g, 'Σ')
-    .replace(/\\left\(|\\right\)/g, '')
-    .replace(/\\dots/g, '...')
-    .replace(/\\ln/g, 'ln')
-    .replace(/\\%/g, '%')
-    .replace(/\\\\/g, ' ');
-  return f.trim();
-}
+import { renderMathInMarkdown, cleanDisplayFormula } from '@/lib/mathRenderer';
 
 function parseContentBlocks(raw) {
   if (!raw) return [];
@@ -65,11 +17,14 @@ function parseContentBlocks(raw) {
     .replace(/(^|\n)(#{1,4}\s+[^\n]+)/g, '$1\n\n$2\n\n')
     .replace(/(^|\n)(>[^\n]+(\n>[^\n]+)*)/g, '$1\n\n$2\n\n')
     .replace(/(\$\$[\s\S]*?\$\$)/g, '\n\n$1\n\n')
+    .replace(/([^\n])\n([-\*]\s+[^\n]+)/g, '$1\n\n$2') // Ensure list after sentence becomes separate block
+    .replace(/([-\*]\s+[^\n]+)\n([^\n-\*#>\$])/g, '$1\n\n$2') // Ensure paragraph after list becomes separate block
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
   return normalized.split('\n\n').map((b) => b.trim()).filter(Boolean);
 }
+
 
 export default function ConceptDetailClient({ concept, category, relatedConcepts }) {
   const [activeTab, setActiveTab] = useState('narrative'); // 'narrative' | 'math' | 'telemetry' | 'citations'
@@ -270,7 +225,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                     <h2
                       key={idx}
                       className={styles.h2}
-                      dangerouslySetInnerHTML={{ __html: formatInline(block.replace(/^##\s+/, '')) }}
+                      dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^##\s+/, '')) }}
                     />
                   );
                 }
@@ -279,14 +234,14 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                     <h3
                       key={idx}
                       className={styles.h3}
-                      dangerouslySetInnerHTML={{ __html: formatInline(block.replace(/^###\s+/, '')) }}
+                      dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^###\s+/, '')) }}
                     />
                   );
                 }
                 if (block.startsWith('>')) {
                   return (
                     <blockquote key={idx} className={styles.blockquote}>
-                      <p dangerouslySetInnerHTML={{ __html: formatInline(block.replace(/^>\s*/gm, '')) }} />
+                      <p dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^>\s*/gm, '')) }} />
                     </blockquote>
                   );
                 }
@@ -304,7 +259,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                   return (
                     <ul key={idx} className={styles.list}>
                       {items.map((item, i) => (
-                        <li key={i} dangerouslySetInnerHTML={{ __html: formatInline(item) }} />
+                        <li key={i} dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(item) }} />
                       ))}
                     </ul>
                   );
@@ -314,7 +269,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                     key={idx}
                     className={styles.paragraph}
                     dangerouslySetInnerHTML={{
-                      __html: formatInline(block),
+                      __html: renderMathInMarkdown(block),
                     }}
                   />
                 );
@@ -341,22 +296,24 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                       <h3
                         key={idx}
                         className={styles.h3}
-                        dangerouslySetInnerHTML={{ __html: formatInline(block.replace(/^#{2,3}\s+/, '')) }}
+                        dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^#{2,3}\s+/, '')) }}
                       />
                     );
                   }
                   if (block.startsWith('$$') && block.endsWith('$$')) {
                     return (
-                      <div key={idx} className={styles.formulaBlock}>
-                        <span>{cleanDisplayFormula(block)}</span>
-                      </div>
+                      <div
+                        key={idx}
+                        className={styles.formulaBlock}
+                        dangerouslySetInnerHTML={{ __html: cleanDisplayFormula(block) }}
+                      />
                     );
                   }
                   return (
                     <p
                       key={idx}
                       className={styles.paragraph}
-                      dangerouslySetInnerHTML={{ __html: formatInline(block) }}
+                      dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block) }}
                     />
                   );
                 })
