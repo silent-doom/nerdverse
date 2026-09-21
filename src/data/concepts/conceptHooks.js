@@ -1,5 +1,5 @@
 /**
- * Pedagogical Hooks & Guided Challenges for all 20 concepts.
+ * Pedagogical Hooks & Guided Challenges for all 36 concepts.
  * Designed for Progressive Disclosure:
  * - Level 1: The 30-Second Hook (Premise, Intuition, Twist)
  * - Level 2: Guided Interactive Challenges

@@ -80,9 +80,9 @@ export default function AboutPage() {
         </p>
 
         <div className={styles.contactGrid}>
-          <a href="mailto:contact@nerdverse.org" className={styles.contactCard}>
+          <a href="mailto:curiosity.nerdverse@gmail.com" className={styles.contactCard}>
             <span className={styles.contactType}>General &amp; Research Inquiries</span>
-            <span className={styles.contactVal}>contact@nerdverse.org</span>
+            <span className={styles.contactVal}>curiosity.nerdverse@gmail.com</span>
             <span className={styles.contactDesc}>Academic collaboration, curriculum integration, and questions.</span>
           </a>
 

@@ -107,7 +107,7 @@ export default function KnowledgeNodeGraph({ initialActiveSlug = null }) {
           <Icon name="search" size={15} color="var(--color-text-secondary)" />
           <input
             type="text"
-            placeholder="Search all 36 knowledge nodes..."
+            placeholder={`Search all ${concepts.length} knowledge nodes...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={styles.searchInput}
