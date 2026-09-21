@@ -56,6 +56,28 @@
   color: var(--color-text-tertiary, #5d6377);
 }
 
+.graphNodeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs, 12px);
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 3px 10px;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.graphNodeBadge:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
 .title {
   font-size: clamp(2.25rem, 4.5vw, 3.5rem);
   font-weight: 800;

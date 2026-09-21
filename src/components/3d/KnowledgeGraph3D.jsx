@@ -58,7 +58,7 @@ function createLabelSprite(text, colorHex, isHighlighted = false) {
   return sprite;
 }
 
-export default function KnowledgeGraph3D() {
+export default function KnowledgeGraph3D({ initialNodeSlug = null }) {
   const mountRef = useRef(null);
 
   // Interaction & UI state
@@ -155,6 +155,16 @@ export default function KnowledgeGraph3D() {
       return next;
     });
   }, []);
+
+  // Handle initial node focus on mount
+  useEffect(() => {
+    if (initialNodeSlug) {
+      const node = getNodeById(initialNodeSlug);
+      if (node) {
+        focusNodeIn3D(node);
+      }
+    }
+  }, [initialNodeSlug, focusNodeIn3D]);
 
   // Filter by Domain
   const handleDomainFilter = useCallback((domainId) => {

@@ -106,6 +106,14 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
             <Icon name="clock" size={13} />
             <span>{concept.readTime} min activity</span>
           </div>
+          <Link
+            href={`/explore?node=${concept.slug}`}
+            className={styles.graphNodeBadge}
+            title={`Inspect ${concept.title} in the 3D Knowledge Graph`}
+          >
+            <Icon name="network" size={13} />
+            <span>Knowledge Node #{concept.id}</span>
+          </Link>
         </div>
 
         <h1 className={styles.title}>{concept.title}</h1>

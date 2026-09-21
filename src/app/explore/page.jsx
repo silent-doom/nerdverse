@@ -1,7 +1,9 @@
 'use client';
 
+import React, { useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Icon from '@/components/common/Icon';
 import styles from './ExploreGraph.module.css';
 import { getAllPublishedConcepts } from '@/data/concepts';
@@ -16,7 +18,21 @@ const KnowledgeGraph3D = dynamic(() => import('@/components/3d/KnowledgeGraph3D'
   ),
 });
 
-export default function ExplorePage() {
+const KnowledgeNodeGraph = dynamic(() => import('@/components/interactive/KnowledgeNodeGraph'), {
+  ssr: false,
+  loading: () => (
+    <div className={styles.loadingPlaceholder}>
+      <div className={styles.loadingSpinner} />
+      <span>Loading 2D Knowledge Web...</span>
+    </div>
+  ),
+});
+
+function ExploreContent() {
+  const searchParams = useSearchParams();
+  const initialNode = searchParams.get('node') || null;
+  const initialView = searchParams.get('view') === '2d' ? '2d' : '3d';
+  const [viewMode, setViewMode] = useState(initialView);
   const publishedCount = getAllPublishedConcepts().length;
 
   return (
@@ -24,11 +40,11 @@ export default function ExplorePage() {
       <header className={styles.header}>
         <div className={styles.badge}>
           <Icon name="network" size={15} />
-          <span>3D Domain Projection &amp; Epistemic Graph</span>
+          <span>Domain Projection &amp; Epistemic Network</span>
         </div>
         <h1 className={styles.title}>The Knowledge Graph</h1>
         <p className={styles.subtitle}>
-          A multidimensional 3D projection of the domains that scientific and philosophical ideas are about. 
+          A multidimensional projection of the domains that scientific and philosophical ideas are about. 
           Discover semantic affinity paths, disciplinary clusters, and cross-domain bridges inspired by Connected Papers.
         </p>
 
@@ -54,12 +70,54 @@ export default function ExplorePage() {
             <span>Instant Semantic Search</span>
           </div>
         </div>
+
+        {/* View Mode Toggle: 3D Orbit vs 2D Web */}
+        <div className={styles.viewModeToggle} role="tablist" aria-label="Knowledge Graph View Mode">
+          <button
+            className={`${styles.viewModeBtn} ${viewMode === '3d' ? styles.viewModeBtnActive : ''}`}
+            onClick={() => setViewMode('3d')}
+            role="tab"
+            aria-selected={viewMode === '3d'}
+          >
+            <Icon name="network" size={15} />
+            <span>3D Orbit Space</span>
+          </button>
+          <button
+            className={`${styles.viewModeBtn} ${viewMode === '2d' ? styles.viewModeBtnActive : ''}`}
+            onClick={() => setViewMode('2d')}
+            role="tab"
+            aria-selected={viewMode === '2d'}
+          >
+            <Icon name="layers" size={15} />
+            <span>2D Knowledge Web ({publishedCount} Nodes)</span>
+          </button>
+        </div>
       </header>
 
-      {/* 3D Knowledge Graph Projection */}
+      {/* Projection Area */}
       <main className={styles.graphWrapper}>
-        <KnowledgeGraph3D />
+        {viewMode === '3d' ? (
+          <KnowledgeGraph3D initialNodeSlug={initialNode} />
+        ) : (
+          <KnowledgeNodeGraph initialActiveSlug={initialNode} />
+        )}
       </main>
     </div>
   );
 }
+
+export default function ExplorePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.loadingPlaceholder}>
+          <div className={styles.loadingSpinner} />
+          <span>Initializing Knowledge Graph...</span>
+        </div>
+      }
+    >
+      <ExploreContent />
+    </Suspense>
+  );
+}
+
