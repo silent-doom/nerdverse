@@ -85,4 +85,41 @@ describe('PiCollisions3DLab', () => {
     expect(screen.getAllByText('31').length).toBeGreaterThan(0);
     expect(screen.getByText(/Exact π Target Reached/i)).toBeInTheDocument();
   });
+
+  it('supports extreme mass ratios computing 5 and 7 digits of pi', () => {
+    render(<PiCollisions3DLab />);
+
+    // Select 10^8 : 1 (5 digits of pi -> 31,415)
+    const preset5Digits = screen.getByRole('button', { name: /10⁸ : 1/i });
+    fireEvent.click(preset5Digits);
+
+    const fastForwardBtn = screen.getByRole('button', { name: /Fast-Forward/i });
+    fireEvent.click(fastForwardBtn);
+
+    expect(screen.getAllByText('31,415').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/3\.1415/i).length).toBeGreaterThan(0);
+
+    // Select 10^12 : 1 (7 digits of pi -> 3,141,592)
+    const preset7Digits = screen.getByRole('button', { name: /10¹² : 1/i });
+    fireEvent.click(preset7Digits);
+    fireEvent.click(fastForwardBtn);
+
+    expect(screen.getAllByText('3,141,592').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/3\.141592/i).length).toBeGreaterThan(0);
+  });
+
+  it('demonstrates the 1,000 : 1 curiosity case yielding 99 collisions rather than pi digits', () => {
+    render(<PiCollisions3DLab />);
+
+    const curiosityBtn = screen.getByRole('button', { name: /^1,000 : 1/i });
+    fireEvent.click(curiosityBtn);
+
+    const fastForwardBtn = screen.getByRole('button', { name: /Fast-Forward/i });
+    fireEvent.click(fastForwardBtn);
+
+    expect(screen.getAllByText('99').length).toBeGreaterThan(0);
+    expect(screen.getByText(/≠ π/i)).toBeInTheDocument();
+    expect(screen.getByText(/Done: 99 Collisions Reached/i)).toBeInTheDocument();
+  });
 });
+

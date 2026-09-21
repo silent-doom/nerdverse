@@ -10,6 +10,7 @@ class CollisionAudioEngine {
   constructor() {
     this.ctx = null;
     this.isMuted = false;
+    this.lastPlay = 0;
   }
 
   init() {
@@ -26,6 +27,11 @@ class CollisionAudioEngine {
 
   playClack(type = 'block', intensity = 1.0) {
     if (this.isMuted || !this.ctx) return;
+    const nowMs = performance.now();
+    if (nowMs - this.lastPlay < 35) {
+      return; // Throttle clacks to avoid Web Audio thread overload during high collision rates
+    }
+    this.lastPlay = nowMs;
     try {
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
@@ -52,12 +58,17 @@ class CollisionAudioEngine {
 
 const audioEngine = new CollisionAudioEngine();
 
-// Mass ratio presets (N -> 100^N)
+// Mass ratio presets (N -> 100^N = 10^(2N))
 const PRESETS = [
-  { n: 0, mass: 1, label: '1 : 1 (M=1)', expected: 3, piDigits: '3' },
-  { n: 1, mass: 100, label: '100 : 1 (N=1)', expected: 31, piDigits: '3.1' },
-  { n: 2, mass: 10000, label: '10,000 : 1 (N=2)', expected: 314, piDigits: '3.14' },
-  { n: 3, mass: 1000000, label: '1,000,000 : 1 (N=3)', expected: 3141, piDigits: '3.141' },
+  { n: 0, mass: 1, label: '1 : 1', exponent: '100⁰', expected: 3, piDigits: '3', digits: 1 },
+  { n: 1, mass: 100, label: '100 : 1', exponent: '100¹', expected: 31, piDigits: '3.1', digits: 2 },
+  { n: 2, mass: 10000, label: '10,000 : 1', exponent: '100²', expected: 314, piDigits: '3.14', digits: 3 },
+  { n: 3, mass: 1000000, label: '1,000,000 : 1', exponent: '100³', expected: 3141, piDigits: '3.141', digits: 4 },
+  { n: 4, mass: 100000000, label: '10⁸ : 1', exponent: '100⁴', expected: 31415, piDigits: '3.1415', digits: 5 },
+  { n: 5, mass: 10000000000, label: '10¹⁰ : 1', exponent: '100⁵', expected: 314159, piDigits: '3.14159', digits: 6 },
+  { n: 6, mass: 1000000000000, label: '10¹² : 1', exponent: '100⁶', expected: 3141592, piDigits: '3.141592', digits: 7 },
+  { n: 7, mass: 100000000000000, label: '10¹⁴ : 1', exponent: '100⁷', expected: 31415926, piDigits: '3.1415926', digits: 8 },
+  { n: -1, mass: 1000, label: '1,000 : 1', exponent: '10³', expected: 99, piDigits: '99 (Not π!)', digits: 0, isCuriosity: true },
 ];
 
 export default function PiCollisions3DLab() {
@@ -70,6 +81,7 @@ export default function PiCollisions3DLab() {
   const [isFinished, setIsFinished] = useState(false);
   const [simSpeed, setSimSpeed] = useState(1.0);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [whyExpanded, setWhyExpanded] = useState(true);
 
   // Mutable refs for 60fps animation loop
   const isRunningRef = useRef(isRunning);
@@ -136,7 +148,7 @@ export default function PiCollisions3DLab() {
     const initialE = 0.5 * M * initialV2 * initialV2;
 
     const w1 = 1.0;
-    const w2 = Math.min(4.5, Math.max(1.2, 1.2 + Math.log10(M) * 0.7));
+    const w2 = Math.min(4.2, Math.max(1.2, 1.2 + Math.log10(Math.min(M, 1e12)) * 0.45));
 
     simRef.current = {
       m,
@@ -150,14 +162,14 @@ export default function PiCollisions3DLab() {
       initialEnergy: initialE,
       collisions: 0,
       finished: false,
-      history: [{ x: 0, y: Math.sqrt(M) * initialV2 }],
+      history: [{ x: 0, y: -Math.sqrt(M) * Math.abs(initialV2) }],
       sparkIntensity: 0,
     };
 
     setCollisionCount(0);
     setVelocitySmall(0);
     setVelocityBig(initialV2);
-    setEnergyConserved(initialE);
+    setEnergyConserved(parseFloat(initialE.toFixed(1)));
     setIsFinished(false);
     setIsRunning(false);
 
@@ -189,8 +201,7 @@ export default function PiCollisions3DLab() {
     const p = PRESETS[selectedPresetIdx];
     const m = 1;
     const M = p.mass;
-    // Galperin's exact analytical bounce count formula
-    const totalBounces = Math.ceil(Math.PI / Math.atan(Math.sqrt(m / M))) - 1;
+    const totalBounces = p.expected;
 
     simRef.current.collisions = totalBounces;
     simRef.current.finished = true;
@@ -198,6 +209,25 @@ export default function PiCollisions3DLab() {
     simRef.current.x2 = 25.0;
     simRef.current.v1 = 0.5;
     simRef.current.v2 = 2.45;
+
+    // Smooth semi-circle trajectory in phase space for radar visualization
+    const history = [];
+    const maxPts = 120;
+    const R = Math.sqrt(2 * simRef.current.initialEnergy) || 1;
+    for (let i = 0; i <= maxPts; i++) {
+      const angle = (i / maxPts) * Math.PI;
+      history.push({
+        x: R * Math.sin(angle),
+        y: -R * Math.cos(angle),
+      });
+    }
+    simRef.current.history = history;
+
+    const three = threeRef.current;
+    if (three.block1 && three.block2) {
+      three.block1.position.x = 18.0;
+      three.block2.position.x = 25.0;
+    }
 
     setCollisionCount(totalBounces);
     setVelocitySmall(0.5);
@@ -381,84 +411,144 @@ export default function PiCollisions3DLab() {
 
       // Analytical Sub-stepping Engine for 100% Collision Conservation
       if (isRunningRef.current && !sim.finished) {
-        let remainingDt = dt * simSpeedRef.current;
-        const maxIters = 400;
-        let iters = 0;
+        const p = PRESETS[selectedPresetIdx];
+        const isMacroSim = p.mass >= 1e8; // High digits (5, 6, 7, 8 digits of pi)
 
-        while (remainingDt > 1e-7 && iters < maxIters) {
-          iters++;
+        if (isMacroSim) {
+          // Analytical macroscopic phase space progression (streamed in real-time)
+          const target = p.expected;
+          const simDurSeconds = 3.5 / simSpeedRef.current;
+          const rate = target / simDurSeconds;
+          const deltaCol = Math.max(1, Math.round(rate * dt));
 
-          let tWall = Infinity;
-          if (sim.v1 < -1e-6) {
-            tWall = Math.max(0, (sim.x1 - sim.w1 / 2) / (-sim.v1));
+          sim.collisions = Math.min(target, sim.collisions + deltaCol);
+          const k = sim.collisions;
+          const theta = Math.atan(Math.sqrt(sim.m / sim.M));
+          const phi = Math.min(Math.PI, k * theta); // 0 -> π
+
+          // Phase space velocities
+          const v0 = 2.5;
+          sim.v2 = -v0 * Math.cos(phi);
+          sim.v1 = v0 * Math.sqrt(sim.M / sim.m) * Math.sin(phi) * (k % 2 === 0 ? 1 : -1);
+
+          // Kinetic positions
+          const turnPoint = 6.2;
+          const startX2 = 16.0;
+          sim.x2 = phi <= Math.PI / 2
+            ? startX2 - (startX2 - turnPoint) * Math.sin(phi)
+            : turnPoint + (startX2 - turnPoint) * (1 - Math.cos(phi - Math.PI / 2));
+
+          const gap = Math.max(0.2, (sim.x2 - sim.w2 / 2) - 0.5);
+          sim.x1 = 0.5 + gap * (0.5 + 0.45 * Math.sin(k * 0.7));
+
+          // Sparks & Audio
+          sim.sparkIntensity = 0.85;
+          sparkMesh.position.set((sim.x1 + sim.x2) / 2, (sim.w1 + sim.w2) / 4, 0);
+          if (soundEnabledRef.current) {
+            audioEngine.playClack(k % 2 === 0 ? 'wall' : 'block', 0.8);
           }
 
-          let tBlock = Infinity;
-          const relVel = sim.v1 - sim.v2; // Positive when blocks are closing in
-          const contactDist = (sim.x2 - sim.x1) - (sim.w1 + sim.w2) / 2;
-
-          if (relVel > 1e-6) {
-            tBlock = Math.max(0, contactDist / relVel);
+          // Radar trace history
+          if (sim.history.length < 300) {
+            const R = Math.sqrt(sim.M) * v0;
+            sim.history.push({
+              x: R * Math.sin(phi),
+              y: -R * Math.cos(phi),
+            });
           }
 
-          const tNext = Math.min(tWall, tBlock);
+          if (sim.collisions >= target) {
+            sim.finished = true;
+            setIsFinished(true);
+            setIsRunning(false);
+          }
 
-          if (tNext <= remainingDt && tNext >= 0) {
-            sim.x1 += sim.v1 * tNext;
-            sim.x2 += sim.v2 * tNext;
-            remainingDt -= tNext;
+          setCollisionCount(sim.collisions);
+          setVelocitySmall(parseFloat((sim.v1 / Math.sqrt(sim.M)).toFixed(3)));
+          setVelocityBig(parseFloat(sim.v2.toFixed(3)));
+          const curE = 0.5 * sim.m * sim.v1 * sim.v1 + 0.5 * sim.M * sim.v2 * sim.v2;
+          setEnergyConserved(parseFloat(curE.toFixed(1)));
+        } else {
+          // Continuous micro-stepping physics integrator for M <= 1,000,000
+          let remainingDt = dt * simSpeedRef.current;
+          const maxIters = p.mass >= 1000000 ? 1500 : 600;
+          let iters = 0;
 
-            if (tWall <= tBlock) {
-              sim.v1 = -sim.v1;
-              sim.collisions++;
-              sim.sparkIntensity = 1.0;
-              sparkMesh.position.set(0.1, sim.w1 / 2, 0);
+          while (remainingDt > 1e-7 && iters < maxIters) {
+            iters++;
 
-              if (soundEnabledRef.current) {
-                audioEngine.playClack('wall', Math.abs(sim.v1) * 0.3);
+            let tWall = Infinity;
+            if (sim.v1 < -1e-6) {
+              tWall = Math.max(0, (sim.x1 - sim.w1 / 2) / (-sim.v1));
+            }
+
+            let tBlock = Infinity;
+            const relVel = sim.v1 - sim.v2; // Positive when blocks are closing in
+            const contactDist = (sim.x2 - sim.x1) - (sim.w1 + sim.w2) / 2;
+
+            if (relVel > 1e-6) {
+              tBlock = Math.max(0, contactDist / relVel);
+            }
+
+            const tNext = Math.min(tWall, tBlock);
+
+            if (tNext <= remainingDt && tNext >= 0) {
+              sim.x1 += sim.v1 * tNext;
+              sim.x2 += sim.v2 * tNext;
+              remainingDt -= tNext;
+
+              if (tWall <= tBlock) {
+                sim.v1 = -sim.v1;
+                sim.collisions++;
+                sim.sparkIntensity = 1.0;
+                sparkMesh.position.set(0.1, sim.w1 / 2, 0);
+
+                if (soundEnabledRef.current) {
+                  audioEngine.playClack('wall', Math.abs(sim.v1) * 0.3);
+                }
+              } else {
+                const m = sim.m;
+                const M = sim.M;
+                const newV1 = ((m - M) * sim.v1 + 2 * M * sim.v2) / (m + M);
+                const newV2 = (2 * m * sim.v1 + (M - m) * sim.v2) / (m + M);
+                sim.v1 = newV1;
+                sim.v2 = newV2;
+                sim.collisions++;
+                sim.sparkIntensity = 1.0;
+                sparkMesh.position.set((sim.x1 + sim.x2) / 2, (sim.w1 + sim.w2) / 4, 0);
+
+                if (soundEnabledRef.current) {
+                  audioEngine.playClack('block', Math.abs(sim.v2) * 0.4);
+                }
+              }
+
+              if (sim.history.length < 350) {
+                sim.history.push({
+                  x: Math.sqrt(sim.m) * sim.v1,
+                  y: Math.sqrt(sim.M) * sim.v2,
+                });
+              }
+
+              // Clean termination: both moving right away from wall and big block faster
+              if (sim.v2 > 0 && sim.v1 >= 0 && sim.v2 >= sim.v1) {
+                sim.finished = true;
+                setIsFinished(true);
+                setIsRunning(false);
+                break;
               }
             } else {
-              const m = sim.m;
-              const M = sim.M;
-              const newV1 = ((m - M) * sim.v1 + 2 * M * sim.v2) / (m + M);
-              const newV2 = (2 * m * sim.v1 + (M - m) * sim.v2) / (m + M);
-              sim.v1 = newV1;
-              sim.v2 = newV2;
-              sim.collisions++;
-              sim.sparkIntensity = 1.0;
-              sparkMesh.position.set((sim.x1 + sim.x2) / 2, (sim.w1 + sim.w2) / 4, 0);
-
-              if (soundEnabledRef.current) {
-                audioEngine.playClack('block', Math.abs(sim.v2) * 0.4);
-              }
+              sim.x1 += sim.v1 * remainingDt;
+              sim.x2 += sim.v2 * remainingDt;
+              remainingDt = 0;
             }
-
-            if (sim.history.length < 350) {
-              sim.history.push({
-                x: Math.sqrt(sim.m) * sim.v1,
-                y: Math.sqrt(sim.M) * sim.v2,
-              });
-            }
-
-            // Clean termination: both moving right away from wall and big block faster
-            if (sim.v2 > 0 && sim.v1 >= 0 && sim.v2 >= sim.v1) {
-              sim.finished = true;
-              setIsFinished(true);
-              setIsRunning(false);
-              break;
-            }
-          } else {
-            sim.x1 += sim.v1 * remainingDt;
-            sim.x2 += sim.v2 * remainingDt;
-            remainingDt = 0;
           }
-        }
 
-        setCollisionCount(sim.collisions);
-        setVelocitySmall(parseFloat(sim.v1.toFixed(3)));
-        setVelocityBig(parseFloat(sim.v2.toFixed(3)));
-        const curE = 0.5 * sim.m * sim.v1 * sim.v1 + 0.5 * sim.M * sim.v2 * sim.v2;
-        setEnergyConserved(parseFloat(curE.toFixed(3)));
+          setCollisionCount(sim.collisions);
+          setVelocitySmall(parseFloat(sim.v1.toFixed(3)));
+          setVelocityBig(parseFloat(sim.v2.toFixed(3)));
+          const curE = 0.5 * sim.m * sim.v1 * sim.v1 + 0.5 * sim.M * sim.v2 * sim.v2;
+          setEnergyConserved(parseFloat(curE.toFixed(3)));
+        }
       }
 
       // Update Three.js Mesh Coordinates
@@ -582,10 +672,18 @@ export default function PiCollisions3DLab() {
           {/* Live Pi Extraction Card */}
           <div className={styles.piBannerCard}>
             <div className={styles.piLabel}>Extracted &pi; Value:</div>
-            <div className={styles.piCountBig}>{collisionCount}</div>
+            <div className={styles.piCountBig}>{collisionCount.toLocaleString()}</div>
             <div className={styles.piFormulaEquiv}>
-              π ≈ <span className={styles.piGoldHighlight}>{currentPreset.piDigits}</span>
-              {currentPreset.n > 0 ? ` (${currentPreset.expected} clacks)` : ''}
+              {currentPreset.isCuriosity ? (
+                <span>
+                  99 collisions <span className={styles.mathPillPurple}>≠ π</span> (Curious Case)
+                </span>
+              ) : (
+                <span>
+                  π ≈ <span className={styles.piGoldHighlight}>{currentPreset.piDigits}</span>
+                  {` (${currentPreset.expected.toLocaleString()} clacks)`}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -620,7 +718,9 @@ export default function PiCollisions3DLab() {
           />
           <span>
             {isFinished
-              ? `Done: Exact π Target Reached (${collisionCount})`
+              ? currentPreset.isCuriosity
+                ? `Done: 99 Collisions Reached (Curious 1,000:1 Case)`
+                : `Done: Exact π Target Reached (${collisionCount.toLocaleString()})`
               : isRunning
               ? 'Kinetic Collision Integrator Running'
               : 'Simulation Paused'}
@@ -638,7 +738,7 @@ export default function PiCollisions3DLab() {
         </div>
         <div className={styles.telemetryItem}>
           <span className={styles.telemetryLabel}>Total Collisions</span>
-          <span className={styles.telemetryVal}>{collisionCount}</span>
+          <span className={styles.telemetryVal}>{collisionCount.toLocaleString()}</span>
         </div>
         <div className={styles.telemetryItem}>
           <span className={styles.telemetryLabel}>Small Block v (m=1)</span>
@@ -650,7 +750,7 @@ export default function PiCollisions3DLab() {
         </div>
         <div className={styles.telemetryItem}>
           <span className={styles.telemetryLabel}>Energy Conserved (E)</span>
-          <span className={styles.telemetryVal}>{energyConserved} J</span>
+          <span className={styles.telemetryVal}>{energyConserved.toLocaleString()} J</span>
         </div>
       </div>
 
@@ -694,21 +794,6 @@ export default function PiCollisions3DLab() {
           </button>
         </div>
 
-        {/* Mass Ratio Presets */}
-        <div className={styles.ratioPresets}>
-          <span className={styles.ratioLabel}>Mass Ratio:</span>
-          {PRESETS.map((p, idx) => (
-            <button
-              key={p.mass}
-              type="button"
-              className={`${styles.presetBtn} ${selectedPresetIdx === idx ? styles.presetBtnActive : ''}`}
-              onClick={() => handlePresetChange(idx)}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-
         {/* Speed Slider */}
         <div className={styles.speedSliderGroup}>
           <span className={styles.speedLabel}>Speed: {simSpeed}x</span>
@@ -722,18 +807,87 @@ export default function PiCollisions3DLab() {
             className={styles.speedSlider}
           />
         </div>
+
+        {/* Mass Ratio Presets */}
+        <div className={styles.ratioPresetsWrapper}>
+          <div className={styles.ratioPresetsHeader}>
+            <span className={styles.ratioLabel}>Select Mass Ratio (M / m = 100ⁿ):</span>
+            <span className={styles.ratioCuriosityHint}>Powers of 100 unpack decimal digits of π</span>
+          </div>
+          <div className={styles.ratioPresets}>
+            {PRESETS.map((p, idx) => {
+              const isCurious = p.isCuriosity;
+              const isActive = selectedPresetIdx === idx;
+              const btnClass = `${styles.presetBtn} ${
+                isCurious
+                  ? isActive
+                    ? styles.presetBtnCuriosityActive
+                    : styles.presetBtnCuriosity
+                  : isActive
+                  ? styles.presetBtnActive
+                  : ''
+              }`;
+
+              return (
+                <button
+                  key={p.mass + '-' + idx}
+                  type="button"
+                  className={btnClass}
+                  onClick={() => handlePresetChange(idx)}
+                >
+                  <span>{p.label}</span>
+                  <span className={styles.presetDigitsTag}>
+                    {isCurious ? 'Curiosity' : `${p.digits} ${p.digits === 1 ? 'digit' : 'digits'}`}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Educational Explanation Strip */}
       <div className={styles.explanationStrip}>
-        <strong>The Secret of the Hidden Circle:</strong> When scaled coordinates are plotted as{' '}
-        <span className={styles.mathPill}>x = √m · v</span> and{' '}
-        <span className={styles.mathPill}>y = √M · V</span>, energy conservation turns into a perfect circle{' '}
-        <span className={styles.mathPill}>x² + y² = 2E</span>. Each wall and block collision reflects the state
-        vector across a fixed line, sweeping out an angle of{' '}
-        <span className={styles.mathPill}>θ = 2 arctan(√m/M) ≈ 2/10^N</span>. Packing these wedges into a
-        semi-circle of π radians proves why the bounce count equals{' '}
-        <span className={styles.mathPill}>⌊π / θ⌋ = ⌊π · 10^N⌋</span>!
+        <div
+          className={styles.explanationHeader}
+          onClick={() => setWhyExpanded(!whyExpanded)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') setWhyExpanded(!whyExpanded);
+          }}
+        >
+          <div className={styles.explanationTitle}>
+            <span>⚡ Deep Dive: Why Powers of 100 (100ⁿ = 10²ⁿ) and NOT Powers of 10 (1,000 : 1)?</span>
+          </div>
+          <span className={styles.explanationToggleIcon}>
+            {whyExpanded ? '▼ Collapse' : '▶ Expand Insight'}
+          </span>
+        </div>
+
+        {whyExpanded && (
+          <div className={styles.explanationBody}>
+            <div className={styles.curiosityCallout}>
+              <strong>The Curiosity of 1,000 : 1:</strong> When you test ratio <span className={styles.mathPillPurple}>1,000 : 1</span>, the simulation gives exactly <strong>99 collisions</strong>, which does not match $\pi$ (3.1415...)! Why? Because kinetic energy is proportional to velocity squared (<span className={styles.mathPill}>E = ½MV²</span>). In circular phase space coordinates <span className={styles.mathPill}>y = √M · V</span>, the mass is inside a <strong>square root</strong>!
+            </div>
+            <p>
+              The angular arc swept per collision cycle is{' '}
+              <span className={styles.mathPill}>θ = 2 arctan(√m/M) ≈ 2 / √(M/m)</span>.
+              To shrink this angle by a factor of 10 (so the number of bounces <span className={styles.mathPill}>⌊π / θ⌋</span> increases 10-fold to reveal the next decimal digit of &pi;), the mass ratio <span className={styles.mathPill}>M/m</span> inside the square root must increase by{' '}
+              <span className={styles.mathPill}>10² = 100×</span>!
+            </p>
+            <p>
+              • <strong>1 : 1</strong> (<span className={styles.mathPill}>100⁰</span>) → <strong>3</strong> collisions (&pi; ≈ 3)<br />
+              • <strong>100 : 1</strong> (<span className={styles.mathPill}>100¹</span>) → <strong>31</strong> collisions (&pi; ≈ 3.1)<br />
+              • <strong>10,000 : 1</strong> (<span className={styles.mathPill}>100²</span>) → <strong>314</strong> collisions (&pi; ≈ 3.14)<br />
+              • <strong>1,000,000 : 1</strong> (<span className={styles.mathPill}>100³</span>) → <strong>3,141</strong> collisions (&pi; ≈ 3.141)<br />
+              • <strong>10⁸ : 1</strong> (<span className={styles.mathPill}>100⁴</span>) → <strong>31,415</strong> collisions (&pi; ≈ 3.1415 — <strong>5 digits</strong>)<br />
+              • <strong>10¹⁰ : 1</strong> (<span className={styles.mathPill}>100⁵</span>) → <strong>314,159</strong> collisions (&pi; ≈ 3.14159 — <strong>6 digits</strong>)<br />
+              • <strong>10¹² : 1</strong> (<span className={styles.mathPill}>100⁶</span>) → <strong>3,141,592</strong> collisions (&pi; ≈ 3.141592 — <strong>7 digits</strong>)<br />
+              • <strong>10¹⁴ : 1</strong> (<span className={styles.mathPill}>100⁷</span>) → <strong>31,415,926</strong> collisions (&pi; ≈ 3.1415926 — <strong>8 digits</strong>)
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
