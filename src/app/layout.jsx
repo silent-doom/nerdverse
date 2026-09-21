@@ -2,6 +2,7 @@ import './globals.css';
 import Header from '@/components/layout/Header/Header';
 import Footer from '@/components/layout/Footer/Footer';
 import EasterEggManager from '@/components/common/EasterEggManager';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const viewport = {
   width: 'device-width',
@@ -80,6 +81,7 @@ export default function RootLayout({ children }) {
         </main>
         <Footer />
         <EasterEggManager />
+        <SpeedInsights />
       </body>
     </html>
   );
