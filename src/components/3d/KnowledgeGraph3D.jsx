@@ -303,7 +303,12 @@ export default function KnowledgeGraph3D({ initialNodeSlug = null }) {
       nodeGroup.position.set(...node.coords);
 
       const domain = DOMAIN_CLUSTERS[node.domain] || { color: '#38BDF8' };
-      const baseRadius = node.importance * 0.95;
+      // Connected Papers citation / footfall dynamic radius scaling:
+      // High-footfall seminal anchors (Monty Hall, Schrödinger, Trolley) are prominent (~1.25 radius).
+      // Specialized/niche satellite nodes (Hick's Law, Peter Principle) are compact dots (~0.44 radius).
+      const imp = typeof node.importance === 'number' ? node.importance : 1.5;
+      const normImp = Math.max(0, Math.min(1, (imp - 0.7) / (2.4 - 0.7)));
+      const baseRadius = 0.44 + Math.pow(normImp, 1.25) * 0.81;
 
       // Inner Core Mesh
       const coreMat = new THREE.MeshStandardMaterial({
@@ -318,20 +323,26 @@ export default function KnowledgeGraph3D({ initialNodeSlug = null }) {
       coreMesh.userData = { node };
       nodeGroup.add(coreMesh);
 
-      // Outer Glow Shell
+      // Outer Glow Shell (Holographic wireframe aura illuminated only on hover/select)
       const glowMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color(domain.color),
         wireframe: true,
         transparent: true,
-        opacity: 0.18,
+        opacity: 0, // Clean resting state: eliminates cage clutter
       });
       const glowMesh = new THREE.Mesh(glowGeo, glowMat);
-      glowMesh.scale.setScalar(baseRadius);
+      glowMesh.scale.setScalar(baseRadius * 1.35);
+      glowMesh.userData = { node };
       nodeGroup.add(glowMesh);
 
-      // Floating Title Sprite
+      // Floating Title Sprite - Proportional billboard scaling based on footfall tier
+      const isLandmark = imp >= 2.0;
+      const isNiche = imp <= 1.0;
       const labelSprite = createLabelSprite(node.title, domain.color, false);
-      labelSprite.position.set(0, baseRadius + 1.4, 0);
+      const spriteScaleX = isLandmark ? 6.2 : isNiche ? 4.2 : 5.1;
+      const spriteScaleY = spriteScaleX * (70 / 300);
+      labelSprite.scale.set(spriteScaleX, spriteScaleY, 1);
+      labelSprite.position.set(0, baseRadius + (isLandmark ? 1.05 : isNiche ? 0.65 : 0.82), 0);
       nodeGroup.add(labelSprite);
 
       scene.add(nodeGroup);
@@ -432,7 +443,7 @@ export default function KnowledgeGraph3D({ initialNodeSlug = null }) {
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      const interactiveMeshes = Array.from(nodeMeshes.values()).map((item) => item.core);
+      const interactiveMeshes = Array.from(nodeMeshes.values()).flatMap((item) => [item.core, item.glow]);
       const intersects = raycaster.intersectObjects(interactiveMeshes);
 
       if (intersects.length > 0) {
@@ -452,7 +463,7 @@ export default function KnowledgeGraph3D({ initialNodeSlug = null }) {
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      const interactiveMeshes = Array.from(nodeMeshes.values()).map((item) => item.core);
+      const interactiveMeshes = Array.from(nodeMeshes.values()).flatMap((item) => [item.core, item.glow]);
       const intersects = raycaster.intersectObjects(interactiveMeshes);
 
       if (intersects.length > 0) {
@@ -564,18 +575,18 @@ export default function KnowledgeGraph3D({ initialNodeSlug = null }) {
 
       const isDirectlyRelevant = !activeNodeId ? isDomainMatch : (id === activeNodeId || isConnected);
 
-      // Core mesh emissive intensity
+      // Core mesh emissive intensity & hover states
       if (isSelected || isHovered) {
-        core.material.emissiveIntensity = 0.9;
-        glow.material.opacity = 0.5;
-        group.scale.setScalar(1.2);
+        core.material.emissiveIntensity = 0.95;
+        glow.material.opacity = 0.45;
+        group.scale.setScalar(1.22);
       } else if (isDirectlyRelevant) {
         core.material.emissiveIntensity = 0.45;
-        glow.material.opacity = 0.18;
+        glow.material.opacity = 0; // Keep resting state clean and uncluttered
         group.scale.setScalar(1.0);
       } else {
         core.material.emissiveIntensity = 0.08;
-        glow.material.opacity = 0.04;
+        glow.material.opacity = 0;
         group.scale.setScalar(0.85);
       }
 
