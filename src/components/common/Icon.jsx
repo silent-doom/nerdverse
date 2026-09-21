@@ -2,7 +2,7 @@
  * Clean, lightweight SVG Icon system for NerdVerse.
  * Replaces emojis with crisp geometric vector iconography.
  */
-export default function Icon({ name, size = 16, className = '', color = 'currentColor' }) {
+export default function Icon({ name, size = 16, className = '', color = 'currentColor', style = {} }) {
   const props = {
     width: size,
     height: size,
@@ -12,7 +12,14 @@ export default function Icon({ name, size = 16, className = '', color = 'current
     strokeWidth: 2,
     strokeLinecap: 'round',
     strokeLinejoin: 'round',
-    className,
+    className: className ? `icon ${className}` : 'icon',
+    'data-icon': 'true',
+    style: {
+      verticalAlign: '-0.15em',
+      flexShrink: 0,
+      display: 'inline-block',
+      ...style,
+    },
     'aria-hidden': 'true',
   };
 
