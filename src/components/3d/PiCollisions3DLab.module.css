@@ -519,3 +519,35 @@
     flex-wrap: wrap;
   }
 }
+
+@media (max-width: 640px) {
+  .topHeader {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    padding: 12px;
+    background: #090e1a;
+    border-bottom: 1px solid #1e2638;
+  }
+  .canvasWrapper {
+    height: 380px;
+  }
+  .primaryControls {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .actionBtn {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+    padding: 9px 12px;
+  }
+  .telemetryBar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .piBannerCard {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+

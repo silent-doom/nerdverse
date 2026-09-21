@@ -70,4 +70,24 @@ describe('New Concepts Integration & Placeholder Engine', () => {
     fireEvent.change(slider, { target: { value: 3 } });
     expect(screen.getByText('314')).toBeInTheDocument();
   });
+
+  it('displays Coming Soon overlay with planned engine and community issue desk priority link', () => {
+    const testConcept = { slug: 'eulers-number', title: "Euler's Number" };
+    render(<ConceptLabPlaceholder conceptType="EulersNumber" concept={testConcept} />);
+
+    expect(screen.getByText(/Coming Soon: Interactive Simulation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Engineering Pipeline • Phase 2/i)).toBeInTheDocument();
+    expect(screen.getByText(/3D Logarithmic Growth Spiral/i)).toBeInTheDocument();
+
+    // Verify community issue desk link
+    const priorityLink = screen.getByRole('link', { name: /Request Priority \/ Propose Simulation Design/i });
+    expect(priorityLink).toBeInTheDocument();
+    expect(priorityLink.getAttribute('href')).toBe('/community?category=feature&page=/concepts/eulers-number');
+
+    // Verify notification toggle
+    const notifyBtn = screen.getByRole('button', { name: /Notify on Release/i });
+    expect(notifyBtn).toBeInTheDocument();
+    fireEvent.click(notifyBtn);
+    expect(screen.getByText(/Subscribed for Release/i)).toBeInTheDocument();
+  });
 });

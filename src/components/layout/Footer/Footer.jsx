@@ -115,10 +115,51 @@ export default function Footer() {
               <Icon name="alert" size={13} />
               <span>DO NOT PRESS</span>
             </button>
-            <span className={styles.eggBtn} title="Speed of light in vacuum">
+            <button
+              type="button"
+              className={styles.eggBtn}
+              onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('nerdverse:warp'))}
+              title="Special Relativity: Accelerate to speed of light c"
+            >
               <Icon name="zap" size={13} />
               <span>c = 299,792,458 m/s</span>
-            </span>
+            </button>
+            <button
+              type="button"
+              className={styles.eggBtn}
+              onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('nerdverse:matrix'))}
+              title="Universal Invariants: Cascading matrix of mathematical constants"
+            >
+              <Icon name="math" size={13} />
+              <span>Matrix Invariants</span>
+            </button>
+            <button
+              type="button"
+              className={styles.eggBtn}
+              onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('nerdverse:blackhole'))}
+              title="General Relativity: Schwarzschild Event Horizon"
+            >
+              <Icon name="network" size={13} />
+              <span>Event Horizon</span>
+            </button>
+            <button
+              type="button"
+              className={styles.eggBtn}
+              onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('nerdverse:heisenberg'))}
+              title="Quantum Mechanics: Heisenberg Uncertainty Jitter"
+            >
+              <Icon name="brain" size={13} />
+              <span>Δx·Δp ≥ ℏ/2</span>
+            </button>
+            <button
+              type="button"
+              className={styles.eggBtn}
+              onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('nerdverse:dontpanic'))}
+              title="The Hitchhiker's Guide to the Galaxy: 42"
+            >
+              <Icon name="sparkles" size={13} />
+              <span>Don&apos;t Panic</span>
+            </button>
           </div>
 
           <div className={styles.madeWith}>

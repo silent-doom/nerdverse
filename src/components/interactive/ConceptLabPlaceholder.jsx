@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import styles from './ConceptLabPlaceholder.module.css';
 import Icon from '@/components/common/Icon';
 
@@ -8,6 +9,12 @@ const LAB_CONFIGS = {
   PiCollisions: {
     title: 'Galperin Elastic Collisions Engine',
     subtitle: 'Kinetic momentum circle mapping calculating digits of π via mass ratio bounces.',
+    plannedEngine: '3D WebGL Elastic Kinetic Arena',
+    plannedFeatures: [
+      'Precision physics simulation with analytical collision fast-forwarding',
+      'Phase space momentum vector radar with invariant circular radius mapping',
+      'Harmonic acoustic synthesizer generating real-time collision click tones',
+    ],
     paramName: 'Mass Ratio (M : 1)',
     min: 1,
     max: 4,
@@ -29,6 +36,12 @@ const LAB_CONFIGS = {
   EulersNumber: {
     title: 'Bernoulli Continuous Compounding Engine',
     subtitle: 'Demonstrating (1 + 1/n)ⁿ approaching Euler constant e as frequency approaches infinity.',
+    plannedEngine: '3D Logarithmic Growth Spiral & Compounding Matrix (WebGL)',
+    plannedFeatures: [
+      'Interactive continuous compounding timeline scaling from annual to infinitesimal seconds',
+      'Dynamic 3D spiral manifold showing exponential divergence vs steady-state convergence',
+      'Euler limit derivation visualizer comparing discrete interest steps to e^x curve',
+    ],
     paramName: 'Compounding Intervals (n)',
     min: 1,
     max: 6,
@@ -48,6 +61,12 @@ const LAB_CONFIGS = {
   CapTheorem: {
     title: 'Distributed Network Partition Matrix',
     subtitle: 'Brewer trilemma simulator exploring latency and split-brain trade-offs under network failure.',
+    plannedEngine: '3D Distributed Multi-Datacenter Cluster Mesh',
+    plannedFeatures: [
+      'Simulated cross-ocean packet drops and network bridge severing in real-time',
+      'Visualized linearizable consensus vs eventual consistency read/write routing',
+      'Dynamic partition inject test: watch CP nodes reject writes while AP nodes return stale reads',
+    ],
     paramName: 'Network Partition Severity',
     min: 0,
     max: 2,
@@ -67,6 +86,12 @@ const LAB_CONFIGS = {
   TeslersLaw: {
     title: 'Complexity Displacement Balance',
     subtitle: 'Conservation of inherent complexity across user interface vs architectural engineering.',
+    plannedEngine: '2D Hydraulic Conservation Reservoir Simulator',
+    plannedFeatures: [
+      'Interactive hydraulic volume balance showing irreducible system complexity',
+      'UI simplicity slider demonstrating displacement into backend state machine logic',
+      'Real-world product archetypes (Search bar vs complex filter panel trade-offs)',
+    ],
     paramName: 'User Friction Reduction Target',
     min: 10,
     max: 90,
@@ -83,6 +108,12 @@ const LAB_CONFIGS = {
   BrouwersFixedPoint: {
     title: 'Continuous Topology Deformation Grid',
     subtitle: 'Tracking invariant stationary points across continuous fluid stirring and surface crumpling.',
+    plannedEngine: '3D Continuous Rubber Sheet & Fluid Vortex Topology Lab',
+    plannedFeatures: [
+      'Interactive crumpling and flattening of a 2D manifold without tearing or holes',
+      'Coffee cup vortex simulation isolating the invariant stationary center particle',
+      'Coordinate vector field overlay verifying Brouwer existence proof (f(x) = x)',
+    ],
     paramName: 'Stir Turbulence Velocity',
     min: 1,
     max: 5,
@@ -99,6 +130,12 @@ const LAB_CONFIGS = {
   ParkinsonsLaw: {
     title: 'Bureaucracy & Deadline Expansion Model',
     subtitle: 'Simulating task dilation and administrative proliferation as allocated schedule expands.',
+    plannedEngine: '2D/3D Gantt Sprawl & Bureaucracy Proliferation Engine',
+    plannedFeatures: [
+      'Visual timeline dilation demonstrating task expansion to fill available project window',
+      'Administrative overhead meeting proliferation curves based on Cyril Parkinson historical data',
+      'Deadline compression simulator demonstrating efficiency thresholds',
+    ],
     paramName: 'Allocated Project Horizon',
     min: 1,
     max: 12,
@@ -115,6 +152,12 @@ const LAB_CONFIGS = {
   HofstadtersLaw: {
     title: 'Recursive Estimation Expansion Model',
     subtitle: 'Simulating fractal unexpected dependencies across complex software architectures.',
+    plannedEngine: 'Recursive Fractal Project Dependency DAG',
+    plannedFeatures: [
+      'Branching tree of recursive unknowns expanding even when taking the law into account',
+      'Monte Carlo estimation bounds demonstrating heavy-tailed project distribution curves',
+      'Software release delay simulation comparing planned milestones to actual delivery',
+    ],
     paramName: 'Initial Optimistic Estimate',
     min: 5,
     max: 50,
@@ -131,6 +174,12 @@ const LAB_CONFIGS = {
   HanlonsRazor: {
     title: 'Intent vs Cognitive Noise Filter',
     subtitle: 'Bayesian likelihood evaluation of malice vs system complexity and fatigue.',
+    plannedEngine: '2D Bayesian Cognitive Fatigue vs Malice Scatterplot',
+    plannedFeatures: [
+      'Interactive likelihood distribution separating intentional harm from operational error',
+      'Cognitive load slider illustrating how fatigue mimics malicious sabotage',
+      'Incident post-mortem simulator evaluating blameless culture trade-offs',
+    ],
     paramName: 'Observed Error Severity',
     min: 1,
     max: 5,
@@ -147,6 +196,12 @@ const LAB_CONFIGS = {
   ParetoPrinciple: {
     title: 'Power-Law Distribution Simulator',
     subtitle: 'Evaluating 80/20 asymmetry across codebase crash triggers, query loads, and wealth curves.',
+    plannedEngine: '3D Power-Law Lorenz Surface & Asymmetric Heavy Tail',
+    plannedFeatures: [
+      'Lorenz curve visualizer with interactive Gini coefficient and alpha shape index',
+      'Crash telemetry simulator showing 20% of bugs producing 80% of total system failures',
+      'Fractal 80/20 recursion: observing the 4% of causes that drive 64% of consequences',
+    ],
     paramName: 'Core Driver Fraction (%)',
     min: 5,
     max: 40,
@@ -163,6 +218,12 @@ const LAB_CONFIGS = {
   PeterPrinciple: {
     title: 'Hierarchical Incompetence Transition Matrix',
     subtitle: 'Markov chain modeling of promotions until performance matches terminal incompetence ceiling.',
+    plannedEngine: '3D Organizational Lattice & Markov Promotion Chain',
+    plannedFeatures: [
+      'Agent-based organizational hierarchy tracking skill match across managerial tiers',
+      'Markov transition matrix tracking promotion velocity vs performance plateau',
+      'Comparative organizational models: competence-based ladders vs dual-track IC systems',
+    ],
     paramName: 'Organization Hierarchy Tiers',
     min: 3,
     max: 8,
@@ -179,6 +240,12 @@ const LAB_CONFIGS = {
   HicksLaw: {
     title: 'Logarithmic Decision Friction Gauge',
     subtitle: 'Hick-Hyman equation T = b · log₂(n + 1) measuring latency penalty of choice proliferation.',
+    plannedEngine: 'Interactive Cognitive Latency Matrix & Reaction Stopwatch',
+    plannedFeatures: [
+      'Real-time decision stopwatch testing human cognitive reaction times against n choices',
+      'Hick-Hyman logarithmic curve fit comparing theoretical bits to observed reaction',
+      'UX design optimizer comparing mega-menus to hierarchical categorized taxonomies',
+    ],
     paramName: 'Number of Interface Choices (n)',
     min: 2,
     max: 32,
@@ -195,6 +262,12 @@ const LAB_CONFIGS = {
   GoodhartsLaw: {
     title: 'Target Degradation & Metric Distortion Lab',
     subtitle: 'Simulating proxy metric collapse when optimization pressure corrupts genuine quality.',
+    plannedEngine: '2D Metric Gaming & Perverse Incentive Agent Simulator',
+    plannedFeatures: [
+      'Simulated KPI optimization pressure demonstrating the erosion of underlying quality',
+      'Historical scenario presets (British Cobra Effect, Soviet Nail Factory Quotas, Lines of Code KPI)',
+      'Counter-measure visualizer modeling balanced scorecard and adversarial metric auditing',
+    ],
     paramName: 'Optimization Pressure on Metric',
     min: 1,
     max: 5,
@@ -211,6 +284,12 @@ const LAB_CONFIGS = {
   DunningKrugerEffect: {
     title: 'Metacognitive Calibration Curve',
     subtitle: 'Tracking self-assessed competence vs actual performance from Mount Foolish to Mastery.',
+    plannedEngine: '2D Metacognitive Calibration Manifold & Quiz Arena',
+    plannedFeatures: [
+      'Self-assessment slider versus objective difficulty benchmark tracking confidence gap',
+      'Dynamic path tracing from Peak of Mount Stupid down into the Valley of Despair to Mastery',
+      'Metacognitive calibration metrics evaluating epistemic humility across domains',
+    ],
     paramName: 'Actual Domain Knowledge',
     min: 1,
     max: 5,
@@ -231,6 +310,12 @@ const LAB_CONFIGS = {
   OccamsRazor: {
     title: 'Parsimony & Model Parameter Penalizer',
     subtitle: 'Bayesian Occam factor and Minimum Description Length penalizing epistemic overfitting.',
+    plannedEngine: '3D Epistemic Bayesian Parameter Mesh & Overfitting Curve',
+    plannedFeatures: [
+      'Interactive polynomial curve fitting demonstrating generalization error vs parameter explosion',
+      'Bayesian Occam factor penalty quantifying why simpler models receive higher posterior probability',
+      'Minimum Description Length (MDL) data compressor balancing model complexity against residual error',
+    ],
     paramName: 'Hypothesis Complexity (Free Parameters)',
     min: 1,
     max: 10,
@@ -247,6 +332,12 @@ const LAB_CONFIGS = {
   ChestertonsFence: {
     title: 'Refactoring & Legacy Architecture Inspector',
     subtitle: 'Quantifying hidden second-order failure modes when removing un-investigated code constraints.',
+    plannedEngine: '2D Architectural Dependency Inspector & Failure Simulator',
+    plannedFeatures: [
+      'Legacy codebase refactoring sandbox with hidden second-order failure traps',
+      'Context investigation slider demonstrating bug hazard reduction before removing legacy barriers',
+      'Simulated production incident post-mortem demonstrating why the constraint was placed originally',
+    ],
     paramName: 'Inspection Depth Before Removal',
     min: 1,
     max: 5,
@@ -263,6 +354,12 @@ const LAB_CONFIGS = {
   BrooksLaw: {
     title: 'Pairwise Communication Scaler',
     subtitle: 'Fred Brooks n(n-1)/2 channel equation and ramp-up drag when adding engineers to late projects.',
+    plannedEngine: '3D Mesh of Pairwise Channels & Ramp-Up Drag Model',
+    plannedFeatures: [
+      'Interactive graph network illustrating exponential n(n-1)/2 channel growth as headcount scales',
+      'Ramp-up training burden calculator showing veteran engineer diversion from active tasks',
+      'Mythical Man-Month threshold detector demonstrating when adding people delays delivery further',
+    ],
     paramName: 'Team Headcount (n)',
     min: 2,
     max: 16,
@@ -281,10 +378,16 @@ const LAB_CONFIGS = {
   },
 };
 
-export default function ConceptLabPlaceholder({ conceptType }) {
+export default function ConceptLabPlaceholder({ conceptType, concept }) {
   const config = LAB_CONFIGS[conceptType] || {
-    title: `${conceptType || 'Interactive'} Simulation Lab`,
+    title: `${concept?.title || conceptType || 'Interactive'} Simulation Lab`,
     subtitle: 'Dynamic computational laboratory for real-time mathematical parameter testing.',
+    plannedEngine: '3D/2D WebGL Physics Simulation Engine',
+    plannedFeatures: [
+      'Full real-time parameter controls with dynamic physics feedback',
+      'Telemetry graphs and invariant conservation monitoring',
+      'Interactive guided exploration scenarios and challenges',
+    ],
     paramName: 'System Parameter Scale',
     min: 1,
     max: 5,
@@ -300,22 +403,84 @@ export default function ConceptLabPlaceholder({ conceptType }) {
   };
 
   const [paramVal, setParamVal] = useState(config.defaultVal);
+  const [isNotified, setIsNotified] = useState(false);
   const telemetry = config.calculate(paramVal);
 
+  const conceptSlug = concept?.slug || (conceptType ? conceptType.toLowerCase() : 'concept');
+  const issueDeskUrl = `/community?category=feature&page=/concepts/${conceptSlug}`;
+
   return (
-    <div className={styles.placeholderCard}>
+    <div className={styles.placeholderCard} data-testid="concept-lab-placeholder">
+      {/* ── COMING SOON OVERLAY / SIMULATION SCREEN ── */}
+      <div className={styles.comingSoonScreen}>
+        <div className={styles.screenGlow} />
+        
+        <div className={styles.screenHeader}>
+          <div className={styles.engineBadgeGroup}>
+            <span className={styles.comingSoonBadge}>
+              <span className={styles.pulseDotAmber} />
+              <span>Coming Soon: Interactive Simulation</span>
+            </span>
+            <span className={styles.phaseBadge}>
+              <span>Engineering Pipeline • Phase 2</span>
+            </span>
+          </div>
+
+          <button
+            type="button"
+            className={`${styles.notifyBtn} ${isNotified ? styles.notifyBtnActive : ''}`}
+            onClick={() => setIsNotified(!isNotified)}
+            title="Get notified when this interactive simulation goes live"
+          >
+            <Icon name={isNotified ? 'check' : 'bell'} size={14} />
+            <span>{isNotified ? 'Subscribed for Release' : 'Notify on Release'}</span>
+          </button>
+        </div>
+
+        <div className={styles.enginePlannedContent}>
+          <div className={styles.engineIconBox}>
+            <Icon name="portal" size={32} color="#38bdf8" />
+          </div>
+
+          <div className={styles.engineMeta}>
+            <span className={styles.plannedEngineLabel}>Planned Simulation Architecture:</span>
+            <h4 className={styles.plannedEngineTitle}>{config.plannedEngine}</h4>
+            <p className={styles.plannedEngineDesc}>
+              A full high-fidelity canvas simulation is being engineered for this concept. You can request priority implementation or submit architecture designs below:
+            </p>
+
+            <ul className={styles.plannedFeaturesList}>
+              {config.plannedFeatures.map((feat, i) => (
+                <li key={i} className={styles.plannedFeatureItem}>
+                  <Icon name="check" size={13} color="#10b981" />
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className={styles.screenActions}>
+              <Link href={issueDeskUrl} className={styles.requestPriorityLink}>
+                <Icon name="git-pull-request" size={14} />
+                <span>Request Priority / Propose Simulation Design</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── ACTIVE LIVE MATHEMATICAL PARAMETER SCRUBBER ── */}
       <div className={styles.topBar}>
         <div className={styles.titleGroup}>
           <span className={styles.stagingBadge}>
             <Icon name="sparkles" size={13} />
-            <span>Interactive Sandbox Preview</span>
+            <span>Active Live Mathematical Sandbox</span>
           </span>
           <h3 className={styles.labTitle}>{config.title}</h3>
           <p className={styles.labSubtitle}>{config.subtitle}</p>
         </div>
         <div className={styles.statusIndicator}>
           <span className={styles.pulseDot} />
-          <span>Interactive Model Active</span>
+          <span>Calculations Active</span>
         </div>
       </div>
 
@@ -325,6 +490,9 @@ export default function ConceptLabPlaceholder({ conceptType }) {
             <Icon name="math" size={16} color="#38bdf8" />
             <span>Live Mathematical Parameter Scrubber</span>
           </div>
+          <span className={styles.sandboxHint}>
+            Slide parameter below to evaluate real-time theoretical metrics
+          </span>
         </div>
 
         <div className={styles.sandboxControls}>
@@ -341,6 +509,7 @@ export default function ConceptLabPlaceholder({ conceptType }) {
               step={config.step}
               value={paramVal}
               onChange={(e) => setParamVal(Number(e.target.value))}
+              aria-label={config.paramName}
             />
             <p className={styles.controlHelp}>
               Slide to test mathematical boundary behaviors and dynamic consequence scaling.
@@ -363,7 +532,7 @@ export default function ConceptLabPlaceholder({ conceptType }) {
       <div className={styles.calloutNote}>
         <Icon name="lightbulb" size={18} color="#38bdf8" />
         <div className={styles.calloutText}>
-          <strong>Guided Experiment Active:</strong> Use the <strong>Guided Lab Scenarios</strong> in the challenge bar above to test specific edge cases, or explore the <strong>Formal Math & Logic</strong> tab below for rigorous mathematical derivations!
+          <strong>Guided Scenarios Active:</strong> Use the <strong>Guided Lab Scenarios</strong> in the challenge bar above to test specific edge cases, or explore the <strong>Formal Math & Logic</strong> tab below for rigorous mathematical derivations!
         </div>
       </div>
     </div>

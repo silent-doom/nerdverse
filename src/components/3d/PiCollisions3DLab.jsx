@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import VisualizationGuideHUD from '@/components/interactive/VisualizationGuideHUD';
 import styles from './PiCollisions3DLab.module.css';
 
 // Audio Synthesizer for Collision Clacks
@@ -653,6 +654,42 @@ export default function PiCollisions3DLab() {
 
   return (
     <div className={styles.labContainer} data-testid="pi-collisions-3d-lab">
+      {/* Standardized 3D Experiment Guide HUD */}
+      <VisualizationGuideHUD
+        mode="3d"
+        title="Galperin Elastic Collisions: 3D Experiment Guide"
+        steps={[
+          {
+            step: 1,
+            title: 'Mass Ratio Selection',
+            badge: 'M = 100ⁿ : 1',
+            text: 'Choose mass ratios from 1:1 up to 10¹⁴:1. Each factor of 100 adds another decimal digit of π.',
+          },
+          {
+            step: 2,
+            title: 'Kinetic Bounces',
+            badge: 'Play / Pause',
+            text: 'Watch the heavier block transfer momentum to the smaller block, which rebounds elastically against the left wall.',
+          },
+          {
+            step: 3,
+            title: 'Fast-Forward',
+            badge: 'Fast-Forward →',
+            text: 'For large mass ratios (10,000:1 or 1,000,000:1), instantly compute all reflections to the final state.',
+          },
+          {
+            step: 4,
+            title: 'Phase Space Circle',
+            badge: '√M V vs √m v',
+            text: 'Observe the circular radar on the top right: each collision corresponds to a constant chord angle θ = 2 arctan(√m/M) on the invariant energy circle.',
+          },
+        ]}
+        hotkeys={[
+          { key: 'Space', action: 'Play / Pause' },
+          { key: 'R', action: 'Reset Simulation' },
+        ]}
+      />
+
       {/* 3D Canvas Viewport */}
       <div className={styles.canvasContainer}>
         <div ref={mountRef} className={styles.canvasWrapper} />

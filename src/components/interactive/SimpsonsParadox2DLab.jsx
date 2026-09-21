@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Icon from '@/components/common/Icon';
+import VisualizationGuideHUD from '@/components/interactive/VisualizationGuideHUD';
 import styles from './SimpsonsParadox2DLab.module.css';
 
 const PRESETS = {
@@ -53,6 +54,38 @@ export default function SimpsonsParadox2DLab() {
 
   return (
     <div className={styles.labContainer} data-testid="simpsons-paradox-2d-lab">
+      {/* Standardized 2D Interactive Lab Guide */}
+      <VisualizationGuideHUD
+        mode="2d"
+        title="Simpson's Paradox: 2D Interactive Lab Guide"
+        steps={[
+          {
+            step: 1,
+            title: 'Aggregate View',
+            badge: 'Combined Data',
+            text: 'Look at the overall combined success rates. At first glance, Treatment B seems superior (82.6% vs 78.0%).',
+          },
+          {
+            step: 2,
+            title: 'Subgroup Stratification',
+            badge: 'Control for Confounder',
+            text: 'Click "Stratified by Subgroup". Notice Treatment A actually wins in both small stones (93.1% vs 86.7%) AND large stones (73.0% vs 68.8%)!',
+          },
+          {
+            step: 3,
+            title: 'Confounding Mechanism',
+            badge: 'Sample Weights',
+            text: 'Observe that Treatment A was disproportionately assigned to severe, hard cases, dragging down its aggregate average.',
+          },
+          {
+            step: 4,
+            title: 'Explore Historical Cases',
+            badge: 'Presets',
+            text: 'Switch to the 1973 UC Berkeley Admissions investigation to test systemic gender bias vs department selectivity.',
+          },
+        ]}
+      />
+
       {/* Top Header & Presets */}
       <div className={styles.topBar}>
         <div className={styles.titleArea}>

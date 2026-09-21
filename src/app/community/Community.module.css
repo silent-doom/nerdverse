@@ -409,3 +409,52 @@
   flex-shrink: 0;
   margin-top: 2px;
 }
+
+/* ── Mobile & Tablet Viewport Responsive Styles ── */
+@media (max-width: 768px) {
+  .container {
+    padding: 32px 16px 64px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .builderActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .previewBox {
+    word-break: break-word;
+    overflow-x: auto;
+  }
+
+  .channelsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .guidelinesSection {
+    padding: 20px 16px;
+  }
+
+  .issueDeskSection {
+    padding: 20px 16px;
+  }
+
+  .navBar {
+    gap: 6px;
+  }
+
+  .navPill {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+

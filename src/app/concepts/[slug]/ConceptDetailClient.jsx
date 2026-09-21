@@ -165,7 +165,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
           )}
 
           <div className={styles.simulatorWrapper}>
-            <ConceptSimulatorResolver type={concept.interactiveType} />
+            <ConceptSimulatorResolver type={concept.interactiveType} concept={concept} />
           </div>
         </section>
       )}

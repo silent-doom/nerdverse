@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Icon from '@/components/common/Icon';
+import VisualizationGuideHUD from '@/components/interactive/VisualizationGuideHUD';
 import styles from './BayesTheorem2DLab.module.css';
 
 const PRESETS = [
@@ -70,6 +71,38 @@ export default function BayesTheorem2DLab() {
 
   return (
     <div className={styles.labContainer} data-testid="bayes-theorem-2d-lab">
+      {/* Standardized 2D Interactive Lab Guide */}
+      <VisualizationGuideHUD
+        mode="2d"
+        title="Bayesian Updating: 2D Interactive Lab Guide"
+        steps={[
+          {
+            step: 1,
+            title: 'Base Rate Prevalence',
+            badge: 'P(Condition)',
+            text: 'Adjust the background occurrence in the population (e.g. 0.1% for rare diseases vs 15% for seasonal flu).',
+          },
+          {
+            step: 2,
+            title: 'Test Sensitivity & False Alarms',
+            badge: 'P(Positive | Sick)',
+            text: 'Set test reliability. Notice that even with 99% accuracy, a small 1% false-positive rate on healthy people generates massive false alarms.',
+          },
+          {
+            step: 3,
+            title: 'Inspect Posterior Probability',
+            badge: 'P(Sick | Positive)',
+            text: 'Watch the real-time card below calculate true positives divided by total positive flags.',
+          },
+          {
+            step: 4,
+            title: 'Test Quick Presets',
+            badge: 'Presets',
+            text: 'Switch between Medical Screening, AI Malware Detection, and Seasonal Flu to observe base rate impact.',
+          },
+        ]}
+      />
+
       {/* Top Bar */}
       <div className={styles.topBar}>
         <div className={styles.titleArea}>

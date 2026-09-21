@@ -25,7 +25,7 @@ const BraessParadox3DLab = dynamic(() => import('@/components/3d/BraessParadox3D
 const PiCollisions3DLab = dynamic(() => import('@/components/3d/PiCollisions3DLab'), { ssr: false });
 const ConceptLabPlaceholder = dynamic(() => import('@/components/interactive/ConceptLabPlaceholder'), { ssr: false });
 
-export default function ConceptSimulatorResolver({ type }) {
+export default function ConceptSimulatorResolver({ type, concept }) {
   switch (type) {
     case 'MurphysLaw':
       return <MurphysLaw3DPhysics />;
@@ -70,6 +70,6 @@ export default function ConceptSimulatorResolver({ type }) {
     case 'PiCollisions':
       return <PiCollisions3DLab />;
     default:
-      return <ConceptLabPlaceholder conceptType={type} />;
+      return <ConceptLabPlaceholder conceptType={type} concept={concept} />;
   }
 }

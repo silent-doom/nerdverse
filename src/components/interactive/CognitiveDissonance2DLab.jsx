@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Icon from '@/components/common/Icon';
+import VisualizationGuideHUD from '@/components/interactive/VisualizationGuideHUD';
 import styles from './CognitiveDissonance2DLab.module.css';
 
 const CONDITIONS = [
@@ -50,6 +51,38 @@ export default function CognitiveDissonance2DLab() {
 
   return (
     <div className={styles.labContainer} data-testid="cognitive-dissonance-2d-lab">
+      {/* Standardized 2D Interactive Lab Guide */}
+      <VisualizationGuideHUD
+        mode="2d"
+        title="Cognitive Dissonance: 2D Interactive Lab Guide"
+        steps={[
+          {
+            step: 1,
+            title: 'Condition Selection',
+            badge: '$1 vs $20 vs Control',
+            text: 'Select one of Festinger & Carlsmith\'s landmark 1959 experimental payment conditions.',
+          },
+          {
+            step: 2,
+            title: 'External Justification Meter',
+            badge: 'Excuse Factor',
+            text: 'Observe how the magnitude of reward alters whether participants have an external excuse for their behavior.',
+          },
+          {
+            step: 3,
+            title: 'Internal Psychological Dissonance',
+            badge: 'Mental Conflict',
+            text: 'When paid only $1 to lie, external excuse is near zero, causing severe internal dissonance ("I lied for almost nothing").',
+          },
+          {
+            step: 4,
+            title: 'Self-Deception Attitude Shift',
+            badge: 'Attitude Shift',
+            text: 'Watch how the $1 group resolved their dissonance by rewriting their own conviction: "Actually, turning those pegs was fun!"',
+          },
+        ]}
+      />
+
       {/* Top Header */}
       <div className={styles.topBar}>
         <div className={styles.titleArea}>

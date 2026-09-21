@@ -124,4 +124,88 @@ describe('EasterEggManager', () => {
     expect(screen.getByText(/Gravitational Singularity/i)).toBeInTheDocument();
     expect(screen.getByText(/Somewhere, something incredible is waiting to be known/i)).toBeInTheDocument();
   });
+
+  it('handles warp speed easter egg via console and custom event', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.nerdverse.warpSpeed();
+    });
+
+    expect(screen.getAllByText(/WARP SPEED/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/Lorentz Factor: γ = 1 \/ √\(1 - v²\/c²\) → ∞/i)).toBeInTheDocument();
+    expect(screen.getByText(/Special Relativity/i)).toBeInTheDocument();
+  });
+
+  it('handles matrix constant rain easter egg', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.nerdverse.matrixRain();
+    });
+
+    expect(screen.getByText(/CONSTANT MATRIX RAIN ACTIVE/i)).toBeInTheDocument();
+    expect(screen.getByText(/Universal Constant Matrix/i)).toBeInTheDocument();
+  });
+
+  it('handles black hole event horizon easter egg', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.nerdverse.eventHorizon();
+    });
+
+    expect(screen.getAllByText(/SCHWARZSCHILD EVENT HORIZON/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/Rs = 2GM \/ c²/i)).toBeInTheDocument();
+  });
+
+  it('handles Heisenberg uncertainty jitter easter egg', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.nerdverse.quantumFuzz();
+    });
+
+    expect(document.body.classList.contains('heisenberg-jitter-mode')).toBe(true);
+    expect(screen.getByText(/HEISENBERG UNCERTAINTY ACTIVE/i)).toBeInTheDocument();
+    expect(screen.getByText(/Heisenberg Uncertainty Principle: Δx · Δp ≥ ħ\/2/i)).toBeInTheDocument();
+
+    // Toggle off
+    act(() => {
+      window.nerdverse.quantumFuzz();
+    });
+    expect(document.body.classList.contains('heisenberg-jitter-mode')).toBe(false);
+  });
+
+  it('handles Hitchhiker\'s Guide Don\'t Panic easter egg', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.nerdverse.dontPanic();
+    });
+
+    expect(screen.getAllByText(/DON'T PANIC/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/42/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/The Hitchhiker's Guide/i)).toBeInTheDocument();
+  });
+
+  it('triggers easter eggs when secret keywords are typed', () => {
+    render(<EasterEggManager />);
+
+    // Type 'warp'
+    act(() => {
+      ['w', 'a', 'r', 'p'].forEach((char) => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
+      });
+    });
+
+    expect(screen.getAllByText(/WARP SPEED/i).length).toBeGreaterThanOrEqual(1);
+
+    // Press Escape to reset all
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+
+    expect(screen.queryByText(/WARP SPEED/i)).toBeNull();
+  });
 });
