@@ -25,11 +25,13 @@ describe('PiCollisions3DLab', () => {
       fillRect: vi.fn(),
       clearRect: vi.fn(),
       beginPath: vi.fn(),
+      closePath: vi.fn(),
       arc: vi.fn(),
       fill: vi.fn(),
       stroke: vi.fn(),
       moveTo: vi.fn(),
       lineTo: vi.fn(),
+      fillText: vi.fn(),
     });
   });
 
@@ -44,17 +46,17 @@ describe('PiCollisions3DLab', () => {
     expect(screen.getByText(/Energy Conserved/i)).toBeInTheDocument();
   });
 
-  it('provides exactly 5 mass ratio options including the 1,000 : 1 curiosity case', () => {
+  it('provides exactly 6 mass ratio options including 5 digits and the 1,000 : 1 curiosity case', () => {
     render(<PiCollisions3DLab />);
 
     expect(screen.getByRole('button', { name: /^1 : 1/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^100 : 1/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^10,000 : 1/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^1,000,000 : 1/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^100,000,000 : 1/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^1,000 : 1/i })).toBeInTheDocument();
 
-    // Verify there are no higher 5/6/7/8 digit presets (which cause erratic high-loop lag)
-    expect(screen.queryByRole('button', { name: /10⁸ : 1/i })).not.toBeInTheDocument();
+    // Verify there are no erratic >5 digit presets
     expect(screen.queryByRole('button', { name: /10¹⁰ : 1/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /10¹² : 1/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /10¹⁴ : 1/i })).not.toBeInTheDocument();
@@ -94,6 +96,19 @@ describe('PiCollisions3DLab', () => {
 
     expect(screen.getAllByText('3,141').length).toBeGreaterThan(0);
     expect(screen.getByText(/Exact π Target Reached/i)).toBeInTheDocument();
+  });
+
+  it('fast-forwards smoothly to 31,415 collisions for 100,000,000 : 1 (5 digits)', () => {
+    render(<PiCollisions3DLab />);
+
+    const preset100M = screen.getByRole('button', { name: /^100,000,000 : 1/i });
+    fireEvent.click(preset100M);
+
+    const fastForwardBtn = screen.getByRole('button', { name: /Fast-Forward/i });
+    fireEvent.click(fastForwardBtn);
+
+    expect(screen.getAllByText('31,415').length).toBeGreaterThan(0);
+    expect(screen.getByText(/Exact π Target Reached \(31,415\)/i)).toBeInTheDocument();
   });
 
   it('demonstrates the 1,000 : 1 curiosity case yielding exactly 99 collisions rather than pi digits', () => {

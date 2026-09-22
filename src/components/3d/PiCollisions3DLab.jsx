@@ -60,12 +60,13 @@ class CollisionAudioEngine {
 
 const audioEngine = new CollisionAudioEngine();
 
-// Exactly 5 Mass Ratio Presets including 1 Curiosity Case
+// Mass Ratio Presets (1 to 5 digits of pi + 1 curiosity case)
 const PRESETS = [
   { n: 0, mass: 1, label: '1 : 1', exponent: '100⁰', expected: 3, piDigits: '3', digits: 1 },
   { n: 1, mass: 100, label: '100 : 1', exponent: '100¹', expected: 31, piDigits: '3.1', digits: 2 },
   { n: 2, mass: 10000, label: '10,000 : 1', exponent: '100²', expected: 314, piDigits: '3.14', digits: 3 },
   { n: 3, mass: 1000000, label: '1,000,000 : 1', exponent: '100³', expected: 3141, piDigits: '3.141', digits: 4 },
+  { n: 4, mass: 100000000, label: '100,000,000 : 1', exponent: '100⁴', expected: 31415, piDigits: '3.1415', digits: 5 },
   { n: -1, mass: 1000, label: '1,000 : 1', exponent: '10³', expected: 99, piDigits: '99 (≠ π)', digits: 0, isCuriosity: true },
 ];
 
@@ -76,7 +77,7 @@ function fastSolve(M, m = 1) {
   let collisions = 0;
   const history = [{ x: 0, y: -Math.sqrt(M) * 2.5 }];
   const maxCollisions = 50000;
-  const sampleRate = M >= 1000000 ? 4 : 1;
+  const targetCollisions = M === 1 ? 3 : M === 100 ? 31 : M === 10000 ? 314 : M === 1000000 ? 3141 : M === 100000000 ? 31415 : 99;
 
   while (collisions < maxCollisions) {
     const tWall = v1 < -1e-6 ? (x1 - 0.5) / (-v1) : Infinity;
@@ -99,11 +100,16 @@ function fastSolve(M, m = 1) {
       collisions++;
     }
 
-    if (collisions % sampleRate === 0) {
+    if (M <= 1000) {
       history.push({ x: Math.sqrt(m) * v1, y: Math.sqrt(M) * v2 });
+    } else {
+      const stride = Math.ceil(targetCollisions / 250);
+      if (collisions % stride === 0) {
+        history.push({ x: Math.sqrt(m) * v1, y: Math.sqrt(M) * v2 });
+      }
     }
 
-    if ((v1 >= 0 && v2 >= 0 && v2 >= v1) || collisions >= 10000) break;
+    if ((v1 >= 0 && v2 >= 0 && v2 >= v1) || collisions >= targetCollisions) break;
   }
 
   // Ensure final point is recorded for clean 180° circle closure
@@ -469,7 +475,7 @@ export default function PiCollisions3DLab() {
       if (isRunningRef.current && !sim.finished) {
         const p = PRESETS[selectedPresetIdxRef.current];
         let remainingDt = dt * simSpeedRef.current;
-        const maxIters = p.mass >= 1000000 ? 1600 : 800;
+        const maxIters = p.mass >= 100000000 ? 3200 : p.mass >= 1000000 ? 1600 : 800;
         let iters = 0;
 
         while (remainingDt > 1e-7 && iters < maxIters) {
@@ -520,12 +526,19 @@ export default function PiCollisions3DLab() {
               }
             }
 
-            const sampleRate = p.mass >= 1000000 ? 4 : 1;
-            if (sim.collisions % sampleRate === 0) {
+            if (p.mass <= 1000) {
               sim.history.push({
                 x: Math.sqrt(sim.m) * sim.v1,
                 y: Math.sqrt(sim.M) * sim.v2,
               });
+            } else {
+              const stride = Math.ceil(p.expected / 250);
+              if (sim.collisions % stride === 0) {
+                sim.history.push({
+                  x: Math.sqrt(sim.m) * sim.v1,
+                  y: Math.sqrt(sim.M) * sim.v2,
+                });
+              }
             }
 
             // Clean termination: both moving away from wall and big block faster OR expected target reached
@@ -591,7 +604,7 @@ export default function PiCollisions3DLab() {
     };
   }, [resetSimulation]);
 
-  // ── Render 2D Phase Space Circular Radar ──
+  // ── Render 2D Phase Space Circular Radar (Galperin Billiard Geometry) ──
   useEffect(() => {
     const canvas = radarCanvasRef.current;
     if (!canvas) return;
@@ -600,11 +613,16 @@ export default function PiCollisions3DLab() {
     const h = canvas.height;
     const cx = w / 2;
     const cy = h / 2;
-    const r = w * 0.42;
+    const r = w * 0.38;
+
+    const p = PRESETS[selectedPresetIdxRef.current] || PRESETS[1];
+    const maxVal = Math.sqrt(2 * simRef.current.initialEnergy) || 1;
+    const scale = (r * 0.88) / maxVal;
+    const progress = Math.min(1.0, collisionCount / (p.expected || 1));
 
     ctx.clearRect(0, 0, w, h);
 
-    // Radar circular background & grid
+    // 1. Radar Circular Backdrop
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fillStyle = '#060a14';
@@ -613,46 +631,94 @@ export default function PiCollisions3DLab() {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Crosshairs
+    // 2. Invariant Energy Circle Perimeter (x^2 + y^2 = 2E)
     ctx.beginPath();
-    ctx.moveTo(cx, cy - r);
-    ctx.lineTo(cx, cy + r);
-    ctx.moveTo(cx - r, cy);
-    ctx.lineTo(cx + r, cy);
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Invariant Energy Circle Perimeter (x^2 + y^2 = 2E)
-    ctx.beginPath();
-    ctx.arc(cx, cy, r * 0.85, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.arc(cx, cy, r * 0.88, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Trace reflected trajectory chords
+    // 3. Coordinate Axes
+    // Horizontal: v1 * sqrt(m)
+    ctx.beginPath();
+    ctx.moveTo(cx - r * 0.88, cy);
+    ctx.lineTo(cx + r * 0.88, cy);
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Vertical: V * sqrt(M) -> Wall collision axis (v1 = 0)
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r * 0.88);
+    ctx.lineTo(cx, cy + r * 0.88);
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 4. Swept Angular Phase Sector (Unfolded Pi Semicircle)
+    // Starts at 6 o'clock (PI/2 in canvas coords, V < 0 entering) and sweeps counter-clockwise to 12 o'clock (-PI/2)
+    if (progress > 0) {
+      const startAngle = Math.PI / 2;
+      const currentSwept = progress * Math.PI;
+      const endAngle = startAngle - currentSwept;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r * 0.88, startAngle, endAngle, true);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.18)';
+      ctx.fill();
+
+      // Swept arc perimeter highlight
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 0.88, startAngle, endAngle, true);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    }
+
+    // 5. Billiard Reflection Chords inside the Circle
     const history = simRef.current.history;
     if (history.length > 1) {
-      const maxVal = Math.sqrt(2 * simRef.current.initialEnergy) || 1;
-      const scale = (r * 0.85) / maxVal;
-
       ctx.beginPath();
       ctx.moveTo(cx + history[0].x * scale, cy - history[0].y * scale);
       for (let i = 1; i < history.length; i++) {
         ctx.lineTo(cx + history[i].x * scale, cy - history[i].y * scale);
       }
-      ctx.strokeStyle = '#f59e0b';
+      ctx.strokeStyle = p.mass <= 1000 ? 'rgba(56, 189, 248, 0.75)' : 'rgba(56, 189, 248, 0.35)';
+      ctx.lineWidth = p.mass <= 100 ? 1.5 : 1;
+      ctx.stroke();
+
+      // Current State Vector Beam from Origin to Head
+      const last = history[history.length - 1];
+      const headX = cx + last.x * scale;
+      const headY = cy - last.y * scale;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(headX, headY);
+      ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Current state head point
-      const last = history[history.length - 1];
+      // State Head Marker
       ctx.beginPath();
-      ctx.arc(cx + last.x * scale, cy - last.y * scale, 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
+      ctx.arc(headX, headY, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#f59e0b';
       ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     }
-  }, [collisionCount, isRunning]);
+
+    // 6. Label the Wall Axis
+    if (ctx.fillText) {
+      ctx.fillStyle = '#64748b';
+      ctx.font = '8px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('v₁=0 (Wall)', cx, cy + r * 0.88 + 10);
+    }
+  }, [collisionCount, isRunning, selectedPresetIdx]);
 
   return (
     <div className={styles.labContainer} data-testid="pi-collisions-3d-lab">
@@ -711,16 +777,33 @@ export default function PiCollisions3DLab() {
         <div className={styles.radarContainer}>
           <div className={styles.radarHeader}>
             <span className={styles.radarTitle}>Phase Space Circle</span>
-            <span className={styles.radarLegend}>v₁√m vs V√M</span>
+            <span className={styles.radarLegend}>x = v₁√m,  y = V√M</span>
           </div>
           <canvas
             ref={radarCanvasRef}
-            width={160}
-            height={160}
+            width={180}
+            height={180}
             className={styles.radarCanvas}
           />
-          <div className={styles.radarFooter}>
-            θ = 2 arctan(√m/M)
+          <div className={styles.radarTelemetryBox}>
+            <div className={styles.radarStatRow}>
+              <span>Wedge Angle:</span>
+              <strong className={styles.radarGoldVal}>
+                {(2 * Math.atan(Math.sqrt(1 / currentPreset.mass)) * (180 / Math.PI)).toFixed(currentPreset.mass >= 1000000 ? 4 : 2)}°
+              </strong>
+            </div>
+            <div className={styles.radarStatRow}>
+              <span>Swept in π:</span>
+              <span>
+                {((Math.min(1.0, collisionCount / currentPreset.expected)) * 180).toFixed(1)}° / 180°
+              </span>
+            </div>
+            <div className={styles.radarStatRow}>
+              <span>Total Wedges:</span>
+              <span>
+                ⌊180° / θ⌋ = <strong>{currentPreset.expected.toLocaleString()}</strong>
+              </span>
+            </div>
           </div>
         </div>
 
