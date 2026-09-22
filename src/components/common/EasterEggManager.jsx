@@ -57,6 +57,11 @@ export default function EasterEggManager() {
   const keyBufferRef = useRef('');
   const toastTimeoutRef = useRef(null);
 
+  const isMurphyActiveRef = useRef(false);
+  useEffect(() => {
+    isMurphyActiveRef.current = isMurphyActive;
+  }, [isMurphyActive]);
+
   const showToast = useCallback((badge, title, desc, icon = 'trophy') => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast({ badge, title, desc, icon });
@@ -70,8 +75,20 @@ export default function EasterEggManager() {
     setToast(null);
   }, []);
 
+  const restoreMurphyLaw = useCallback(() => {
+    setIsMurphyActive(false);
+    document.body.classList.remove('murphy-tilted');
+    showToast(
+      'Thermodynamics Restored',
+      'Order Re-established',
+      'Local entropy temporarily stabilized. Handle cosmic buttons with care.',
+      'shield'
+    );
+  }, [showToast]);
+
   // Master Reset for all Easter Eggs (triggered by ESC or resetAll)
   const resetAllEffects = useCallback(() => {
+    const wasMurphy = isMurphyActiveRef.current;
     setIsRetroActive(false);
     document.body.classList.remove('retro-phosphor-mode');
     setIsMurphyActive(false);
@@ -84,8 +101,17 @@ export default function EasterEggManager() {
     setIsBlackHoleActive(false);
     setIsHeisenbergActive(false);
     setIsDontPanicActive(false);
-    setToast(null);
-  }, []);
+    if (wasMurphy) {
+      showToast(
+        'Thermodynamics Restored',
+        'Order Re-established',
+        'Local entropy temporarily stabilized. Handle cosmic buttons with care.',
+        'shield'
+      );
+    } else {
+      setToast(null);
+    }
+  }, [showToast]);
 
   // Reset Retro Mode
   const resetRetroMode = useCallback(() => {
@@ -104,17 +130,6 @@ export default function EasterEggManager() {
     setIsMurphyActive(true);
     document.body.classList.add('murphy-tilted');
   }, []);
-
-  const restoreMurphyLaw = useCallback(() => {
-    setIsMurphyActive(false);
-    document.body.classList.remove('murphy-tilted');
-    showToast(
-      'Thermodynamics Restored',
-      'Order Re-established',
-      'Local entropy temporarily stabilized. Handle cosmic buttons with care.',
-      'shield'
-    );
-  }, [showToast]);
 
   // Schrödinger's Cat
   const collapseSchrodinger = useCallback(() => {
@@ -337,7 +352,7 @@ export default function EasterEggManager() {
     // Keystroke Buffer & Konami Code Listener
     const onKeyDown = (e) => {
       // Escape resets all effects instantly
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
         resetAllEffects();
         return;
       }
@@ -421,7 +436,13 @@ export default function EasterEggManager() {
   ]);
 
   const hasAnyActiveEffect =
-    isRetroActive || isWarpActive || isMatrixActive || isBlackHoleActive || isHeisenbergActive || isDontPanicActive;
+    isMurphyActive ||
+    isRetroActive ||
+    isWarpActive ||
+    isMatrixActive ||
+    isBlackHoleActive ||
+    isHeisenbergActive ||
+    isDontPanicActive;
 
   return (
     <>
@@ -429,9 +450,15 @@ export default function EasterEggManager() {
       {hasAnyActiveEffect && (
         <div className={styles.retroActiveHud}>
           <span className={styles.retroHudBadge}>
-            <Icon name="zap" size={14} color="#F59E0B" />
+            <Icon
+              name={isMurphyActive ? 'alert' : 'zap'}
+              size={14}
+              color={isMurphyActive ? '#EF4444' : '#F59E0B'}
+            />
             <span>
-              {isRetroActive
+              {isMurphyActive
+                ? "MURPHY'S LAW ACTIVE: LOCAL ENTROPY TILTED"
+                : isRetroActive
                 ? 'RETRO NERD MODE ACTIVE'
                 : isWarpActive
                 ? 'WARP SPEED: c = 299,792,458 m/s'
@@ -441,7 +468,7 @@ export default function EasterEggManager() {
                 ? 'SCHWARZSCHILD EVENT HORIZON'
                 : isHeisenbergActive
                 ? 'HEISENBERG UNCERTAINTY ACTIVE'
-                : 'DON\'T PANIC (42)'}
+                : "DON'T PANIC (42)"}
             </span>
           </span>
           <button
@@ -562,16 +589,36 @@ export default function EasterEggManager() {
       {/* ── Murphy's Law Buttered Toast Drop Animation ── */}
       {isMurphyActive && (
         <>
-          <div className={styles.toastOverlay}>
+          <div
+            className={styles.toastOverlay}
+            onClick={restoreMurphyLaw}
+            role="presentation"
+            aria-hidden="true"
+          >
             <div className={styles.butteredToastDrop}>
               <Icon name="alert" size={48} color="#EF4444" />
             </div>
           </div>
-          <div className={styles.murphyModal}>
+          <div
+            className={styles.murphyModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="murphy-modal-heading"
+          >
+            <button
+              type="button"
+              className={styles.modalEscBtn}
+              onClick={restoreMurphyLaw}
+              title="Close modal (ESC)"
+              aria-label="Close Murphy modal (or press ESC)"
+            >
+              <span className={styles.escBadgeText}>ESC</span>
+              <Icon name="x" size={12} />
+            </button>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem' }}>
               <Icon name="alert" size={36} color="#EF4444" />
             </div>
-            <div style={{ fontWeight: 800, fontSize: '1.125rem', color: '#EF4444' }}>
+            <div id="murphy-modal-heading" style={{ fontWeight: 800, fontSize: '1.125rem', color: '#EF4444' }}>
               Murphy&apos;s Law Validated!
             </div>
             <p style={{ fontSize: '0.875rem', color: '#D1D5DB', margin: 0 }}>
@@ -579,7 +626,8 @@ export default function EasterEggManager() {
               Notice that the falling toast landed <strong>butter-side down</strong> with mathematical certainty.
             </p>
             <button type="button" className={styles.restoreBtn} onClick={restoreMurphyLaw}>
-              Restore Normal Gravity
+              <span>Restore Normal Gravity</span>
+              <kbd className={styles.restoreEscKbd}>ESC</kbd>
             </button>
           </div>
         </>

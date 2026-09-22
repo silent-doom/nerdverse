@@ -95,9 +95,56 @@ describe('EasterEggManager', () => {
 
     expect(document.body.classList.contains('murphy-tilted')).toBe(true);
     expect(screen.getByText(/Murphy's Law Validated/i)).toBeInTheDocument();
+    expect(screen.getByText(/MURPHY'S LAW ACTIVE: LOCAL ENTROPY TILTED/i)).toBeInTheDocument();
 
     const restoreBtn = screen.getByText(/Restore Normal Gravity/i);
     fireEvent.click(restoreBtn);
+
+    expect(document.body.classList.contains('murphy-tilted')).toBe(false);
+    expect(screen.getByText(/Thermodynamics Restored/i)).toBeInTheDocument();
+  });
+
+  it('restores normal reality from Murphy mode when pressing the modal ESC button', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('nerdverse:murphy'));
+    });
+    expect(document.body.classList.contains('murphy-tilted')).toBe(true);
+
+    const escBtn = screen.getByRole('button', { name: /Close Murphy modal/i });
+    fireEvent.click(escBtn);
+
+    expect(document.body.classList.contains('murphy-tilted')).toBe(false);
+    expect(screen.getByText(/Thermodynamics Restored/i)).toBeInTheDocument();
+  });
+
+  it('restores normal reality from Murphy mode when clicking top HUD Reset (ESC) button', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('nerdverse:murphy'));
+    });
+    expect(document.body.classList.contains('murphy-tilted')).toBe(true);
+
+    const resetHudBtn = screen.getByRole('button', { name: /Reset \(ESC\)/i });
+    fireEvent.click(resetHudBtn);
+
+    expect(document.body.classList.contains('murphy-tilted')).toBe(false);
+    expect(screen.getByText(/Thermodynamics Restored/i)).toBeInTheDocument();
+  });
+
+  it('restores normal reality from Murphy mode when pressing keyboard Escape key', () => {
+    render(<EasterEggManager />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('nerdverse:murphy'));
+    });
+    expect(document.body.classList.contains('murphy-tilted')).toBe(true);
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
 
     expect(document.body.classList.contains('murphy-tilted')).toBe(false);
     expect(screen.getByText(/Thermodynamics Restored/i)).toBeInTheDocument();
