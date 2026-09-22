@@ -23,17 +23,19 @@ describe('New Concepts Integration & Placeholder Engine', () => {
     'occams-razor',
     'chestertons-fence',
     'brooks-law',
+    'mobius-strip',
+    'vampire-tiles',
   ];
 
-  it('all 16 new concepts exist in concepts data layer', () => {
-    expect(concepts.length).toBeGreaterThanOrEqual(36);
+  it('all 18 concepts exist in concepts data layer', () => {
+    expect(concepts.length).toBeGreaterThanOrEqual(38);
     const existingSlugs = new Set(concepts.map((c) => c.slug));
     newSlugs.forEach((slug) => {
       expect(existingSlugs.has(slug)).toBe(true);
     });
   });
 
-  it('all 16 new concepts possess 30-second hooks and guided challenges', () => {
+  it('all 18 concepts possess 30-second hooks and guided challenges', () => {
     newSlugs.forEach((slug) => {
       const c = concepts.find((item) => item.slug === slug);
       expect(c).toBeDefined();
@@ -47,7 +49,7 @@ describe('New Concepts Integration & Placeholder Engine', () => {
     });
   });
 
-  it('all 16 new concepts are mapped as nodes in 3D Knowledge Graph', () => {
+  it('all 18 concepts are mapped as nodes in 3D Knowledge Graph', () => {
     const graphSlugs = new Set(GRAPH_NODES.map((n) => n.slug));
     newSlugs.forEach((slug) => {
       expect(graphSlugs.has(slug)).toBe(true);
@@ -56,7 +58,7 @@ describe('New Concepts Integration & Placeholder Engine', () => {
 
   it('GRAPH_LINKS contains semantic connections involving new concepts', () => {
     const newLinks = GRAPH_LINKS.filter((l) => newSlugs.includes(l.source) || newSlugs.includes(l.target));
-    expect(newLinks.length).toBeGreaterThanOrEqual(16);
+    expect(newLinks.length).toBeGreaterThanOrEqual(18);
   });
 
   it('ConceptLabPlaceholder renders and updates parameters interactively', () => {
@@ -69,6 +71,34 @@ describe('New Concepts Integration & Placeholder Engine', () => {
 
     fireEvent.change(slider, { target: { value: 3 } });
     expect(screen.getByText('314')).toBeInTheDocument();
+  });
+
+  it('renders MobiusStrip placeholder with Coming Soon banner and half-twist scrubber', () => {
+    const concept = { slug: 'mobius-strip', title: 'Möbius Strip' };
+    render(<ConceptLabPlaceholder conceptType="MobiusStrip" concept={concept} />);
+
+    expect(screen.getByText(/Coming Soon: Interactive Simulation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Non-Orientable Topology & Manifold Lab/i)).toBeInTheDocument();
+    expect(screen.getByText(/3D Continuous Non-Orientable Manifold/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 Surface \(Non-Orientable\)/i)).toBeInTheDocument();
+
+    const slider = screen.getByRole('slider');
+    fireEvent.change(slider, { target: { value: 2 } });
+    expect(screen.getByText(/2 Surfaces \(Orientable\)/i)).toBeInTheDocument();
+  });
+
+  it('renders VampireTiles placeholder with Coming Soon banner and inflation depth scrubber', () => {
+    const concept = { slug: 'vampire-tiles', title: 'Vampire Tiles (an "ein stein")' };
+    render(<ConceptLabPlaceholder conceptType="VampireTiles" concept={concept} />);
+
+    expect(screen.getByText(/Coming Soon: Interactive Simulation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Spectre Aperiodic Monotile Matrix/i)).toBeInTheDocument();
+    expect(screen.getByText(/2D\/3D Chiral Quasicrystal Tessellation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Zero Reflections \(Chiral Pure\)/i)).toBeInTheDocument();
+
+    const slider = screen.getByRole('slider');
+    fireEvent.change(slider, { target: { value: 3 } });
+    expect(screen.getByText(/64 Monotiles/i)).toBeInTheDocument();
   });
 
   it('displays Coming Soon overlay with planned engine and community issue desk priority link', () => {

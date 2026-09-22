@@ -376,6 +376,50 @@ const LAB_CONFIGS = {
       };
     },
   },
+  MobiusStrip: {
+    title: 'Non-Orientable Topology & Manifold Lab',
+    subtitle: 'Simulating 180° half-twist topological invariants, centerline traversal length (2L), and boundary cutting.',
+    plannedEngine: '3D Continuous Non-Orientable Manifold & Traversal Lab (Three.js WebGL)',
+    plannedFeatures: [
+      'Interactive 3D parametric Möbius strip manifold with dynamic width and half-twist slider',
+      'Ant particle traversal simulation demonstrating continuous 4π single-sided loop traversal',
+      'Virtual scissors cutting simulator: midline bisecting (4 half-twists) vs 1/3 offset interlocking loops',
+    ],
+    paramName: 'Half-Twist Multiplier (n × 180°)',
+    min: 1,
+    max: 5,
+    step: 1,
+    defaultVal: 1,
+    renderVal: (v) => ['Single Half-Twist (Möbius)', 'Double Half-Twist (Cylinder Loop)', 'Triple Half-Twist (Trefoil Knot Edge)', 'Quadruple Half-Twist', 'Quintuple Half-Twist'][v - 1],
+    calculate: (v) => ({
+      metric1: v % 2 === 1 ? '1 Surface (Non-Orientable)' : '2 Surfaces (Orientable)',
+      metric1Label: 'Global Surface Topology',
+      metric2: v % 2 === 1 ? '1 Boundary Component' : '2 Boundary Components',
+      metric2Label: 'Manifold Boundary Edges',
+    }),
+  },
+  VampireTiles: {
+    title: 'Spectre Aperiodic Monotile Matrix',
+    subtitle: 'Simulating chiral aperiodic plane tiling without reflections ("ein stein" Vampire tile).',
+    plannedEngine: '2D/3D Chiral Quasicrystal Tessellation & Inflation Engine',
+    plannedFeatures: [
+      'Interactive Spectre polykite tessellation canvas generating hundreds of non-repeating tiles',
+      'Chirality enforcement toggle verifying zero mirror reflections are needed (Vampire condition)',
+      'Hierarchical super-tile inflation/deflation visualizer revealing fractal quasicrystalline order',
+    ],
+    paramName: 'Hierarchical Inflation Depth (k)',
+    min: 1,
+    max: 5,
+    step: 1,
+    defaultVal: 2,
+    renderVal: (v) => ['Level 1: 1 Monotile', 'Level 2: 8 Super-Tiles', 'Level 3: 64 Cluster Tiles', 'Level 4: 512 Macro-Tiles', 'Level 5: 4,096 Quasicrystal Tiles'][v - 1],
+    calculate: (v) => ({
+      metric1: `${Math.pow(8, v - 1).toLocaleString()} Monotiles`,
+      metric1Label: 'Active Monotile Count',
+      metric2: 'Zero Reflections (Chiral Pure)',
+      metric2Label: 'Mirror Reflection Usage',
+    }),
+  },
 };
 
 export default function ConceptLabPlaceholder({ conceptType, concept }) {

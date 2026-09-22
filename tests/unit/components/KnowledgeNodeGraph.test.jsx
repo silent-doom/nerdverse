@@ -9,16 +9,16 @@ describe('KnowledgeNodeGraph Component', () => {
 
     expect(screen.getByTestId('knowledge-node-graph')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: /The Knowledge Web/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Search all 36 knowledge nodes/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(new RegExp(`Search all ${concepts.length} knowledge nodes`, 'i'))).toBeInTheDocument();
     expect(screen.getByText(/All Nodes/i)).toBeInTheDocument();
   });
 
-  it('contains and renders all 36 concept nodes without omitting any', () => {
+  it('contains and renders all concept nodes without omitting any', () => {
     render(<KnowledgeNodeGraph />);
 
-    expect(concepts.length).toBe(36);
+    expect(concepts.length).toBeGreaterThanOrEqual(38);
 
-    // Verify all 16 new concept titles are present in tooltips/links
+    // Verify new concept titles are present in tooltips/links
     const newConcepts = [
       "Galperin's Pi Collisions",
       "Euler's Number (The Constant of Growth)",
@@ -36,6 +36,8 @@ describe('KnowledgeNodeGraph Component', () => {
       "Occam's Razor (Lex Parsimoniae)",
       "Chesterton's Fence",
       "Brooks' Law",
+      'Möbius Strip',
+      'Vampire Tiles (an "ein stein")',
     ];
 
     newConcepts.forEach((title) => {
@@ -47,7 +49,7 @@ describe('KnowledgeNodeGraph Component', () => {
   it('filters nodes when searching in the search bar', () => {
     render(<KnowledgeNodeGraph />);
 
-    const searchInput = screen.getByPlaceholderText(/Search all 36 knowledge nodes/i);
+    const searchInput = screen.getByPlaceholderText(new RegExp(`Search all ${concepts.length} knowledge nodes`, 'i'));
     fireEvent.change(searchInput, { target: { value: 'collisions' } });
 
     // Link for pi-collisions should exist

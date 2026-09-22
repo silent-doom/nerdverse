@@ -834,6 +834,52 @@ export const CONCEPT_HOOKS = {
       },
     ],
   },
+
+  'mobius-strip': {
+    hook: {
+      premise: 'Take a paper strip, give one end a half-twist of 180°, and tape the two ends together into a loop. How many sides and edges does it possess?',
+      intuition: 'A standard paper loop has two distinct surfaces (an inside and an outside) and two separate boundary rims.',
+      twist: 'An ant crawling along the centerline traverses the entire loop—covering both "front" and "back"—without ever crossing an edge! It has strictly ONE side, ONE boundary, and cutting down the center produces a single longer loop with 4 half-twists!',
+    },
+    takeaway: 'Twisting geometry changes global topology: local two-sidedness can invert into global non-orientability.',
+    challenges: [
+      {
+        id: 'ant-traversal',
+        title: 'Challenge 1: The 4π Ant Traversal',
+        prompt: 'Trace the path of the ant across the surface. Verify that a continuous 4π (720°) circuit is required to return right-side up.',
+        actionLabel: 'Trace Ant Traversal',
+      },
+      {
+        id: 'midline-scissors',
+        title: 'Challenge 2: The Midline Scissors Paradox',
+        prompt: 'Bisect the strip along its center line. Observe how one continuous loop with 4 half-twists emerges instead of two separate loops.',
+        actionLabel: 'Simulate Midline Cut',
+      },
+    ],
+  },
+
+  'vampire-tiles': {
+    hook: {
+      premise: 'Can a single geometric puzzle piece tile an infinite floor completely without gaps, but NEVER repeat its pattern periodically?',
+      intuition: 'If you have only one identical tile shape, tiling a floor inevitably forces repeating grid rows, hexagons, or bricks.',
+      twist: 'In 2023, mathematicians discovered "The Spectre"—an aperiodic monotile ("ein stein") that tiles an infinite plane strictly without repeating, and without needing its mirror reflection—earning it the title "The Vampire Tile"!',
+    },
+    takeaway: 'Deterministic local geometry can dictate infinite non-repeating order across the continuum without global periodic symmetry.',
+    challenges: [
+      {
+        id: 'chiral-mirror-ban',
+        title: 'Challenge 1: The Chiral Mirror Ban',
+        prompt: 'Test the tiling constraints to verify that zero mirror-flipped tiles are needed to tile the infinite plane (the Vampire property).',
+        actionLabel: 'Verify Zero Reflections',
+      },
+      {
+        id: 'hierarchical-inflation',
+        title: 'Challenge 2: Hierarchical Super-Tile Inflation',
+        prompt: 'Zoom out through successive hierarchical inflation levels to observe the non-repeating quasicrystal lattice order.',
+        actionLabel: 'Expand Inflation Depth',
+      },
+    ],
+  },
 };
 
 /**
