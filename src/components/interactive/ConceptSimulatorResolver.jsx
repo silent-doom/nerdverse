@@ -23,6 +23,7 @@ const PrisonersDilemma3DLab = dynamic(() => import('@/components/3d/PrisonersDil
 const TragedyOfCommons3DLab = dynamic(() => import('@/components/3d/TragedyOfCommons3DLab'), { ssr: false });
 const BraessParadox3DLab = dynamic(() => import('@/components/3d/BraessParadox3DLab'), { ssr: false });
 const PiCollisions3DLab = dynamic(() => import('@/components/3d/PiCollisions3DLab'), { ssr: false });
+const EulersNumber3DLab = dynamic(() => import('@/components/3d/EulersNumber3DLab'), { ssr: false });
 const ConceptLabPlaceholder = dynamic(() => import('@/components/interactive/ConceptLabPlaceholder'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type, concept }) {
@@ -69,6 +70,8 @@ export default function ConceptSimulatorResolver({ type, concept }) {
       return <BraessParadox3DLab />;
     case 'PiCollisions':
       return <PiCollisions3DLab />;
+    case 'EulersNumber':
+      return <EulersNumber3DLab />;
     default:
       return <ConceptLabPlaceholder conceptType={type} concept={concept} />;
   }

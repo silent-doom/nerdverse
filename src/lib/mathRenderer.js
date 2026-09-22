@@ -109,6 +109,12 @@ export function formatFormula(formula) {
 
   let out = formula;
 
+  // 0. Delimiters first (\left(, \right), etc.) before symbol substitutions
+  out = out.replace(/\\left\(/g, '<span class="math-delim">(</span>').replace(/\\right\)/g, '<span class="math-delim">)</span>');
+  out = out.replace(/\\left\[/g, '<span class="math-delim">[</span>').replace(/\\right\]/g, '<span class="math-delim">]</span>');
+  out = out.replace(/\\left\\\{/g, '<span class="math-delim">{</span>').replace(/\\right\\\}/g, '<span class="math-delim">}</span>');
+  out = out.replace(/\\\{/g, '{').replace(/\\\}/g, '}');
+
   // 1. Text wrappers (\text{...}, \mathrm{...}, \mathbf{...})
   out = out.replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>');
   out = out.replace(/\\text\{([^}]+)\}/g, '<span class="math-text">$1</span>');
@@ -142,37 +148,47 @@ export function formatFormula(formula) {
   }
 
   // 4. Large Operators with Sub/Superscripts (Limits, Sums, Integrals)
-  out = out.replace(/\\sum_\{([^{}]+)\}\^\{([^{}]+)\}/g, '<span class="math-big-op">Σ<sub class="math-limits">$1</sub><sup class="math-limits">$2</sup></span>');
-  out = out.replace(/\\sum_\{([^{}]+)\}/g, '<span class="math-big-op">Σ<sub class="math-limits">$1</sub></span>');
-  out = out.replace(/\\sum/g, '<span class="math-symbol">Σ</span>');
+  out = out.replace(/\\sum_\{([^{}]+)\}\^(\\{0,1}[a-zA-Z0-9]+|\{[^{}]+\})/g, (match, sub, sup) => {
+    let cleanSup = sup.startsWith('{') ? sup.slice(1, -1) : sup;
+    if (cleanSup === '\\infty') cleanSup = '∞';
+    return `<span class="math-big-op"><span class="math-op-sup">${cleanSup}</span><span class="math-op-sym">Σ</span><span class="math-op-sub">${sub}</span></span>`;
+  });
+  out = out.replace(/\\sum_\{([^{}]+)\}/g, (match, sub) => {
+    return `<span class="math-big-op"><span class="math-op-sym">Σ</span><span class="math-op-sub">${sub}</span></span>`;
+  });
+  out = out.replace(/\\sum(?![a-zA-Z])/g, '<span class="math-symbol">Σ</span>');
 
-  out = out.replace(/\\int_\{([^{}]+)\}\^\{([^{}]+)\}/g, '<span class="math-big-op">∫<sub class="math-limits">$1</sub><sup class="math-limits">$2</sup></span>');
-  out = out.replace(/\\int/g, '<span class="math-symbol">∫</span>');
+  out = out.replace(/\\int_\{([^{}]+)\}\^(\\{0,1}[a-zA-Z0-9]+|\{[^{}]+\})/g, (match, sub, sup) => {
+    let cleanSup = sup.startsWith('{') ? sup.slice(1, -1) : sup;
+    if (cleanSup === '\\infty') cleanSup = '∞';
+    return `<span class="math-big-op"><span class="math-op-sup">${cleanSup}</span><span class="math-op-sym">∫</span><span class="math-op-sub">${sub}</span></span>`;
+  });
+  out = out.replace(/\\int(?![a-zA-Z])/g, '<span class="math-symbol">∫</span>');
 
-  out = out.replace(/\\lim_\{([^{}]+)\}/g, '<span class="math-big-op">lim<sub class="math-limits">$1</sub></span>');
+  out = out.replace(/\\lim_\{([^{}]+)\}/g, (match, sub) => {
+    const cleanSub = sub.replace(/\\to/g, '→').replace(/\\infty/g, '∞');
+    return `<span class="math-big-op"><span class="math-op-text">lim</span><span class="math-op-sub">${cleanSub}</span></span>`;
+  });
 
-  // 5. Greek Letters
-  for (const [tex, sym] of Object.entries(GREEK_LETTERS)) {
+  // 5. Greek Letters (word boundary protected)
+  const sortedGreek = Object.entries(GREEK_LETTERS).sort((a, b) => b[0].length - a[0].length);
+  for (const [tex, sym] of sortedGreek) {
     const escaped = tex.replace('\\', '\\\\');
     out = out.replace(new RegExp(escaped + '(?![a-zA-Z])', 'g'), `<span class="math-symbol">${sym}</span>`);
   }
 
-  // 6. Math Symbols & Operators
-  for (const [tex, sym] of Object.entries(MATH_SYMBOLS)) {
+  // 6. Math Symbols & Operators (sorted by length to prevent partial prefix replacements)
+  const sortedSymbols = Object.entries(MATH_SYMBOLS).sort((a, b) => b[0].length - a[0].length);
+  for (const [tex, sym] of sortedSymbols) {
     const escaped = tex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    out = out.replace(new RegExp(escaped, 'g'), `<span class="math-operator">${sym}</span>`);
+    const pattern = /^[a-zA-Z\\]+$/.test(tex) ? escaped + '(?![a-zA-Z])' : escaped;
+    out = out.replace(new RegExp(pattern, 'g'), `<span class="math-operator">${sym}</span>`);
   }
 
   // 7. Math functions (\sin, \cos, \tan, \ln, \log, \det, \exp, \max, \min)
   out = out.replace(/\\(sin|cos|tan|cot|sec|csc|arcsin|arccos|arctan|ln|log|exp|det|max|min)(?![a-zA-Z])/g, '<span class="math-func">$1</span>');
 
-  // 8. Delimiters (\left(, \right), etc.)
-  out = out.replace(/\\left\(/g, '(').replace(/\\right\)/g, ')');
-  out = out.replace(/\\left\[/g, '[').replace(/\\right\]/g, ']');
-  out = out.replace(/\\left\\\{/g, '{').replace(/\\right\\\}/g, '}');
-  out = out.replace(/\\\{/g, '{').replace(/\\\}/g, '}');
-
-  // 9. Exponents and Subscripts
+  // 8. Exponents and Subscripts
   let expSafety = 0;
   while (out.includes('^{') && expSafety < 5) {
     prev = out;

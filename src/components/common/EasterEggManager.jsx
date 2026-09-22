@@ -18,21 +18,21 @@ const KONAMI_SEQUENCE = [
 ];
 
 const FLOATING_ITEMS = [
-  { id: 1, symbol: '👾', left: '6%', delay: '0s', duration: '11s', size: '28px' },
+  { id: 1, symbol: 'e', left: '6%', delay: '0s', duration: '11s', size: '28px' },
   { id: 2, symbol: '42', left: '14%', delay: '2s', duration: '14s', size: '24px' },
-  { id: 3, symbol: '★', left: '22%', delay: '1s', duration: '10s', size: '20px' },
-  { id: 4, symbol: 'π', left: '30%', delay: '3.5s', duration: '13s', size: '26px' },
+  { id: 3, symbol: 'π', left: '22%', delay: '1s', duration: '10s', size: '26px' },
+  { id: 4, symbol: 'ħ', left: '30%', delay: '3.5s', duration: '13s', size: '26px' },
   { id: 5, symbol: '∞', left: '38%', delay: '0.5s', duration: '12s', size: '26px' },
-  { id: 6, symbol: '🛸', left: '46%', delay: '2.5s', duration: '15s', size: '28px' },
-  { id: 7, symbol: '💾', left: '54%', delay: '1.2s', duration: '11s', size: '22px' },
-  { id: 8, symbol: '🐱', left: '62%', delay: '4s', duration: '13s', size: '26px' },
-  { id: 9, symbol: '⚡', left: '70%', delay: '2s', duration: '10s', size: '22px' },
-  { id: 10, symbol: '♥', left: '78%', delay: '0.8s', duration: '14s', size: '22px' },
+  { id: 6, symbol: 'c', left: '46%', delay: '2.5s', duration: '15s', size: '28px' },
+  { id: 7, symbol: 'G', left: '54%', delay: '1.2s', duration: '11s', size: '22px' },
+  { id: 8, symbol: 'φ', left: '62%', delay: '4s', duration: '13s', size: '26px' },
+  { id: 9, symbol: 'λ', left: '70%', delay: '2s', duration: '10s', size: '22px' },
+  { id: 10, symbol: '∇', left: '78%', delay: '0.8s', duration: '14s', size: '22px' },
   { id: 11, symbol: '42', left: '86%', delay: '3s', duration: '12s', size: '26px' },
-  { id: 12, symbol: '👾', left: '94%', delay: '1.8s', duration: '13s', size: '24px' },
+  { id: 12, symbol: 'e', left: '94%', delay: '1.8s', duration: '13s', size: '24px' },
   { id: 13, symbol: 'ħ', left: '18%', delay: '5.5s', duration: '14s', size: '22px' },
   { id: 14, symbol: 'c', left: '50%', delay: '6s', duration: '12s', size: '22px' },
-  { id: 15, symbol: '🍞', left: '82%', delay: '5s', duration: '15s', size: '24px' },
+  { id: 15, symbol: '∫', left: '82%', delay: '5s', duration: '15s', size: '24px' },
 ];
 
 const MATRIX_SYMBOLS = [
@@ -57,7 +57,7 @@ export default function EasterEggManager() {
   const keyBufferRef = useRef('');
   const toastTimeoutRef = useRef(null);
 
-  const showToast = useCallback((badge, title, desc, icon = '🏆') => {
+  const showToast = useCallback((badge, title, desc, icon = 'trophy') => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast({ badge, title, desc, icon });
     toastTimeoutRef.current = setTimeout(() => {
@@ -95,7 +95,7 @@ export default function EasterEggManager() {
       'Retro Mode Disabled',
       'Normal Reality Restored',
       'Zero-gravity particles dissipated. Standard continuum normalized.',
-      '🌟'
+      'sparkles'
     );
   }, [showToast]);
 
@@ -112,7 +112,7 @@ export default function EasterEggManager() {
       'Thermodynamics Restored',
       'Order Re-established',
       'Local entropy temporarily stabilized. Handle cosmic buttons with care.',
-      '🛡️'
+      'shield'
     );
   }, [showToast]);
 
@@ -121,12 +121,12 @@ export default function EasterEggManager() {
     const isAlive = Math.random() > 0.5;
     const outcome = isAlive
       ? {
-          icon: '🐱',
+          icon: 'check',
           title: 'Wavefunction Collapsed: Cat is ALIVE!',
           desc: 'Coherence broken by conscious observation. State: |ψ⟩ = 1.00 |Purring Alive⟩. Quality of life: Optimal.',
         }
       : {
-          icon: '👻',
+          icon: 'portal',
           title: 'Wavefunction Collapsed: Quantum Ghost State!',
           desc: 'The radioactive atom decayed during observation. State: |ψ⟩ = 1.00 |Quantum Ghost⟩.',
         };
@@ -144,7 +144,7 @@ export default function EasterEggManager() {
       'Gravitational Singularity',
       'Event Horizon Reached!',
       '"Somewhere, something incredible is waiting to be known." — Carl Sagan',
-      '🌌'
+      'portal'
     );
   }, [showToast]);
 
@@ -155,7 +155,7 @@ export default function EasterEggManager() {
       'Special Relativity',
       'Warp Factor: Speed of Light c Achieved!',
       'Lorentz factor γ → ∞. Time dilation maximized. Space contracted to zero thickness along trajectory.',
-      '⚡'
+      'zap'
     );
     setTimeout(() => {
       setIsWarpActive(false);
@@ -171,7 +171,7 @@ export default function EasterEggManager() {
           'Universal Constant Matrix',
           'Mathematical Cascade Unleashed',
           'Cascading fundamental invariants: π, e, ħ, c, G, and the fine structure constant α.',
-          '🧮'
+          'math'
         );
       }
       return next;
@@ -185,7 +185,7 @@ export default function EasterEggManager() {
       'General Relativity',
       'Schwarzschild Event Horizon Active',
       'Escape velocity equals c. Inward light cones tilt irrevocably toward central gravitational singularity.',
-      '🕳️'
+      'portal'
     );
     setTimeout(() => {
       setIsBlackHoleActive(false);
@@ -202,7 +202,7 @@ export default function EasterEggManager() {
           'Copenhagen Interpretation',
           'Heisenberg Uncertainty Principle: Δx · Δp ≥ ħ/2',
           'Position and momentum cannot both be precisely determined. Text wavefunction actively decohering.',
-          '🔬'
+          'atom'
         );
       } else {
         document.body.classList.remove('heisenberg-jitter-mode');
@@ -218,7 +218,7 @@ export default function EasterEggManager() {
       'The Hitchhiker\'s Guide',
       '42 — DON\'T PANIC!',
       '"A towel is about the most massively useful thing an interstellar hitchhiker can have." — Douglas Adams',
-      '🚀'
+      'sparkles'
     );
     setTimeout(() => {
       setIsDontPanicActive(false);
@@ -258,23 +258,23 @@ export default function EasterEggManager() {
     window.nerdverse = {
       warpSpeed: () => {
         triggerWarpSpeed();
-        return '⚡ Accelerating to c = 299,792,458 m/s.';
+        return '[WARP] Accelerating to c = 299,792,458 m/s.';
       },
       matrixRain: () => {
         triggerMatrixRain();
-        return '🧮 Matrix cascade toggled.';
+        return '[MATRIX] Matrix cascade toggled.';
       },
       eventHorizon: () => {
         triggerBlackHole();
-        return '🕳️ Schwarzschild radius calculated: Rs = 2GM/c².';
+        return '[EVENT_HORIZON] Schwarzschild radius calculated: Rs = 2GM/c².';
       },
       quantumFuzz: () => {
         triggerHeisenberg();
-        return '🔬 Heisenberg uncertainty jitter toggled.';
+        return '[UNCERTAINTY] Heisenberg uncertainty jitter toggled.';
       },
       dontPanic: () => {
         triggerDontPanic();
-        return '🚀 DON\'T PANIC! Always know where your towel is.';
+        return '[42] DON\'T PANIC! Always know where your towel is.';
       },
       retroMode: () => {
         setIsRetroActive((prev) => {
@@ -286,32 +286,32 @@ export default function EasterEggManager() {
           }
           return next;
         });
-        return '👾 Retro mode toggled.';
+        return '[RETRO] Retro mode toggled.';
       },
       quantumFlip: () => {
         document.body.classList.toggle('quantum-flipped');
         const active = document.body.classList.contains('quantum-flipped');
-        console.log(active ? '🌌 Spacetime inverted into Quantum Matrix!' : '🌟 Spacetime normalized.');
+        console.log(active ? '[QUANTUM] Spacetime inverted into Quantum Matrix!' : '[NORMAL] Spacetime normalized.');
         return active ? 'Inverted' : 'Normalized';
       },
       butterToast: () => {
         window.dispatchEvent(new CustomEvent('nerdverse:murphy'));
-        return '🍞 Toast dispatched. Check your screen.';
+        return '[MURPHY] Toast dispatched. Check your screen.';
       },
       meaningOfLife: () => {
         return '42. "Don\'t Panic, and always carry a towel." — The Hitchhiker\'s Guide to the Galaxy';
       },
       collapseCat: () => {
         window.dispatchEvent(new CustomEvent('nerdverse:schrodinger'));
-        return '📦 Box opened. Wavefunction collapsed.';
+        return '[SCHRODINGER] Box opened. Wavefunction collapsed.';
       },
       singularity: () => {
         window.dispatchEvent(new CustomEvent('nerdverse:singularity'));
-        return '🌌 Singularity initialized.';
+        return '[SINGULARITY] Singularity initialized.';
       },
       resetAll: () => {
         resetAllEffects();
-        return '🌟 Reality normalized. All easter eggs reset.';
+        return '[RESET] Reality normalized. All easter eggs reset.';
       },
     };
 
@@ -379,11 +379,11 @@ export default function EasterEggManager() {
                 'Secret Cheat Code',
                 'Retro 8-Bit Nerd Mode Enabled!',
                 'Zero-gravity particles unleashed! Press ESC or click the top banner to reset.',
-                '👾'
+                'sparkles'
               );
             } else {
               document.body.classList.remove('retro-phosphor-mode');
-              showToast('Normal Reality', 'Retro Mode Disabled', 'Standard physics restored.', '🌟');
+              showToast('Normal Reality', 'Retro Mode Disabled', 'Standard physics restored.', 'sparkles');
             }
             return next;
           });
@@ -429,7 +429,7 @@ export default function EasterEggManager() {
       {hasAnyActiveEffect && (
         <div className={styles.retroActiveHud}>
           <span className={styles.retroHudBadge}>
-            <span>⚡</span>
+            <Icon name="zap" size={14} color="#F59E0B" />
             <span>
               {isRetroActive
                 ? 'RETRO NERD MODE ACTIVE'
@@ -540,7 +540,9 @@ export default function EasterEggManager() {
       {/* ── Achievement Toast ── */}
       {toast && (
         <div className={styles.achievementToast} role="alert">
-          <div className={styles.toastIconWrap}>{toast.icon}</div>
+          <div className={styles.toastIconWrap}>
+            <Icon name={toast.icon || 'trophy'} size={20} />
+          </div>
           <div className={styles.toastContent}>
             <span className={styles.toastTitle}>{toast.badge}</span>
             <span className={styles.toastHeading}>{toast.title}</span>
@@ -561,10 +563,14 @@ export default function EasterEggManager() {
       {isMurphyActive && (
         <>
           <div className={styles.toastOverlay}>
-            <div className={styles.butteredToastDrop}>🍞</div>
+            <div className={styles.butteredToastDrop}>
+              <Icon name="alert" size={48} color="#EF4444" />
+            </div>
           </div>
           <div className={styles.murphyModal}>
-            <div style={{ fontSize: '2rem' }}>⚠️</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem' }}>
+              <Icon name="alert" size={36} color="#EF4444" />
+            </div>
             <div style={{ fontWeight: 800, fontSize: '1.125rem', color: '#EF4444' }}>
               Murphy&apos;s Law Validated!
             </div>
@@ -582,7 +588,9 @@ export default function EasterEggManager() {
       {/* ── Quantum Superposition Collapse Banner ── */}
       {isQuantumActive && quantumState && (
         <div className={styles.quantumBanner} role="status">
-          <div className={styles.quantumIcon}>{quantumState.icon}</div>
+          <div className={styles.quantumIcon}>
+            <Icon name={quantumState.icon || 'portal'} size={20} />
+          </div>
           <div className={styles.toastContent}>
             <span className={styles.toastTitle} style={{ color: '#A78BFA' }}>
               Quantum Observation

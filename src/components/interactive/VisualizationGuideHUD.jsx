@@ -29,21 +29,21 @@ export default function VisualizationGuideHUD({
         <div className={styles.navDesktop}>
           {mode === '3d' ? (
             <>
-              <span className={styles.navIcon}>🖱️</span>
+              <span className={styles.navIcon}><Icon name="mouse" size={13} color="#38bdf8" /></span>
               <span><strong>Left-Click + Drag:</strong> Orbit View</span>
               <span className={styles.navSep}>•</span>
-              <span className={styles.navIcon}>🔍</span>
+              <span className={styles.navIcon}><Icon name="search" size={13} color="#38bdf8" /></span>
               <span><strong>Scroll Wheel:</strong> Zoom</span>
               <span className={styles.navSep}>•</span>
-              <span className={styles.navIcon}>↔️</span>
+              <span className={styles.navIcon}><Icon name="move" size={13} color="#38bdf8" /></span>
               <span><strong>Right-Click + Drag:</strong> Pan</span>
             </>
           ) : (
             <>
-              <span className={styles.navIcon}>🎛️</span>
+              <span className={styles.navIcon}><Icon name="sliders" size={13} color="#eab308" /></span>
               <span><strong>Sliders & Toggles:</strong> Drag to adjust continuous mathematical inputs</span>
               <span className={styles.navSep}>•</span>
-              <span className={styles.navIcon}>⚡</span>
+              <span className={styles.navIcon}><Icon name="zap" size={13} color="#eab308" /></span>
               <span><strong>Real-Time Recalculation:</strong> Analytical metrics update live</span>
             </>
           )}
@@ -51,9 +51,9 @@ export default function VisualizationGuideHUD({
 
         <div className={styles.navTouch}>
           {mode === '3d' ? (
-            <span>📱 <strong>Touch:</strong> 1-Finger Drag to Rotate • Pinch to Zoom</span>
+            <span><Icon name="smartphone" size={12} color="#94a3b8" /> <strong>Touch:</strong> 1-Finger Drag to Rotate • Pinch to Zoom</span>
           ) : (
-            <span>📱 <strong>Touch:</strong> Tap & slide controls to explore boundary conditions</span>
+            <span><Icon name="smartphone" size={12} color="#94a3b8" /> <strong>Touch:</strong> Tap & slide controls to explore boundary conditions</span>
           )}
         </div>
       </div>

@@ -345,6 +345,68 @@ export default function Icon({ name, size = 16, className = '', color = 'current
           <line x1="6" y1="18" x2="6.01" y2="18" />
         </svg>
       );
+    case 'mouse':
+      return (
+        <svg {...props}>
+          <rect x="6" y="3" width="12" height="18" rx="6" />
+          <line x1="12" y1="7" x2="12" y2="11" />
+        </svg>
+      );
+    case 'sliders':
+      return (
+        <svg {...props}>
+          <line x1="4" y1="21" x2="4" y2="14" />
+          <line x1="4" y1="10" x2="4" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="3" />
+          <line x1="20" y1="21" x2="20" y2="16" />
+          <line x1="20" y1="12" x2="20" y2="3" />
+          <line x1="1" y1="14" x2="7" y2="14" />
+          <line x1="9" y1="8" x2="15" y2="8" />
+          <line x1="17" y1="16" x2="23" y2="16" />
+        </svg>
+      );
+    case 'smartphone':
+      return (
+        <svg {...props}>
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+          <line x1="12" y1="18" x2="12.01" y2="18" />
+        </svg>
+      );
+    case 'move':
+      return (
+        <svg {...props}>
+          <polyline points="5 9 2 12 5 15" />
+          <polyline points="9 5 12 2 15 5" />
+          <polyline points="15 19 12 22 9 19" />
+          <polyline points="19 9 22 12 19 15" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <line x1="12" y1="2" x2="12" y2="22" />
+        </svg>
+      );
+    case 'bank':
+      return (
+        <svg {...props}>
+          <polygon points="12 2 2 7 22 7 12 2" />
+          <line x1="5" y1="10" x2="5" y2="18" />
+          <line x1="9" y1="10" x2="9" y2="18" />
+          <line x1="15" y1="10" x2="15" y2="18" />
+          <line x1="19" y1="10" x2="19" y2="18" />
+          <line x1="2" y1="21" x2="22" y2="21" />
+        </svg>
+      );
+    case 'rotate':
+      return (
+        <svg {...props}>
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+        </svg>
+      );
+    case 'spiral':
+      return (
+        <svg {...props}>
+          <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12A8 8 0 0 1 10 4c4.42 0 8 3.58 8 8a6 6 0 0 1-6 6 4 4 0 0 1-4-4 2 2 0 0 1 2-2" />
+        </svg>
+      );
     default:
       return (
         <svg {...props}>
