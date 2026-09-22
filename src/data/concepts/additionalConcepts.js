@@ -2419,7 +2419,7 @@ The Möbius strip is far more than an optical parlor trick; it is an active mech
   },
   {
     id: '38',
-    title: 'Vampire Tiles (an "ein stein")',
+    title: 'The Aperiodic Monotile (The Spectre)',
     slug: 'vampire-tiles',
     category: 'math',
     difficulty: 'intermediate',

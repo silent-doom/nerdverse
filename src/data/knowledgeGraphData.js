@@ -781,7 +781,7 @@ export const GRAPH_NODES = [
   {
     id: 'vampire-tiles',
     slug: 'vampire-tiles',
-    title: 'Vampire Tiles (an "ein stein")',
+    title: 'The Aperiodic Monotile (The Spectre)',
     domain: 'math',
     domainName: 'Mathematics & Probability',
     year: '2023',

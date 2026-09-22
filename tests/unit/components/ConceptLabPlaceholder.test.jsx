@@ -88,7 +88,7 @@ describe('New Concepts Integration & Placeholder Engine', () => {
   });
 
   it('renders VampireTiles placeholder with Coming Soon banner and inflation depth scrubber', () => {
-    const concept = { slug: 'vampire-tiles', title: 'Vampire Tiles (an "ein stein")' };
+    const concept = { slug: 'vampire-tiles', title: 'The Aperiodic Monotile (The Spectre)' };
     render(<ConceptLabPlaceholder conceptType="VampireTiles" concept={concept} />);
 
     expect(screen.getByText(/Coming Soon: Interactive Simulation/i)).toBeInTheDocument();

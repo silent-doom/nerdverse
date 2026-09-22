@@ -37,7 +37,7 @@ describe('KnowledgeNodeGraph Component', () => {
       "Chesterton's Fence",
       "Brooks' Law",
       'Möbius Strip',
-      'Vampire Tiles (an "ein stein")',
+      'The Aperiodic Monotile (The Spectre)',
     ];
 
     newConcepts.forEach((title) => {
