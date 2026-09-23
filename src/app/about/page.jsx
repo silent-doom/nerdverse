@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './About.module.css';
 import Icon from '@/components/common/Icon';
+import { FAQ_DATA, getFaqSchema } from '@/data/faqs';
 
 export const metadata = {
   title: 'About NerdVerse — Open Intellectual Infrastructure',
@@ -9,8 +10,16 @@ export const metadata = {
 };
 
 export default function AboutPage() {
+  const faqSchema = getFaqSchema();
+
   return (
     <div className={styles.container}>
+      {/* Inject FAQ Schema for Answer Engine Optimization (AEO / SEO) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       {/* Header Banner */}
       <header className={styles.header}>
         <div className={styles.badge}>
@@ -104,6 +113,32 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
+
+      {/* ── 4. Frequently Asked Questions (#faq) ── */}
+      <section id="faq" className={styles.sectionCard}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionIcon}>
+            <Icon name="help-circle" size={20} />
+          </div>
+          <h2 className={styles.sectionTitle}>Frequently Asked Questions</h2>
+        </div>
+        <p className={styles.text}>
+          Answers to common questions about NerdVerse, its physics foundations, and mathematical proofs.
+        </p>
+
+        <div className={styles.faqList}>
+          {FAQ_DATA.map((faq, index) => (
+            <div key={index} className={styles.faqCard}>
+              <div className={styles.faqTopRow}>
+                <h3 className={styles.faqQuestion}>{faq.question}</h3>
+                <span className={styles.faqBadge}>{faq.category}</span>
+              </div>
+              <p className={styles.faqAnswer}>{faq.answer}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
+

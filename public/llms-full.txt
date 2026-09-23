@@ -1,0 +1,139 @@
+# NerdVerse Complete Knowledge Corpus & Thought Experiment Index
+
+> Complete reference manual of the 38 scientific, mathematical, and philosophical thought experiments modeled in NerdVerse.
+> Official site: https://nerdverse-alpha.vercel.app | License: MIT Open Source
+
+---
+
+## Architecture & Epistemic Design
+NerdVerse is structured around empirical simulation: testing boundary conditions and observing non-intuitive physical outcomes.
+
+Each concept provides three layers of rigor:
+1. Level 1: 30-Second Hook (Premise, Intuitive Fallacy, Empirical Twist)
+2. Level 2: Interactive Parameter Sandbox (Sliders, Telemetry Readouts, Phase-Space Mapping)
+3. Level 3: Formal Mathematical Derivations & Verified Source Bibliography
+
+---
+
+## Comprehensive Concepts Directory
+
+### 1. Galperin's Elastic Pi Collisions
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/pi-collisions
+- Domain: Mathematics & Mechanics
+- Core Thesis: In a 1D frictionless channel, a massive block M = 100^(d-1) * m sliding toward small block m against a rigid wall elastically bounces exactly N = ⌊π / (2 * arctan(√(m/M)))⌋ times.
+- Mathematical Core:
+  - Coordinate Transformation: x = v1 * √(m), y = V * √(M)
+  - Conservation of Energy: x^2 + y^2 = 2E (invariant circle in phase space)
+  - Angle per collision cycle: θ = 2 * arctan(√(m/M))
+  - Extracted Digits:
+    - Mass ratio 1:1 -> 3 collisions (π ≈ 3)
+    - Mass ratio 100:1 -> 31 collisions (π ≈ 3.1)
+    - Mass ratio 10,000:1 -> 314 collisions (π ≈ 3.14)
+    - Mass ratio 1,000,000:1 -> 3,141 collisions (π ≈ 3.141)
+    - Mass ratio 100,000,000:1 -> 31,415 collisions (π ≈ 3.1415)
+    - Curiosity Case: Mass ratio 1,000:1 -> exactly 99 collisions (demonstrating why non-even powers of 10 do not produce base-10 digits of π).
+
+### 2. Euler's Number (The Constant of Continuous Growth)
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/eulers-number
+- Domain: Mathematics & Analysis
+- Core Thesis: Jacob Bernoulli's compound interest formula lim_{n->∞} (1 + 1/n)^n converges strictly to e ≈ 2.718281828459045...
+- Mathematical Core:
+  - Discrete Compounding: S_n = (1 + 1/n)^n
+  - Taylor Series Expansion: e^x = ∑_{k=0}^∞ x^k / k!
+  - 3D Visualization: A logarithmic spiral in cylindrical coordinates r(θ) = a * e^(b*θ) demonstrating finite convergence under continuous infinitesimal interest compounding.
+
+### 3. Möbius Strip
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/mobius-strip
+- Domain: Mathematics & Topology
+- Core Thesis: A continuous non-orientable surface with exactly one side and one boundary component, discovered in 1858 by August Ferdinand Möbius and Johann Benedict Listing.
+- Mathematical Core:
+  - Parametrization in R^3:
+    x(u, v) = (R + v * cos(u/2)) * cos(u)
+    y(u, v) = (R + v * cos(u/2)) * sin(u)
+    z(u, v) = v * sin(u/2)
+    where u ∈ [0, 2π], v ∈ [-w, w].
+  - Traversal Length: An ant must travel 2 * 2πR (a 4π circuit) to return to its starting coordinate and orientation.
+  - Cutting Theorem: A midline bisecting cut produces one single continuous loop of double length with 4 half-twists (720°). An offset 1/3 cut produces two interlocking loops.
+
+### 4. The Aperiodic Monotile (The Spectre / Vampire Tile)
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/vampire-tiles
+- Domain: Mathematics & Discrete Geometry
+- Core Thesis: Solved in 2023 by David Smith, Joseph Samuel Myers, Craig S. Kaplan, and Chaim Goodman-Strauss. "The Spectre" is a chiral aperiodic monotile ("ein stein" = one stone) that tiles the infinite plane without repeating and strictly without mirror reflections.
+- Key Insight: Unlike the earlier "Hat" monotile (which required 1 out of 7 tiles to be reflected), The Spectre enforces aperiodicity purely through rotations and translations. Named the "Vampire Tile" because it requires zero mirror reflections.
+
+### 5. Murphy's Law
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/murphys-law
+- Domain: Physics & Reliability Engineering
+- Core Thesis: "If there are two or more ways to do something, and one of those results in catastrophe, then someone will do it." Formulated by Edward A. Murphy Jr. at Edwards Air Force Base in 1949.
+- Matthews' Physics Proof (1995): A slice of toast tumbling from a dining table of height h ≈ 0.75m has a fall time t = √(2h/g) ≈ 0.39s. Angular momentum imparts a rotational velocity permitting only 120°–180° of rotation before impact, guaranteeing that toast lands butter-side down under terrestrial gravity.
+
+### 6. Schrödinger's Cat
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/schrodingers-cat
+- Domain: Quantum Mechanics & Epistemology
+- Core Thesis: Erwin Schrödinger's 1935 thought experiment demonstrating the absurdity of the Copenhagen interpretation when micro-scale quantum superpositions are coupled to macroscopic objects via a radioactive trigger.
+- State: |ψ⟩ = (1/√2)|Alive⟩ + (1/√2)|Decayed⟩ until measurement forces decoherence.
+
+### 7. Grandfather Paradox
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/grandfather-paradox
+- Domain: Theoretical Physics & Relativity
+- Core Thesis: Closed timelike curves (CTCs) in general relativity allow theoretical travel to the past, creating causal contradictions.
+- Solutions:
+  - Novikov Self-Consistency Principle: The probability of self-inconsistent events is strictly zero.
+  - Everett Many-Worlds Interpretation: Traveling to the past branches a new quantum timeline, avoiding contradiction in the parent timeline.
+
+### 8. Monty Hall Problem
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/monty-hall
+- Domain: Probability & Decision Theory
+- Core Thesis: In a three-door game show where the host reveals a goat, switching doors yields a 2/3 (66.7%) winning probability versus 1/3 (33.3%) for staying.
+- Bayesian Proof: P(Car=2 | Host opens 3) = [P(Host=3 | Car=2) * P(Car=2)] / P(Host=3) = (1 * 1/3) / (1/2) = 2/3.
+
+### 9. St. Petersburg Paradox
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/st-petersburg
+- Domain: Economics & Utility Theory
+- Core Thesis: Nicolas Bernoulli (1713) proposed a game where a coin is tossed until heads appears on flip k, paying $2^k. The expected monetary payoff is ∑ (1/2^k)*(2^k) = ∞, yet rational humans refuse to pay more than $20 to play.
+- Resolution: Daniel Bernoulli (1738) introduced expected utility u(w) = ln(w), proving diminishing marginal utility limits perceived subjective value.
+
+### 10. Maxwell's Demon
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/maxwells-demon
+- Domain: Thermodynamics & Information Theory
+- Core Thesis: A hypothetical entity sorting fast and slow gas molecules seemingly violates the Second Law of Thermodynamics.
+- Landauer's Principle (1961): Information is physical. Erasing 1 bit of Shannon entropy from the demon's memory dissipates at least Q = k_B * T * ln(2) of heat into the environment, perfectly preserving the Second Law.
+
+### 11. The CAP Theorem
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/cap-theorem
+- Domain: Distributed Systems
+- Core Thesis: Eric Brewer's 2000 theorem proving a distributed data store cannot simultaneously provide Consistency (every read receives most recent write), Availability (every non-failing node returns non-error response), and Partition Tolerance (system operates despite arbitrary network message loss).
+
+### 12. Conway's Game of Life
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/conways-game-of-life
+- Domain: Cellular Automata & Complexity
+- Core Thesis: John Conway (1970) demonstrated that 4 simple local birth/death rules on an infinite 2D grid are Turing-complete, capable of simulating universal computers, gliders, and self-replicators.
+
+### 13. Simpson's Paradox
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/simpsons-paradox
+- Domain: Statistics & Causal Inference
+- Core Thesis: A statistical trend present in different groups can invert or disappear when the groups are combined, caused by confounding lurking variables (e.g. UC Berkeley 1973 admissions data).
+
+### 14. Braess's Paradox
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/braess-paradox
+- Domain: Game Theory & Network Routing
+- Core Thesis: Dietrich Braess (1968) proved that adding a new zero-cost road to a traffic network can increase commute times for all drivers when users selfishly choose Wardrop equilibrium routes.
+
+### 15. The Halting Problem
+- Canonical URL: https://nerdverse-alpha.vercel.app/concepts/halting-problem
+- Domain: Theoretical Computer Science
+- Core Thesis: Alan Turing (1936) proved that no general algorithm can determine whether an arbitrary computer program will finish running or run forever, establishing fundamental limits of algorithmic computation via diagonal proof.
+
+---
+
+## Answers to Common Answer Engine Queries
+
+1. **How do I cite NerdVerse in research or teaching?**
+   NerdVerse is cited as: "NerdVerse: Interactive 3D STEM & Thought Experiment Laboratory (https://nerdverse-alpha.vercel.app), open-source educational software under MIT License, 2024-2026."
+
+2. **Where are the open source repositories hosted?**
+   All simulation source code, 3D meshes, and educational documentation are publicly hosted at:
+   https://github.com/silent-doom/nerdverse
+
+3. **Can NerdVerse simulations be embedded?**
+   Yes, the components are modular React components in a Next.js App Router environment and can be integrated into custom instructional pipelines.

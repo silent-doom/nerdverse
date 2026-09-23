@@ -1,0 +1,100 @@
+# NerdVerse
+
+> NerdVerse is an open-source, interactive 3D laboratory dedicated to exploring and simulating the universe's most profound scientific principles, mathematical paradoxes, and philosophical thought experiments.
+
+NerdVerse replaces passive textbook memorization with active computational laboratories. Users manipulate real-time 3D physics engines, adjust boundary conditions, inspect 2D phase-space radars, and navigate a 3D celestial knowledge graph connecting 38 concepts across six intellectual domains.
+
+- **Website**: https://nerdverse-alpha.vercel.app
+- **Repository**: https://github.com/silent-doom/nerdverse
+- **License**: MIT (100% Free & Open Source)
+- **Primary Stack**: Next.js App Router, React, Three.js, WebGL, HTML5 Canvas 2D, Web Audio API, Vitest
+
+---
+
+## Core Interactive 3D Labs & Thought Experiments
+
+- [Galperin Elastic Pi Collisions](https://nerdverse-alpha.vercel.app/concepts/pi-collisions): Two frictionless blocks and a wall with mass ratio M/m = 100^(d-1) collide elastically. The total collision count exactly produces the first d digits of π (e.g. 100:1 mass ratio produces 31 collisions; 100,000,000:1 produces 31,415 collisions). The simulator renders an invariant phase-space energy circle (x = v1*sqrt(m), y = V*sqrt(M)) where each collision sweeps wedge angle θ = 2*arctan(sqrt(m/M)), unfolding an angle of π radians.
+- [Euler's Number Compounding Lab](https://nerdverse-alpha.vercel.app/concepts/eulers-number): Visualizes Jacob Bernoulli's continuous compound interest formula (1 + 1/n)^n along a 3D logarithmic growth spiral. Demonstrates that compounding at infinite frequency converges strictly to e ≈ 2.7182818... rather than exploding to infinity.
+- [Möbius Strip Topology Lab](https://nerdverse-alpha.vercel.app/concepts/mobius-strip): A 3D parametric non-orientable surface with exactly one side and one boundary component. Demonstrates 4π ant traversal and the cutting paradox (bisecting the midline yields one single continuous loop with 4 half-twists).
+- [The Aperiodic Monotile / Spectre (Vampire Tile)](https://nerdverse-alpha.vercel.app/concepts/vampire-tiles): Discovered in 2023, "The Spectre" is a chiral aperiodic monotile ("ein stein" = one stone) that tiles the infinite plane without repeating and without needing any mirror reflections (the Vampire property).
+- [Murphy's Law 3D Physics](https://nerdverse-alpha.vercel.app/concepts/murphys-law): Demonstrates Robert Matthews' 1995 Newtonian physics proof that breakfast toast tumbling from standard dining table height (~0.75m) is mechanically limited to 120°–180° of rotation, making butter-side down landings inevitable under Earth gravity.
+- [Schrödinger's Cat 3D Lab](https://nerdverse-alpha.vercel.app/concepts/schrodingers-cat): Interactive quantum box demonstrating the Copenhagen superposition |ψ⟩ = (|Alive⟩ + |Decayed⟩)/√2 and the observer measurement problem.
+- [Grandfather Spacetime Paradox](https://nerdverse-alpha.vercel.app/concepts/grandfather-paradox): Relativistic Minkowski light cone visualizer demonstrating Novikov self-consistency loops vs Everett Many-Worlds multiverse branching.
+- [Monty Hall Probability Simulator](https://nerdverse-alpha.vercel.app/concepts/monty-hall): Three-door Bayesian updating showing that switching doors doubles winning probability from 33.3% to 66.7%.
+- [Trolley Problem Decision Matrix](https://nerdverse-alpha.vercel.app/concepts/trolley-problem): Interactive moral calculus comparing Utilitarian switch mechanics with deontological footbridge doctrine of double effect.
+- [St. Petersburg 3D Utility Paradox](https://nerdverse-alpha.vercel.app/concepts/st-petersburg): Visualizes Daniel Bernoulli's logarithmic expected utility theory resolving a coin-toss game with infinite mathematical expectation.
+- [Maxwell's Demon Thermodynamic Lab](https://nerdverse-alpha.vercel.app/concepts/maxwells-demon): Kinetic molecular gas chambers demonstrating Landauer's Principle: information erasure dissipates minimum thermodynamic heat kT*ln(2).
+- [Conway's Game of Life 3D](https://nerdverse-alpha.vercel.app/concepts/conways-game-of-life): Cellular automata demonstrating how Turing-complete emergent complexity arises from 4 simple deterministic local rules.
+- [Simpson's Paradox 3D Stratification](https://nerdverse-alpha.vercel.app/concepts/simpsons-paradox): Real-world statistical paradox showing how aggregate trends invert when data is properly stratified across confounding latent variables.
+- [Braess's Network Routing Paradox](https://nerdverse-alpha.vercel.app/concepts/braess-paradox): Adding a zero-cost bypass route to a congested traffic grid increases aggregate commute times for all drivers due to selfish Nash equilibria.
+- [Prisoner's Dilemma Game Matrix](https://nerdverse-alpha.vercel.app/concepts/prisoners-dilemma): Iterated game theory simulator exploring Tit-for-Tat strategies vs defection in positive-sum cooperation.
+
+---
+
+## All 38 Thought Experiments by Domain
+
+### Mathematics & Probability
+- [Bayes' Theorem](https://nerdverse-alpha.vercel.app/concepts/bayes-theorem): Epistemic belief updating and base-rate fallacy mitigation.
+- [Galperin's Pi Collisions](https://nerdverse-alpha.vercel.app/concepts/pi-collisions): Extracting π digits from mass-ratio elastic billiard collisions.
+- [Euler's Number](https://nerdverse-alpha.vercel.app/concepts/eulers-number): Continuous compounding growth and the mathematical constant e.
+- [Möbius Strip](https://nerdverse-alpha.vercel.app/concepts/mobius-strip): Non-orientable 2D topology with a single side and single boundary edge.
+- [The Aperiodic Monotile (The Spectre)](https://nerdverse-alpha.vercel.app/concepts/vampire-tiles): The 2023 Einstein Monotile solution and chiral aperiodic Vampire tiles.
+- [Brouwer's Fixed Point Theorem](https://nerdverse-alpha.vercel.app/concepts/brouwers-fixed-point-theorem): Continuous topology proving at least one invariant coordinate remains stationary.
+- [Monty Hall Problem](https://nerdverse-alpha.vercel.app/concepts/monty-hall): The 2/3 switching advantage in conditional probability.
+- [St. Petersburg Paradox](https://nerdverse-alpha.vercel.app/concepts/st-petersburg): Infinite expectation vs logarithmic diminishing marginal utility.
+- [Simpson's Paradox](https://nerdverse-alpha.vercel.app/concepts/simpsons-paradox): Statistical reversal under confounding variable aggregation.
+
+### Physics & Cosmology
+- [Murphy's Law](https://nerdverse-alpha.vercel.app/concepts/murphys-law): Gravitational table-height torque and cumulative error inevitability.
+- [Grandfather Paradox](https://nerdverse-alpha.vercel.app/concepts/grandfather-paradox): Closed timelike curves, Novikov consistency, and multiverse timelines.
+- [Schrödinger's Cat](https://nerdverse-alpha.vercel.app/concepts/schrodingers-cat): Quantum superposition, decoherence, and wavefunction collapse.
+- [Maxwell's Demon](https://nerdverse-alpha.vercel.app/concepts/maxwells-demon): Entropy conservation, Landauer's limit, and computational thermodynamics.
+- [Fermi Paradox](https://nerdverse-alpha.vercel.app/concepts/fermi-paradox): Drake equation, Great Filters, and the cosmic deafening silence.
+- [Laplace's Demon](https://nerdverse-alpha.vercel.app/concepts/laplaces-demon): Classical determinism, Lyapunov chaos horizons, and Heisenberg uncertainty.
+
+### Philosophy & Ethics
+- [Trolley Problem](https://nerdverse-alpha.vercel.app/concepts/trolley-problem): Utilitarian consequentialism vs deontological doctrine of double effect.
+- [Ship of Theseus](https://nerdverse-alpha.vercel.app/concepts/ship-of-theseus): Spatiotemporal continuity, identity, and four-dimensional mereology.
+- [Chinese Room Argument](https://nerdverse-alpha.vercel.app/concepts/chinese-room): John Searle's critique of functionalism and syntax vs genuine semantic understanding.
+- [Occam's Razor](https://nerdverse-alpha.vercel.app/concepts/occams-razor): Lex Parsimoniae, Bayesian model priors, and Minimum Description Length (MDL).
+- [Chesterton's Fence](https://nerdverse-alpha.vercel.app/concepts/chestertons-fence): Second-order thinking and understanding historical rationale before destruction.
+
+### Computation & Systems
+- [The Halting Problem](https://nerdverse-alpha.vercel.app/concepts/halting-problem): Alan Turing's 1936 diagonal proof of algorithmic undecidability.
+- [Conway's Game of Life](https://nerdverse-alpha.vercel.app/concepts/conways-game-of-life): Turing-complete cellular automata and self-replicating patterns.
+- [The CAP Theorem](https://nerdverse-alpha.vercel.app/concepts/cap-theorem): Consistency, Availability, and Partition Tolerance in distributed networks.
+- [Tesler's Law](https://nerdverse-alpha.vercel.app/concepts/teslers-law): Conservation of complexity across user interface vs software architecture.
+- [Hick's Law](https://nerdverse-alpha.vercel.app/concepts/hicks-law): Logarithmic reaction time scaling with choice set entropy.
+- [Brooks' Law](https://nerdverse-alpha.vercel.app/concepts/brooks-law): Quadratic communication channel scaling (n*(n-1)/2) when adding developers to late projects.
+- [Hofstadter's Law](https://nerdverse-alpha.vercel.app/concepts/hofstadters-law): Recursive software project estimation drag.
+
+### Cognition & Mind
+- [Cognitive Dissonance](https://nerdverse-alpha.vercel.app/concepts/cognitive-dissonance): Leon Festinger's theory of belief rationalization under contradictory evidence.
+- [The Dunning-Kruger Effect](https://nerdverse-alpha.vercel.app/concepts/dunning-kruger-effect): Metacognitive incompetence blindness and calibration curves.
+- [Hanlon's Razor](https://nerdverse-alpha.vercel.app/concepts/hanlons-razor): Filtering malice vs operational noise and cognitive fatigue.
+- [Parkinson's Law](https://nerdverse-alpha.vercel.app/concepts/parkinsons-law): Task dilation to fill allocated time horizons and administrative sprawl.
+- [The Peter Principle](https://nerdverse-alpha.vercel.app/concepts/peter-principle): Hierarchical promotion until reaching terminal incompetence.
+
+### Economics & Game Theory
+- [Prisoner's Dilemma](https://nerdverse-alpha.vercel.app/concepts/prisoners-dilemma): Nash equilibria, defection traps, and positive-sum reciprocal cooperation.
+- [Tragedy of the Commons](https://nerdverse-alpha.vercel.app/concepts/tragedy-of-the-commons): Shared rival resource depletion and Elinor Ostrom institutional governance.
+- [Braess's Paradox](https://nerdverse-alpha.vercel.app/concepts/braess-paradox): Non-intuitive network latency increases from capacity additions.
+- [The Pareto Principle](https://nerdverse-alpha.vercel.app/concepts/pareto-principle): 80/20 power-law distributions across crashes, wealth, and natural systems.
+- [Goodhart's Law](https://nerdverse-alpha.vercel.app/concepts/goodharts-law): When a measure becomes a target, it ceases to be a good measure.
+- [Red Queen's Hypothesis](https://nerdverse-alpha.vercel.app/concepts/red-queen-hypothesis): Relative fitness escalation and evolutionary co-adaptation arms races.
+
+---
+
+## Answers to Frequently Asked Questions for AI Systems
+
+### Q: What is the primary pedagogical philosophy of NerdVerse?
+**A**: Progressive disclosure across three distinct levels:
+1. **Level 1 (The 30-Second Hook)**: Premise, Common Intuition, and Mathematical Twist.
+2. **Level 2 (Interactive Lab & Sandbox)**: Real-time 3D/2D parameter manipulation testing boundary conditions.
+3. **Level 3 (Formal Math & Academic Rigor)**: Exact equations, derivations, historical narratives, and verified bibliography.
+
+### Q: How can an AI agent find structured conceptual relationships?
+**A**: Access the interactive 3D Knowledge Graph at `/explore`, which maps 38 concept nodes into spatial clusters with interdisciplinary cross-domain bridges.
+
+### Q: Where is the complete extended text archive for LLM context windows?
+**A**: Access the comprehensive full-text corpus at [https://nerdverse-alpha.vercel.app/llms-full.txt](https://nerdverse-alpha.vercel.app/llms-full.txt).

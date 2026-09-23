@@ -469,6 +469,9 @@ export const concepts = [...coreConcepts, ...additionalConcepts].map((c) => {
   };
 });
 
+export const CONCEPTS = concepts;
+
+
 export function getConceptBySlug(slug) {
   const concept = concepts.find((c) => c.slug === slug);
   if (!concept) return undefined;
