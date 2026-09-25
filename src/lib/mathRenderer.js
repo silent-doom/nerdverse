@@ -257,8 +257,8 @@ export function formatFormula(formula) {
   });
 
   // Vector and Hat notation (\vec{n}, \hat{n})
-  out = out.replace(/\\vec\{([^{}]+)\}/g, '$1&#x20D7;');
-  out = out.replace(/\\hat\{([^{}]+)\}/g, '$1&#x0302;');
+  out = out.replace(/\\vec\{([^{}]+)\}/g, '<span class="math-vec"><span class="math-vec-arrow">→</span><span class="math-vec-char">$1</span></span>');
+  out = out.replace(/\\hat\{([^{}]+)\}/g, '<span class="math-hat"><span class="math-hat-sym">^</span><span class="math-hat-char">$1</span></span>');
 
   // Degree notation (^\circ, ^{\circ})
   out = out.replace(/\^\{\\circ\}/g, '°').replace(/\^\\circ/g, '°');
@@ -378,8 +378,8 @@ export function renderMathInMarkdown(text) {
     return BLACKBOARD_BOLD[`\\mathbb{${char}}`] || `<span class="math-bb">${char}</span>`;
   });
 
-  res = res.replace(/\\vec\{([^{}]+)\}/g, '$1&#x20D7;');
-  res = res.replace(/\\hat\{([^{}]+)\}/g, '$1&#x0302;');
+  res = res.replace(/\\vec\{([^{}]+)\}/g, '<span class="math-vec"><span class="math-vec-arrow">→</span><span class="math-vec-char">$1</span></span>');
+  res = res.replace(/\\hat\{([^{}]+)\}/g, '<span class="math-hat"><span class="math-hat-sym">^</span><span class="math-hat-char">$1</span></span>');
   res = res.replace(/\^\{\\circ\}/g, '°').replace(/\^\\circ/g, '°').replace(/\\circ(?![a-zA-Z])/g, '°');
 
   for (const [tex, sym] of Object.entries(GREEK_LETTERS)) {

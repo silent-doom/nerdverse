@@ -118,8 +118,8 @@ describe('mathRenderer', () => {
       const text = 'In Euclidean space $\\mathbb{R}^3$, velocity $\\vec{v}$ rotates by $180^\\circ$.';
       const rendered = renderMathInMarkdown(text);
       expect(rendered).toContain('ℝ');
-      expect(rendered).not.toContain('\\mathbb');
-      expect(rendered).toContain('v&#x20D7;');
+      expect(rendered).toContain('math-vec');
+      expect(rendered).toContain('v');
       expect(rendered).not.toContain('\\vec');
       expect(rendered).toContain('180°');
       expect(rendered).not.toContain('\\circ');

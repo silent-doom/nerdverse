@@ -2380,21 +2380,33 @@ If you cut a Möbius strip starting one-third of the width from an edge and cont
 - You will complete a circuit of length $2L$ before returning to your cut line.
 - The result is **two interlocking rings**: one thin Möbius strip of length $L$, linked through a longer two-sided loop of length $2L$!
 
-## Mathematical Formulation
-In Euclidean three-space $\\mathbb{R}^3$, the canonical Möbius strip can be parameterized algebraically by angles $u \\in [0, 2\\pi]$ along the core circle and offset $v \\in [-w, w]$ across the ribbon width:
+## Mathematical Formulation: Parameterization & Non-Orientability
+In three-dimensional Euclidean space $\\mathbb{R}^3$, the canonical developable Möbius strip of radius $R$ and ribbon width $w$ is defined algebraically using two intrinsic coordinates:
+- $u \\in [0, 2\\pi]$: the longitudinal angle parameter traversing the central circular spine of radius $R$.
+- $v \\in [-w/2, w/2]$: the transverse ruling coordinate across the ribbon width.
+
+The parametric coordinate equations are:
 
 $$x(u, v) = \\left( R + v \\cos\\left(\\frac{u}{2}\\right) \\right) \\cos(u)$$
 $$y(u, v) = \\left( R + v \\cos\\left(\\frac{u}{2}\\right) \\right) \\sin(u)$$
 $$z(u, v) = v \\sin\\left(\\frac{u}{2}\\right)$$
 
-Notice the critical argument $\\frac{u}{2}$! As $u$ traverses from $0$ to $2\\pi$ (one full spatial circuit), the ribbon orientation vector rotates by only $\\pi$ ($180^\\circ$), inverting the normal vector:
+### The Surface Normal Inversion Equation
+The mathematical heart of the Möbius paradox lies in the half-angle argument $\\frac{u}{2}$:
+- As an observer traverses one complete $360^\\circ$ spatial circuit around the circle ($u$ goes from $0$ to $2\\pi$), the spatial position $(x, y, z)$ returns to the exact starting seam.
+- However, the ruling orientation vector rotates by only $\\frac{2\\pi}{2} = \\pi$ ($180^\\circ$).
+- This inverts the unit surface normal vector $\\vec{n}(u, v)$ pointing perpendicular to the paper surface:
 
 $$\\vec{n}(2\\pi, 0) = -\\vec{n}(0, 0)$$
 
+**What this equation proves physically:** If an ant with upright normal vector $\\vec{n}(0, 0)$ crawls along the centerline for one full $360^\\circ$ circle ($u = 2\\pi$), it arrives back at the original tape seam pointing in the exact opposite direction: $-\\vec{n}(0, 0)$! Because $\\vec{n}(2\\pi, 0) = -\\vec{n}(0, 0) \\neq \\vec{n}(0, 0)$, it is mathematically impossible to assign a globally consistent, continuous choice of normal vector anywhere on the surface. This is the foundational mathematical criterion for a **non-orientable manifold**. The surface does not possess separate "inside" and "outside" faces; it has strictly **one single continuous side**.
+
+### Topological Invariants
 The Euler characteristic of a Möbius strip with boundary is:
 $$\\chi = V - E + F = 0$$
 
-If you take two Möbius strips and glue their single boundary circles together along their entire perimeter, you construct the famous four-dimensional **Klein Bottle**—a closed, compact manifold with no boundary that has no inside or outside and cannot self-intersect in three dimensions without passing through itself.
+- **Boundary Components ($B = 1$):** Unlike an ordinary cylinder which has $2$ separate boundary circles, a Möbius strip has strictly **1 single continuous boundary loop** of double length $4\\pi R$.
+- **The Klein Bottle Construction:** If you take two identical Möbius strips and glue their single boundary loops together along their entire $4\\pi R$ perimeter, you produce a closed, compact 4-dimensional manifold with zero boundary and no self-intersections—the **Klein Bottle**.
 
 ## Consequence Calculus: Engineering the Infinite Loop
 The Möbius strip is far more than an optical parlor trick; it is an active mechanical optimization and chemical reality:

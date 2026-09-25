@@ -25,18 +25,48 @@ function parseContentBlocks(raw) {
   return normalized.split('\n\n').map((b) => b.trim()).filter(Boolean);
 }
 
+function parseConceptIntoTabs(rawContent) {
+  if (!rawContent) return { narrativeBlocks: [], mathBlocks: [] };
+
+  const sections = rawContent.split(/(?=^##\s+)/m).map((s) => s.trim()).filter(Boolean);
+
+  const mathHeadingRegex = /##\s+(?:the\s+)?(mathemat|formal|arithmetic|proof|logic|deriv|calcul|equation|four laws|phase space|infinite expected|geometry of|physics proof|drake equation)/i;
+
+  const narrativeSections = [];
+  const mathSections = [];
+
+  sections.forEach((sec) => {
+    const firstLine = sec.split('\n')[0];
+    if (mathHeadingRegex.test(firstLine)) {
+      mathSections.push(sec);
+    } else {
+      narrativeSections.push(sec);
+    }
+  });
+
+  // If no section explicitly matched the math heading regex, include any sections containing display formulas
+  if (mathSections.length === 0) {
+    sections.forEach((sec) => {
+      if (sec.includes('$$')) {
+        mathSections.push(sec);
+      }
+    });
+  }
+
+  const narrativeContent = narrativeSections.length > 0 ? narrativeSections.join('\n\n') : rawContent;
+  const mathContent = mathSections.join('\n\n');
+
+  return {
+    narrativeBlocks: parseContentBlocks(narrativeContent),
+    mathBlocks: parseContentBlocks(mathContent),
+  };
+}
 
 export default function ConceptDetailClient({ concept, category, relatedConcepts }) {
   const [activeTab, setActiveTab] = useState('narrative'); // 'narrative' | 'math' | 'telemetry' | 'citations'
   const [selectedChallenge, setSelectedChallenge] = useState(0);
 
-  const blocks = parseContentBlocks(concept.content);
-  const mathBlocks = blocks.filter(
-    (b) => b.includes('$$') || b.includes('`') || b.startsWith('### The Mathematics') || b.includes('Formula') || b.includes('Probability')
-  );
-  const narrativeBlocks = blocks.filter(
-    (b) => !(b.startsWith('$$') && b.endsWith('$$'))
-  );
+  const { narrativeBlocks, mathBlocks } = parseConceptIntoTabs(concept.content);
 
   const challenges = concept.challenges || [];
 
@@ -264,6 +294,15 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                     </ul>
                   );
                 }
+                if (block.startsWith('$$') && block.endsWith('$$')) {
+                  return (
+                    <div
+                      key={idx}
+                      className={styles.formulaBlock}
+                      dangerouslySetInnerHTML={{ __html: cleanDisplayFormula(block) }}
+                    />
+                  );
+                }
                 return (
                   <p
                     key={idx}
@@ -291,13 +330,48 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                 </p>
               ) : (
                 mathBlocks.map((block, idx) => {
-                  if (block.startsWith('## ') || block.startsWith('### ')) {
+                  if (block.startsWith('## ')) {
+                    return (
+                      <h2
+                        key={idx}
+                        className={styles.h2}
+                        dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^##\s+/, '')) }}
+                      />
+                    );
+                  }
+                  if (block.startsWith('### ')) {
                     return (
                       <h3
                         key={idx}
                         className={styles.h3}
-                        dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^#{2,3}\s+/, '')) }}
+                        dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^###\s+/, '')) }}
                       />
+                    );
+                  }
+                  if (block.startsWith('>')) {
+                    return (
+                      <blockquote key={idx} className={styles.blockquote}>
+                        <p dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(block.replace(/^>\s*/gm, '')) }} />
+                      </blockquote>
+                    );
+                  }
+                  if (block.startsWith('```')) {
+                    const lines = block.split('\n');
+                    const code = lines.slice(1, -1).join('\n');
+                    return (
+                      <pre key={idx} className={styles.codeBlock}>
+                        <code>{code}</code>
+                      </pre>
+                    );
+                  }
+                  if (block.startsWith('- ')) {
+                    const items = block.split('\n').map((line) => line.replace(/^[-\*]\s+/, ''));
+                    return (
+                      <ul key={idx} className={styles.list}>
+                        {items.map((item, i) => (
+                          <li key={i} dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(item) }} />
+                        ))}
+                      </ul>
                     );
                   }
                   if (block.startsWith('$$') && block.endsWith('$$')) {
