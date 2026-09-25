@@ -188,6 +188,20 @@
   color: #f8fafc;
 }
 
+.newBadge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(16, 185, 129, 0.22));
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+  line-height: 1.2;
+}
+
 .domainBadge {
   font-size: 10px;
   font-weight: 700;

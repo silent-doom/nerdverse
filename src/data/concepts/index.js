@@ -492,6 +492,10 @@ export function getFeaturedConcepts() {
   return concepts.filter((c) => c.featured && c.published);
 }
 
+export function getNewConcepts() {
+  return concepts.filter((c) => c.isNew && c.published);
+}
+
 export function getAllPublishedConcepts() {
   return concepts.filter((c) => c.published);
 }

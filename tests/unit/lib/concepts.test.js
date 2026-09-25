@@ -4,6 +4,7 @@ import {
   getConceptBySlug,
   getConceptsByCategory,
   getFeaturedConcepts,
+  getNewConcepts,
   getAllPublishedConcepts,
   getRelatedConcepts,
 } from '@/data/concepts';
@@ -102,6 +103,24 @@ describe('Concept Data Layer', () => {
         expect(c.featured).toBe(true);
         expect(c.published).toBe(true);
       });
+    });
+  });
+
+  describe('getNewConcepts', () => {
+    it('returns recently added concepts flagged with isNew', () => {
+      const newConcepts = getNewConcepts();
+      expect(newConcepts.length).toBeGreaterThan(0);
+      newConcepts.forEach((c) => {
+        expect(c.isNew).toBe(true);
+        expect(c.published).toBe(true);
+      });
+
+      const slugs = newConcepts.map((c) => c.slug);
+      expect(slugs).toContain('mobius-strip');
+      expect(slugs).toContain('vampire-tiles');
+      expect(slugs).toContain('pi-collisions');
+      expect(slugs).toContain('eulers-number');
+      expect(slugs).toContain('brouwers-fixed-point-theorem');
     });
   });
 

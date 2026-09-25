@@ -83,10 +83,17 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
         </div>
 
         <div className={styles.metaRow}>
+          {concept.isNew && (
+            <Badge variant="new" size="md">
+              New!
+            </Badge>
+          )}
           <Badge variant="category" category={concept.category} size="md">
             {category?.name || concept.category}
           </Badge>
-          <Badge variant="difficulty" difficulty={concept.difficulty} size="md" />
+          <Badge variant="difficulty" size="md">
+            {concept.difficulty}
+          </Badge>
           <div className={styles.readTime}>
             <Icon name="clock" size={13} />
             <span>{concept.readTime} min activity</span>

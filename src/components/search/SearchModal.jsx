@@ -187,6 +187,9 @@ export default function SearchModal({ isOpen, onClose }) {
                   <div className={styles.resultMain}>
                     <div className={styles.resultTitleRow}>
                       <span className={styles.resultTitle}>{concept.title}</span>
+                      {concept.isNew && (
+                        <span className={styles.newBadge}>New!</span>
+                      )}
                       {category && (
                         <span
                           className={styles.domainBadge}

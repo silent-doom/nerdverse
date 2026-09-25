@@ -82,4 +82,13 @@ describe('SearchModal', () => {
 
     expect(screen.getByText('No concepts found')).toBeInTheDocument();
   });
+
+  it('displays New! badge for recently added concepts', () => {
+    render(<SearchModal isOpen={true} onClose={vi.fn()} />);
+    const input = screen.getByPlaceholderText(/Search all.*concepts/i);
+    fireEvent.change(input, { target: { value: 'Mobius' } });
+
+    expect(screen.getByText('Möbius Strip')).toBeInTheDocument();
+    expect(screen.getByText('New!')).toBeInTheDocument();
+  });
 });

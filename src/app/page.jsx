@@ -111,12 +111,19 @@ export default function HomePage() {
                   <Card variant="interactive" padding="md" className={styles.conceptCard}>
                     <div className={styles.conceptCardInner}>
                       <div className={styles.conceptCardHeader}>
-                        {category && (
-                          <Badge variant="category" style={{ '--badge-color': category.color }}>
-                            <Icon name={category.iconName} size={12} />
-                            <span>{category.name}</span>
-                          </Badge>
-                        )}
+                        <div className={styles.conceptCardBadges}>
+                          {concept.isNew && (
+                            <Badge variant="new" size="sm">
+                              New!
+                            </Badge>
+                          )}
+                          {category && (
+                            <Badge variant="category" style={{ '--badge-color': category.color }}>
+                              <Icon name={category.iconName} size={12} />
+                              <span>{category.name}</span>
+                            </Badge>
+                          )}
+                        </div>
                         <Badge variant="difficulty" size="sm">
                           {concept.difficulty}
                         </Badge>

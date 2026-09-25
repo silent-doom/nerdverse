@@ -116,12 +116,19 @@ export default async function ConceptsPage({ searchParams }) {
             <Link key={concept.id} href={`/concepts/${concept.slug}`} className={styles.cardLink}>
               <Card variant="interactive" padding="lg" className={styles.card}>
                 <div className={styles.cardHeader}>
-                  {category && (
-                    <Badge variant="category" style={{ '--badge-color': category.color }}>
-                      <Icon name={category.iconName} size={12} />
-                      <span>{category.name}</span>
-                    </Badge>
-                  )}
+                  <div className={styles.cardBadges}>
+                    {concept.isNew && (
+                      <Badge variant="new" size="sm">
+                        New!
+                      </Badge>
+                    )}
+                    {category && (
+                      <Badge variant="category" style={{ '--badge-color': category.color }}>
+                        <Icon name={category.iconName} size={12} />
+                        <span>{category.name}</span>
+                      </Badge>
+                    )}
+                  </div>
                   <Badge variant="difficulty" size="sm">
                     {concept.difficulty}
                   </Badge>

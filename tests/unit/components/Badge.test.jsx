@@ -21,6 +21,13 @@ describe('Badge', () => {
     expect(badge.className).toContain('category');
   });
 
+  it('applies the new variant class', () => {
+    const { container } = render(<Badge variant="new">New!</Badge>);
+    const badge = container.firstChild;
+    expect(badge.className).toContain('new');
+    expect(screen.getByText('New!')).toBeInTheDocument();
+  });
+
   it('applies size class', () => {
     const { container } = render(<Badge size="md">Big Badge</Badge>);
     const badge = container.firstChild;

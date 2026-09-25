@@ -47,3 +47,13 @@
   color: var(--color-brand-light, #E5A93C);
   border-color: rgba(229, 169, 60, 0.22);
 }
+
+.new {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(16, 185, 129, 0.18));
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.5);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.22);
+}
+

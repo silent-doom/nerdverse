@@ -4,7 +4,7 @@ import styles from './Badge.module.css';
  * Badge component for labels, categories, and status indicators.
  *
  * @param {Object} props
- * @param {'default'|'category'|'difficulty'|'status'} props.variant
+ * @param {'default'|'category'|'difficulty'|'status'|'new'} props.variant
  * @param {'sm'|'md'} props.size
  * @param {string} props.color - Custom CSS color override
  * @param {React.ReactNode} props.children

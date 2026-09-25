@@ -1260,6 +1260,7 @@ Wherever phase spaces close, waves propagate, or energy is conserved, $\\pi$ eme
     relatedSlugs: ['eulers-number', 'maxwells-demon', 'halting-problem'],
     published: true,
     featured: true,
+    isNew: true,
   },
   {
     id: '22',
@@ -1364,6 +1365,7 @@ It unites the five most fundamental constants in mathematical history:
     relatedSlugs: ['pi-collisions', 'bayes-theorem', 'st-petersburg-paradox'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '23',
@@ -1567,6 +1569,7 @@ The fixed point of that strategy mapping ($f(s^*) = s^*$) is, by definition, a s
     relatedSlugs: ['prisoners-dilemma', 'pi-collisions', 'eulers-number'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '26',
@@ -2428,6 +2431,7 @@ The Möbius strip is far more than an optical parlor trick; it is an active mech
     relatedSlugs: ['brouwers-fixed-point-theorem', 'pi-collisions', 'eulers-number'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '38',
@@ -2511,6 +2515,7 @@ The discovery of aperiodic monotiles has profound implications beyond recreation
     relatedSlugs: ['pi-collisions', 'brouwers-fixed-point-theorem', 'conways-game-of-life'],
     published: true,
     featured: false,
+    isNew: true,
   },
 ];
 
