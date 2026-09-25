@@ -45,16 +45,14 @@ describe('BrouwersFixedPoint3DLab', () => {
     expect(screen.getByText(/Residual/i)).toBeInTheDocument();
   });
 
-  it('provides Coffee Cup, Crumpled Map, and Side-by-Side Dual View tabs', () => {
+  it('provides Coffee Cup Stir and Crumpled Map Paradox mode tabs', () => {
     render(<BrouwersFixedPoint3DLab />);
 
-    const coffeeTab = screen.getByRole('tab', { name: /1\. Coffee Cup Stir/i });
-    const mapTab = screen.getByRole('tab', { name: /2\. Crumpled Map/i });
-    const dualTab = screen.getByRole('tab', { name: /3\. Side-by-Side Dual View/i });
+    const coffeeTab = screen.getByRole('tab', { name: /1\. The Coffee Cup Stir/i });
+    const mapTab = screen.getByRole('tab', { name: /2\. The Crumpled Map Paradox/i });
 
     expect(coffeeTab).toBeInTheDocument();
     expect(mapTab).toBeInTheDocument();
-    expect(dualTab).toBeInTheDocument();
     expect(coffeeTab).toHaveAttribute('aria-selected', 'true');
     expect(mapTab).toHaveAttribute('aria-selected', 'false');
 
@@ -62,23 +60,6 @@ describe('BrouwersFixedPoint3DLab', () => {
     fireEvent.click(mapTab);
     expect(mapTab).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('button', { name: /Crumple Coordinate Map/i })).toBeInTheDocument();
-
-    // Switch to Dual View mode
-    fireEvent.click(dualTab);
-    expect(dualTab).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('button', { name: /Simulate Both Simultaneously/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Stir Cup/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Crumple Map/i })).toBeInTheDocument();
-  });
-
-  it('triggers simultaneous simulation in dual mode', () => {
-    render(<BrouwersFixedPoint3DLab />);
-
-    const dualTab = screen.getByRole('tab', { name: /3\. Side-by-Side Dual View/i });
-    fireEvent.click(dualTab);
-
-    const bothBtn = screen.getByRole('button', { name: /Simulate Both Simultaneously/i });
-    fireEvent.click(bothBtn);
   });
 
   it('supports Stir Fluid Grid challenge action in coffee mode', () => {
