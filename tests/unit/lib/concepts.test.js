@@ -109,7 +109,7 @@ describe('Concept Data Layer', () => {
   describe('getNewConcepts', () => {
     it('returns recently added concepts flagged with isNew', () => {
       const newConcepts = getNewConcepts();
-      expect(newConcepts.length).toBeGreaterThan(0);
+      expect(newConcepts.length).toBe(18);
       newConcepts.forEach((c) => {
         expect(c.isNew).toBe(true);
         expect(c.published).toBe(true);
