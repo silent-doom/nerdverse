@@ -96,12 +96,12 @@ describe('MobiusStrip3DLab Component', () => {
     const topologyTab = screen.getByRole('button', { name: /Topological Manifold Sandbox/i });
     fireEvent.click(topologyTab);
 
-    expect(screen.getByText(/Half-Twists \(\$k\$\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Major Radius \(\$R\$\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Ribbon Width \(\$w\$\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Half-Twists \(k\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Major Radius \(R\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ribbon Width \(w\)/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Wireframe/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Normal Grid/i })).toBeInTheDocument();
-    expect(screen.getByText(/Topological Invariants: χ = 0/i)).toBeInTheDocument();
+    expect(screen.getByText(/Topological Invariant: χ = 0/i)).toBeInTheDocument();
   });
 
   it('can open and close the Guided Walkthrough HUD', () => {

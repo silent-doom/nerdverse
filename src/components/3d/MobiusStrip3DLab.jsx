@@ -1693,8 +1693,8 @@ export default function MobiusStrip3DLab() {
               </div>
               <div>
                 <div className={styles.paradoxHeading}>The 720° Topological Return Paradox</div>
-                Notice the overlapping taped joint at the origin ($u = 0$) where Möbius joined the 180°-twisted paper band.
-                After crawling one complete spatial circle ($2\pi R$), the ant returns to the exact seam, but its normal vector has rotated by exactly $180^\circ$—placing it upside down on what intuition calls the &ldquo;other side&rdquo;. It must crawl a second full circuit ($4\pi R$, $720^\circ$) to return right-side up! The red ink trail coats the entire paper ribbon without ever crossing an edge.
+                Notice the overlapping taped joint at the origin (<em>u</em> = 0) where Möbius joined the 180°-twisted paper band.
+                After crawling one complete spatial circle (2π<em>R</em>), the ant returns to the exact seam, but its normal vector has rotated by exactly 180°—placing it upside down on what intuition calls the &ldquo;other side&rdquo;. It must crawl a second full circuit (4π<em>R</em>, 720°) to return right-side up! The red ink trail coats the entire paper ribbon without ever crossing an edge.
               </div>
             </div>
           </>
@@ -1775,11 +1775,11 @@ export default function MobiusStrip3DLab() {
                 </div>
                 {cutType === 'midline' ? (
                   <span>
-                    Watch the red scissors blade slice through the physical paper ribbon. Unlike a cylinder which cuts into 2 loops, cutting down the centerline produces <strong>one single continuous loop</strong> of double length ($2L$), half width, with <strong>four half-twists ($720^\circ$)</strong>.
+                    Watch the red scissors blade slice through the physical paper ribbon. Unlike a cylinder which cuts into 2 loops, cutting down the centerline produces <strong>one single continuous loop</strong> of double length (2<em>L</em>), half width, with <strong>four half-twists (720°)</strong>.
                   </span>
                 ) : (
                   <span>
-                    Cutting at a 1/3 offset produces <strong>two physically interlinked rings</strong>: one thin Möbius strip of length $L$ linked through a longer two-sided ribbon of length $2L$, forming a topological chain link!
+                    Cutting at a 1/3 offset produces <strong>two physically interlinked rings</strong>: one thin Möbius strip of length <em>L</em> linked through a longer two-sided ribbon of length 2<em>L</em>, forming a topological chain link!
                   </span>
                 )}
               </div>
@@ -1793,7 +1793,7 @@ export default function MobiusStrip3DLab() {
             <div className={styles.parameterGrid}>
               <div className={styles.paramCard}>
                 <div className={styles.paramHeader}>
-                  <span className={styles.paramTitle}>Half-Twists ($k$)</span>
+                  <span className={styles.paramTitle}>Half-Twists (k)</span>
                   <span className={styles.paramVal}>
                     {halfTwists} ({halfTwists % 2 === 1 ? 'Möbius / Non-Orientable' : 'Cylinder / Orientable'})
                   </span>
@@ -1814,7 +1814,7 @@ export default function MobiusStrip3DLab() {
 
               <div className={styles.paramCard}>
                 <div className={styles.paramHeader}>
-                  <span className={styles.paramTitle}>Major Radius ($R$)</span>
+                  <span className={styles.paramTitle}>Major Radius (R)</span>
                   <span className={styles.paramVal}>{ribbonRadius.toFixed(1)} m</span>
                 </div>
                 <input
@@ -1830,7 +1830,7 @@ export default function MobiusStrip3DLab() {
 
               <div className={styles.paramCard}>
                 <div className={styles.paramHeader}>
-                  <span className={styles.paramTitle}>Ribbon Width ($w$)</span>
+                  <span className={styles.paramTitle}>Ribbon Width (w)</span>
                   <span className={styles.paramVal}>{ribbonWidth.toFixed(1)} m</span>
                 </div>
                 <input
@@ -1871,11 +1871,8 @@ export default function MobiusStrip3DLab() {
                 <Icon name="database" size={18} />
               </div>
               <div>
-                <div className={styles.paradoxHeading}>Topological Invariants: &chi; = 0</div>
-                For any half-twist integer $k$, the Euler characteristic is $\chi = V - E + F = 0$. When $k$ is odd (1,
-                3), the manifold has strictly <strong>1 boundary component</strong> and <strong>1 side</strong>. When{' '}
-                $k$ is even (0, 2, 4), the manifold is orientable with <strong>2 boundaries</strong> and{' '}
-                <strong>2 sides</strong>.
+                <div className={styles.paradoxHeading}>Topological Invariant: χ = 0</div>
+                For any half-twist integer <em>k</em>, the Euler characteristic is χ = <em>V</em> - <em>E</em> + <em>F</em> = 0. When <em>k</em> is odd (1, 3), the manifold has strictly <strong>1 boundary component</strong> and <strong>1 side</strong>. When <em>k</em> is even (0, 2, 4), the manifold is orientable with <strong>2 boundaries</strong> and <strong>2 sides</strong>.
               </div>
             </div>
           </>

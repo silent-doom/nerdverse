@@ -47,6 +47,19 @@ const GREEK_LETTERS = {
   '\\Omega': 'Ω',
 };
 
+// Blackboard Bold Dictionary (R, C, Z, N, Q, etc.)
+const BLACKBOARD_BOLD = {
+  '\\mathbb{R}': 'ℝ',
+  '\\mathbb{C}': 'ℂ',
+  '\\mathbb{Z}': 'ℤ',
+  '\\mathbb{N}': 'ℕ',
+  '\\mathbb{Q}': 'ℚ',
+  '\\mathbb{E}': '𝔼',
+  '\\mathbb{P}': 'ℙ',
+  '\\mathbb{H}': 'ℍ',
+  '\\mathbb{F}': '𝔽',
+};
+
 // Math symbols & operators dictionary
 const MATH_SYMBOLS = {
   '\\hbar': 'ℏ',
@@ -115,10 +128,24 @@ export function formatFormula(formula) {
   out = out.replace(/\\left\\\{/g, '<span class="math-delim">{</span>').replace(/\\right\\\}/g, '<span class="math-delim">}</span>');
   out = out.replace(/\\\{/g, '{').replace(/\\\}/g, '}');
 
-  // 1. Text wrappers (\text{...}, \mathrm{...}, \mathbf{...})
+  // 1a. Blackboard bold (\mathbb{R}, \mathbb{C}, etc.)
+  out = out.replace(/\\mathbb\{([A-Za-z0-9]+)\}/g, (match, char) => {
+    return BLACKBOARD_BOLD[`\\mathbb{${char}}`] || `<span class="math-bb">${char}</span>`;
+  });
+
+  // 1b. Vector and Hat notation (\vec{n}, \hat{n})
+  out = out.replace(/\\vec\{([^{}]+)\}/g, '$1&#x20D7;');
+  out = out.replace(/\\hat\{([^{}]+)\}/g, '$1&#x0302;');
+
+  // 1c. Degree notation (^\circ, ^{\circ})
+  out = out.replace(/\^\{\\circ\}/g, '°');
+  out = out.replace(/\^\\circ/g, '°');
+
+  // 1d. Text wrappers (\text{...}, \mathrm{...}, \mathbf{...}, \mathcal{...})
   out = out.replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>');
   out = out.replace(/\\text\{([^}]+)\}/g, '<span class="math-text">$1</span>');
   out = out.replace(/\\mathrm\{([^}]+)\}/g, '<span class="math-text">$1</span>');
+  out = out.replace(/\\mathcal\{([^}]+)\}/g, '<span class="math-cal">$1</span>');
   out = out.replace(/\\operatorname\{([^}]+)\}/g, '<span class="math-op">$1</span>');
 
   // 2. Fractions: \frac{num}{den} -> <span class="math-frac"><span class="math-num">num</span><span class="math-denom">den</span></span>
@@ -239,13 +266,23 @@ export function renderMathInMarkdown(text) {
   res = res.replace(/__CURRENCY_DOLLAR__/g, '$');
 
   // 3. Catch raw leaked LaTeX commands that appear outside of $ ... $
+  res = res.replace(/\\mathbb\{([A-Za-z0-9]+)\}/g, (match, char) => {
+    return BLACKBOARD_BOLD[`\\mathbb{${char}}`] || `<span class="math-bb">${char}</span>`;
+  });
+
+  res = res.replace(/\\vec\{([^{}]+)\}/g, '$1&#x20D7;');
+  res = res.replace(/\\hat\{([^{}]+)\}/g, '$1&#x0302;');
+  res = res.replace(/\^\{\\circ\}/g, '°');
+  res = res.replace(/\^\\circ/g, '°');
+  res = res.replace(/\\circ(?![a-zA-Z])/g, '°');
+
   for (const [tex, sym] of Object.entries(GREEK_LETTERS)) {
     const escaped = tex.replace('\\', '\\\\');
     res = res.replace(new RegExp(escaped + '(?![a-zA-Z])', 'g'), `<span class="math-symbol">${sym}</span>`);
   }
 
   for (const [tex, sym] of Object.entries(MATH_SYMBOLS)) {
-    if (['\\hbar', '\\infty', '\\approx', '\\ge', '\\le', '\\cdot', '\\times', '\\to', '\\pm'].includes(tex)) {
+    if (['\\hbar', '\\infty', '\\approx', '\\ge', '\\le', '\\cdot', '\\times', '\\to', '\\pm', '\\in', '\\subset', '\\subseteq', '\\chi'].includes(tex)) {
       const escaped = tex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       res = res.replace(new RegExp(escaped, 'g'), `<span class="math-operator">${sym}</span>`);
     }
