@@ -665,7 +665,7 @@ export default function EulersNumber3DLab() {
           data-testid="tab-complex"
         >
           <Icon name="spiral" size={16} />
-          <span>Euler&apos;s Identity & Complex Helix (e^{'{i\\pi}'} + 1 = 0)</span>
+          <span>Euler&apos;s Identity &amp; Complex Helix (e<sup>iπ</sup> + 1 = 0)</span>
         </button>
       </div>
 

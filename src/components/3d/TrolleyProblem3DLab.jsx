@@ -2149,7 +2149,7 @@ export default function TrolleyProblem3DLab() {
               <div className={styles.guideSection}>
                 <h4>2. The Footbridge Paradox: Arithmetic vs. Touch</h4>
                 <p>
-                  Why do people readily flip the switch (90% support) but refuse to push the heavy man (90% reject), when both yield the exact same $+4$ net lives?
+                  Why do people readily flip the switch (90% support) but refuse to push the heavy man (90% reject), when both yield the exact same +4 net lives?
                   fMRI neuroimaging demonstrates that direct physical contact triggers ancient evolutionary limbic circuits designed to prevent violence within the tribe,
                   even when reason dictates that five families would be saved.
                 </p>

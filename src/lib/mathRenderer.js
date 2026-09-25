@@ -96,6 +96,8 @@ const MATH_SYMBOLS = {
   '\\notin': '∉',
   '\\subset': '⊂',
   '\\subseteq': '⊆',
+  '\\supset': '⊃',
+  '\\supseteq': '⊇',
   '\\forall': '∀',
   '\\exists': '∃',
   '\\lfloor': '⌊',
@@ -105,12 +107,110 @@ const MATH_SYMBOLS = {
   '\\dots': '…',
   '\\cdots': '⋯',
   '\\ldots': '…',
+  '\\vdots': '⋮',
+  '\\ddots': '⋱',
   '\\quad': '&emsp;',
   '\\qquad': '&emsp;&emsp;',
   '\\,': '&thinsp;',
   '\\;': '&ensp;',
   '\\!': '',
 };
+
+/**
+ * Extracts balanced curly brace group content: { ... }
+ */
+function extractBraceArg(str, startIndex) {
+  if (startIndex >= str.length || str[startIndex] !== '{') return null;
+  let depth = 0;
+  for (let i = startIndex; i < str.length; i++) {
+    if (str[i] === '{') depth++;
+    else if (str[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        return {
+          content: str.slice(startIndex + 1, i),
+          endIndex: i,
+        };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Extracts balanced square bracket group content: [ ... ]
+ */
+function extractBracketArg(str, startIndex) {
+  if (startIndex >= str.length || str[startIndex] !== '[') return null;
+  let depth = 0;
+  for (let i = startIndex; i < str.length; i++) {
+    if (str[i] === '[') depth++;
+    else if (str[i] === ']') {
+      depth--;
+      if (depth === 0) {
+        return {
+          content: str.slice(startIndex + 1, i),
+          endIndex: i,
+        };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Parses LaTeX \frac{num}{den} supporting arbitrary nesting
+ */
+function parseFractions(str) {
+  let out = str;
+  let idx = 0;
+  while ((idx = out.indexOf('\\frac')) !== -1) {
+    let b1 = idx + 5;
+    while (b1 < out.length && out[b1] === ' ') b1++;
+    const arg1 = extractBraceArg(out, b1);
+    if (!arg1) break;
+    let b2 = arg1.endIndex + 1;
+    while (b2 < out.length && out[b2] === ' ') b2++;
+    const arg2 = extractBraceArg(out, b2);
+    if (!arg2) break;
+
+    const formattedNum = formatFormula(arg1.content);
+    const formattedDen = formatFormula(arg2.content);
+    const replacement = `<span class="math-frac"><span class="math-num">${formattedNum}</span><span class="math-denom">${formattedDen}</span></span>`;
+    out = out.slice(0, idx) + replacement + out.slice(arg2.endIndex + 1);
+  }
+  return out;
+}
+
+/**
+ * Parses LaTeX \sqrt{radicand} and \sqrt[n]{radicand} supporting nesting
+ */
+function parseSquareRoots(str) {
+  let out = str;
+  let idx = 0;
+  while ((idx = out.indexOf('\\sqrt')) !== -1) {
+    let nextIdx = idx + 5;
+    while (nextIdx < out.length && out[nextIdx] === ' ') nextIdx++;
+    let rootN = null;
+    if (out[nextIdx] === '[') {
+      const opt = extractBracketArg(out, nextIdx);
+      if (opt) {
+        rootN = opt.content;
+        nextIdx = opt.endIndex + 1;
+        while (nextIdx < out.length && out[nextIdx] === ' ') nextIdx++;
+      }
+    }
+    const arg = extractBraceArg(out, nextIdx);
+    if (!arg) break;
+
+    const formattedRad = formatFormula(arg.content);
+    const replacement = rootN
+      ? `<span class="math-sqrt"><sup class="math-root-n">${rootN}</sup><span class="math-radicand">${formattedRad}</span></span>`
+      : `<span class="math-sqrt"><span class="math-radicand">${formattedRad}</span></span>`;
+    out = out.slice(0, idx) + replacement + out.slice(arg.endIndex + 1);
+  }
+  return out;
+}
 
 /**
  * Format mathematical formula content into HTML.
@@ -122,59 +222,61 @@ export function formatFormula(formula) {
 
   let out = formula;
 
-  // 0. Delimiters first (\left(, \right), etc.) before symbol substitutions
-  out = out.replace(/\\left\(/g, '<span class="math-delim">(</span>').replace(/\\right\)/g, '<span class="math-delim">)</span>');
-  out = out.replace(/\\left\[/g, '<span class="math-delim">[</span>').replace(/\\right\]/g, '<span class="math-delim">]</span>');
-  out = out.replace(/\\left\\\{/g, '<span class="math-delim">{</span>').replace(/\\right\\\}/g, '<span class="math-delim">}</span>');
-  out = out.replace(/\\\{/g, '{').replace(/\\\}/g, '}');
+  // Unescape \$ to $
+  out = out.replace(/\\\$/g, '$');
 
-  // 1a. Blackboard bold (\mathbb{R}, \mathbb{C}, etc.)
+  // Normalize any double-escaped backslashes before commands
+  out = out.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
+
+  // Delimiters: floor, ceil, parens, brackets, braces, norm
+  out = out
+    .replace(/\\left\\lfloor/g, '<span class="math-delim">⌊</span>')
+    .replace(/\\right\\rfloor/g, '<span class="math-delim">⌋</span>')
+    .replace(/\\left\\lceil/g, '<span class="math-delim">⌈</span>')
+    .replace(/\\right\\rceil/g, '<span class="math-delim">⌉</span>')
+    .replace(/\\left\(/g, '<span class="math-delim">(</span>')
+    .replace(/\\right\)/g, '<span class="math-delim">)</span>')
+    .replace(/\\left\[/g, '<span class="math-delim">[</span>')
+    .replace(/\\right\]/g, '<span class="math-delim">]</span>')
+    .replace(/\\left\|/g, '<span class="math-delim">|</span>')
+    .replace(/\\right\|/g, '<span class="math-delim">|</span>')
+    .replace(/\\left\\\{/g, '<span class="math-delim">{</span>')
+    .replace(/\\right\\\}/g, '<span class="math-delim">}</span>')
+    .replace(/\\left\{/g, '<span class="math-delim">{</span>')
+    .replace(/\\right\}/g, '<span class="math-delim">}</span>')
+    .replace(/\\left\./g, '')
+    .replace(/\\right\./g, '')
+    .replace(/\\\{/g, '{')
+    .replace(/\\\}/g, '}')
+    .replace(/\\left(?![a-zA-Z])/g, '')
+    .replace(/\\right(?![a-zA-Z])/g, '');
+
+  // Blackboard bold (\mathbb{R}, \mathbb{C}, etc.)
   out = out.replace(/\\mathbb\{([A-Za-z0-9]+)\}/g, (match, char) => {
     return BLACKBOARD_BOLD[`\\mathbb{${char}}`] || `<span class="math-bb">${char}</span>`;
   });
 
-  // 1b. Vector and Hat notation (\vec{n}, \hat{n})
+  // Vector and Hat notation (\vec{n}, \hat{n})
   out = out.replace(/\\vec\{([^{}]+)\}/g, '$1&#x20D7;');
   out = out.replace(/\\hat\{([^{}]+)\}/g, '$1&#x0302;');
 
-  // 1c. Degree notation (^\circ, ^{\circ})
-  out = out.replace(/\^\{\\circ\}/g, '°');
-  out = out.replace(/\^\\circ/g, '°');
+  // Degree notation (^\circ, ^{\circ})
+  out = out.replace(/\^\{\\circ\}/g, '°').replace(/\^\\circ/g, '°');
 
-  // 1d. Text wrappers (\text{...}, \mathrm{...}, \mathbf{...}, \mathcal{...})
+  // Text commands
   out = out.replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>');
   out = out.replace(/\\text\{([^}]+)\}/g, '<span class="math-text">$1</span>');
   out = out.replace(/\\mathrm\{([^}]+)\}/g, '<span class="math-text">$1</span>');
   out = out.replace(/\\mathcal\{([^}]+)\}/g, '<span class="math-cal">$1</span>');
   out = out.replace(/\\operatorname\{([^}]+)\}/g, '<span class="math-op">$1</span>');
 
-  // 2. Fractions: \frac{num}{den} -> <span class="math-frac"><span class="math-num">num</span><span class="math-denom">den</span></span>
-  let prev;
-  let fracSafety = 0;
-  while (out.includes('\\frac') && fracSafety < 5) {
-    prev = out;
-    out = out.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, (match, num, den) => {
-      return `<span class="math-frac"><span class="math-num">${num.trim()}</span><span class="math-denom">${den.trim()}</span></span>`;
-    });
-    if (out === prev) break;
-    fracSafety++;
-  }
+  // Fractions with balanced braces
+  out = parseFractions(out);
 
-  // 3. Square roots: \sqrt{...} or \sqrt[n]{...}
-  let sqrtSafety = 0;
-  while (out.includes('\\sqrt') && sqrtSafety < 5) {
-    prev = out;
-    out = out.replace(/\\sqrt\[([^{}]+)\]\{([^{}]+)\}/g, (match, n, radicand) => {
-      return `<span class="math-sqrt"><sup class="math-root-n">${n}</sup><span class="math-radicand">${radicand}</span></span>`;
-    });
-    out = out.replace(/\\sqrt\{([^{}]+)\}/g, (match, radicand) => {
-      return `<span class="math-sqrt"><span class="math-radicand">${radicand}</span></span>`;
-    });
-    if (out === prev) break;
-    sqrtSafety++;
-  }
+  // Square roots with balanced braces
+  out = parseSquareRoots(out);
 
-  // 4. Large Operators with Sub/Superscripts (Limits, Sums, Integrals)
+  // Large Operators with Sub/Superscripts (Limits, Sums, Integrals)
   out = out.replace(/\\sum_\{([^{}]+)\}\^(\\{0,1}[a-zA-Z0-9]+|\{[^{}]+\})/g, (match, sub, sup) => {
     let cleanSup = sup.startsWith('{') ? sup.slice(1, -1) : sup;
     if (cleanSup === '\\infty') cleanSup = '∞';
@@ -197,14 +299,14 @@ export function formatFormula(formula) {
     return `<span class="math-big-op"><span class="math-op-text">lim</span><span class="math-op-sub">${cleanSub}</span></span>`;
   });
 
-  // 5. Greek Letters (word boundary protected)
+  // Greek Letters (word boundary protected)
   const sortedGreek = Object.entries(GREEK_LETTERS).sort((a, b) => b[0].length - a[0].length);
   for (const [tex, sym] of sortedGreek) {
     const escaped = tex.replace('\\', '\\\\');
     out = out.replace(new RegExp(escaped + '(?![a-zA-Z])', 'g'), `<span class="math-symbol">${sym}</span>`);
   }
 
-  // 6. Math Symbols & Operators (sorted by length to prevent partial prefix replacements)
+  // Math Symbols & Operators (word boundary protected for alphanumeric words)
   const sortedSymbols = Object.entries(MATH_SYMBOLS).sort((a, b) => b[0].length - a[0].length);
   for (const [tex, sym] of sortedSymbols) {
     const escaped = tex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -212,13 +314,13 @@ export function formatFormula(formula) {
     out = out.replace(new RegExp(pattern, 'g'), `<span class="math-operator">${sym}</span>`);
   }
 
-  // 7. Math functions (\sin, \cos, \tan, \ln, \log, \det, \exp, \max, \min)
+  // Math functions (\sin, \cos, \tan, \ln, \log, \det, \exp, \max, \min)
   out = out.replace(/\\(sin|cos|tan|cot|sec|csc|arcsin|arccos|arctan|ln|log|exp|det|max|min)(?![a-zA-Z])/g, '<span class="math-func">$1</span>');
 
-  // 8. Exponents and Subscripts
+  // Exponents and Subscripts
   let expSafety = 0;
   while (out.includes('^{') && expSafety < 5) {
-    prev = out;
+    let prev = out;
     out = out.replace(/\^\{([^{}]+)\}/g, '<sup>$1</sup>');
     if (out === prev) break;
     expSafety++;
@@ -227,7 +329,7 @@ export function formatFormula(formula) {
 
   let subSafety = 0;
   while (out.includes('_{') && subSafety < 5) {
-    prev = out;
+    let prev = out;
     out = out.replace(/_\{([^{}]+)\}/g, '<sub>$1</sub>');
     if (out === prev) break;
     subSafety++;
@@ -249,32 +351,36 @@ export function renderMathInMarkdown(text) {
 
   let res = text;
 
-  // 1. Process Display Math: $$ ... $$
+  // 1. Deliberately protect literal currency amounts (e.g. $1.00, $50, $1,000) using unicode private area
+  res = res.replace(/(^|\s)\$(\d+(?:,\d+)*(?:\.\d+)?)(?=\s|[.,;:!)]|$)/g, '$1\uE000$2');
+  // Also protect escaped dollar \$
+  res = res.replace(/\\\$/g, '\uE001');
+
+  // 2. Process Display Math: $$ ... $$
   res = res.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
     return `<div class="math-display">${formatFormula(formula.trim())}</div>`;
   });
-
-  // 2. Protect standalone currency amounts (e.g. $1.00, $50, $1,000) so they don't pair up as math
-  res = res.replace(/(^|\s)\$(\d+(?:,\d+)*(?:\.\d+)?)(?=\s|[.,;:!)]|$)/g, '$1__CURRENCY_DOLLAR__$2');
 
   // 3. Process Inline Math: $ ... $
   res = res.replace(/(^|[^\\])\$([^\$\n]+?)\$(?!\$)/g, (match, prefix, formula) => {
     return `${prefix}<span class="math-inline">${formatFormula(formula.trim())}</span>`;
   });
 
-  // Restore protected currency amounts
-  res = res.replace(/__CURRENCY_DOLLAR__/g, '$');
+  // 4. Restore protected currency amounts
+  res = res.replace(/\uE000/g, '$');
+  res = res.replace(/\uE001/g, '$');
 
-  // 3. Catch raw leaked LaTeX commands that appear outside of $ ... $
+  // 5. Catch raw leaked LaTeX commands that appear outside of $ ... $
+  res = parseFractions(res);
+  res = parseSquareRoots(res);
+
   res = res.replace(/\\mathbb\{([A-Za-z0-9]+)\}/g, (match, char) => {
     return BLACKBOARD_BOLD[`\\mathbb{${char}}`] || `<span class="math-bb">${char}</span>`;
   });
 
   res = res.replace(/\\vec\{([^{}]+)\}/g, '$1&#x20D7;');
   res = res.replace(/\\hat\{([^{}]+)\}/g, '$1&#x0302;');
-  res = res.replace(/\^\{\\circ\}/g, '°');
-  res = res.replace(/\^\\circ/g, '°');
-  res = res.replace(/\\circ(?![a-zA-Z])/g, '°');
+  res = res.replace(/\^\{\\circ\}/g, '°').replace(/\^\\circ/g, '°').replace(/\\circ(?![a-zA-Z])/g, '°');
 
   for (const [tex, sym] of Object.entries(GREEK_LETTERS)) {
     const escaped = tex.replace('\\', '\\\\');
@@ -282,13 +388,17 @@ export function renderMathInMarkdown(text) {
   }
 
   for (const [tex, sym] of Object.entries(MATH_SYMBOLS)) {
-    if (['\\hbar', '\\infty', '\\approx', '\\ge', '\\le', '\\cdot', '\\times', '\\to', '\\pm', '\\in', '\\subset', '\\subseteq', '\\chi'].includes(tex)) {
+    if (['\\hbar', '\\infty', '\\approx', '\\ge', '\\leq', '\\le', '\\geq', '\\cdot', '\\times', '\\to', '\\pm', '\\in', '\\notin', '\\subset', '\\subseteq', '\\chi'].includes(tex)) {
       const escaped = tex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      res = res.replace(new RegExp(escaped, 'g'), `<span class="math-operator">${sym}</span>`);
+      const pattern = /^[a-zA-Z\\]+$/.test(tex) ? escaped + '(?![a-zA-Z])' : escaped;
+      res = res.replace(new RegExp(pattern, 'g'), `<span class="math-operator">${sym}</span>`);
     }
   }
 
-  // 4. Standard Markdown formatting
+  // Clean up any remaining stray \left / \right
+  res = res.replace(/\\left(?![a-zA-Z])/g, '').replace(/\\right(?![a-zA-Z])/g, '');
+
+  // 6. Standard Markdown formatting
   res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
   res = res.replace(/`([^`]+)`/g, '<code>$1</code>');

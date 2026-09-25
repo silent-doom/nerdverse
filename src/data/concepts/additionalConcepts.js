@@ -2350,7 +2350,7 @@ In 1858, two German mathematicians—August Ferdinand Möbius and Johann Benedic
 
 Before 1858, mathematicians took it as an unshakeable axiom of nature that every physical surface in three-dimensional space must have two distinct faces—an "inside" and an "outside," a "front" and a "back"—and that to travel from one face to the other, an object must cross an intervening edge or boundary.
 
-Möbius demonstrated that this intuition is a provincial cognitive illusion. Take a flat rectangular strip of paper, give one end a half-twist of $180^\\circ$ ($\\\\pi$ radians), and paste the two ends together. The resulting loop is a **Möbius strip**.
+Möbius demonstrated that this intuition is a provincial cognitive illusion. Take a flat rectangular strip of paper, give one end a half-twist of $180^\circ$ ($\pi$ radians), and paste the two ends together. The resulting loop is a **Möbius strip**.
 
 ## The Ant Traversal & Non-Orientability
 To grasp the topological reality of the Möbius strip, imagine an infinitesimally small two-dimensional ant crawling along the centerline:

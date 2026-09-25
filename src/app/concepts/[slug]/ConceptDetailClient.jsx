@@ -72,7 +72,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
         </div>
 
         <h1 className={styles.title}>{concept.title}</h1>
-        <p className={styles.summary}>{concept.summary}</p>
+        <p className={styles.summary} dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(concept.summary) }} />
       </header>
 
       {/* ── TIER 1: The 30-Second Hook (Above the Fold) ── */}
@@ -92,7 +92,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                 <Icon name="zap" size={16} color="#eab308" />
                 <span className={styles.hookColTitle}>The Premise</span>
               </div>
-              <p className={styles.hookColBody}>{concept.hook.premise}</p>
+              <p className={styles.hookColBody} dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(concept.hook.premise) }} />
             </div>
 
             <div className={styles.hookCol}>
@@ -100,7 +100,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                 <Icon name="brain" size={16} color="#38bdf8" />
                 <span className={styles.hookColTitle}>Common Intuition</span>
               </div>
-              <p className={styles.hookColBody}>{concept.hook.intuition}</p>
+              <p className={styles.hookColBody} dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(concept.hook.intuition) }} />
             </div>
 
             <div className={`${styles.hookCol} ${styles.hookColHighlight}`}>
@@ -108,7 +108,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                 <Icon name="sparkles" size={16} color="#f59e0b" />
                 <span className={styles.hookColTitle}>The Mind-Bending Twist</span>
               </div>
-              <p className={styles.hookColBody}>{concept.hook.twist}</p>
+              <p className={styles.hookColBody} dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(concept.hook.twist) }} />
             </div>
           </div>
 
@@ -118,7 +118,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                 <Icon name="lightbulb" size={15} color="#fef08a" />
                 <span>Core Mental Model:</span>
               </span>
-              <span className={styles.takeawayText}>{concept.takeaway}</span>
+              <span className={styles.takeawayText} dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(concept.takeaway) }} />
             </div>
           )}
         </section>
@@ -151,7 +151,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
               {challenges[selectedChallenge] && (
                 <div className={styles.challengePromptBox}>
                   <div className={styles.challengePrompt}>
-                    <strong>Goal:</strong> {challenges[selectedChallenge].prompt}
+                    <strong>Goal:</strong> <span dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(challenges[selectedChallenge].prompt) }} />
                   </div>
                   {challenges[selectedChallenge].actionLabel && (
                     <div className={styles.challengeActionHint}>
@@ -347,7 +347,7 @@ export default function ConceptDetailClient({ concept, category, relatedConcepts
                     {concept.facts.map((fact, index) => (
                       <li key={index} className={styles.factItem}>
                         <span className={styles.factIndex}>{index + 1}</span>
-                        <span>{fact}</span>
+                        <span dangerouslySetInnerHTML={{ __html: renderMathInMarkdown(fact) }} />
                       </li>
                     ))}
                   </ul>

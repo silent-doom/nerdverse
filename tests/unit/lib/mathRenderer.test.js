@@ -124,6 +124,45 @@ describe('mathRenderer', () => {
       expect(rendered).toContain('180°');
       expect(rendered).not.toContain('\\circ');
     });
+    it('formats nested fractions and square roots with balanced braces', () => {
+      const golden = '$\\phi = \\frac{1 + \\sqrt{5}}{2}$';
+      const rendered = renderMathInMarkdown(golden);
+      expect(rendered).toContain('math-frac');
+      expect(rendered).toContain('math-sqrt');
+      expect(rendered).not.toContain('\\frac');
+      expect(rendered).not.toContain('\\sqrt');
+
+      const floor = '$$K = \\left\\lfloor \\frac{\\pi}{2 \\sqrt{m/M}} \\right\\rfloor$$';
+      const renderedFloor = renderMathInMarkdown(floor);
+      expect(renderedFloor).toContain('⌊');
+      expect(renderedFloor).toContain('⌋');
+      expect(renderedFloor).not.toContain('\\left');
+      expect(renderedFloor).not.toContain('\\right');
+      expect(renderedFloor).not.toContain('\\lfloor');
+      expect(renderedFloor).not.toContain('\\rfloor');
+    });
+
+    it('formats escaped currency in formulas and preserves dollars', () => {
+      const calc = '$$\\$1.00 \\times \\left(1 + \\frac{1}{2}\\right)^2 = \\$2.25$$';
+      const rendered = renderMathInMarkdown(calc);
+      expect(rendered).toContain('$1.00');
+      expect(rendered).toContain('$2.25');
+      expect(rendered).not.toContain('\\$');
+      expect(rendered).not.toContain('\\left');
+    });
+
+    it('renders leaked LaTeX operators and symbols outside dollar delimiters', () => {
+      const raw = 'In \\mathbb{R}^3, offset u \\in [0, 2\\pi] with invariant \\chi = 0';
+      const rendered = renderMathInMarkdown(raw);
+      expect(rendered).toContain('ℝ');
+      expect(rendered).toContain('∈');
+      expect(rendered).toContain('π');
+      expect(rendered).toContain('χ');
+      expect(rendered).not.toContain('\\mathbb');
+      expect(rendered).not.toContain('\\in');
+      expect(rendered).not.toContain('\\pi');
+      expect(rendered).not.toContain('\\chi');
+    });
   });
 
   describe('cleanDisplayFormula', () => {
