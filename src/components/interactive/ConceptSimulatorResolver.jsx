@@ -25,6 +25,7 @@ const BraessParadox3DLab = dynamic(() => import('@/components/3d/BraessParadox3D
 const PiCollisions3DLab = dynamic(() => import('@/components/3d/PiCollisions3DLab'), { ssr: false });
 const EulersNumber3DLab = dynamic(() => import('@/components/3d/EulersNumber3DLab'), { ssr: false });
 const MobiusStrip3DLab = dynamic(() => import('@/components/3d/MobiusStrip3DLab'), { ssr: false });
+const BrouwersFixedPoint3DLab = dynamic(() => import('@/components/3d/BrouwersFixedPoint3DLab'), { ssr: false });
 const ConceptLabPlaceholder = dynamic(() => import('@/components/interactive/ConceptLabPlaceholder'), { ssr: false });
 
 export default function ConceptSimulatorResolver({ type, concept }) {
@@ -75,6 +76,8 @@ export default function ConceptSimulatorResolver({ type, concept }) {
       return <EulersNumber3DLab />;
     case 'MobiusStrip':
       return <MobiusStrip3DLab />;
+    case 'BrouwersFixedPoint':
+      return <BrouwersFixedPoint3DLab />;
     default:
       return <ConceptLabPlaceholder conceptType={type} concept={concept} />;
   }
