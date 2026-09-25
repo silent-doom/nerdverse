@@ -112,184 +112,325 @@ const audioEngine = new MobiusAudioEngine();
 function createAuthenticAntMesh() {
   const antRoot = new THREE.Group();
 
+  // Photorealistic chitin materials with subtle sub-surface scattering and clearcoat sheen
   const chitinDarkMat = new THREE.MeshStandardMaterial({
-    color: 0x140e0b,
+    color: 0x180f0a,
+    roughness: 0.28,
+    metalness: 0.05,
+  });
+
+  const chitinThoraxMat = new THREE.MeshStandardMaterial({
+    color: 0x3a170b, // Rich mahogany / burgundy-chestnut typical of Formica rufa
     roughness: 0.35,
-    metalness: 0.04,
+    metalness: 0.03,
+  });
+
+  const chitinGlossMat = new THREE.MeshStandardMaterial({
+    color: 0x100804, // Polished high-sheen mirror cuticle on gaster tergites
+    roughness: 0.16,
+    metalness: 0.08,
   });
 
   const chitinAmberMat = new THREE.MeshStandardMaterial({
-    color: 0x2e170e,
-    roughness: 0.4,
+    color: 0x5e2712, // Translucent amber chitin for joint sockets, tarsi, antennal scape
+    roughness: 0.42,
     metalness: 0.02,
   });
 
   const eyeGlossMat = new THREE.MeshStandardMaterial({
-    color: 0x060606,
-    roughness: 0.08,
-    metalness: 0.1,
+    color: 0x030303,
+    roughness: 0.05,
+    metalness: 0.4,
+  });
+
+  const mandibleMat = new THREE.MeshStandardMaterial({
+    color: 0x240e05,
+    roughness: 0.26,
+    metalness: 0.04,
+  });
+
+  const toothMat = new THREE.MeshStandardMaterial({
+    color: 0x4a1c09,
+    roughness: 0.22,
+    metalness: 0.02,
   });
 
   const bodyGroup = new THREE.Group();
   antRoot.add(bodyGroup);
 
-  // 1. Head (Caput)
+  // ==========================================
+  // 1. HEAD (Caput)
+  // Heart-shaped cranium, compound eyes, mandibles, geniculate antennae
+  // ==========================================
   const headGroup = new THREE.Group();
-  headGroup.position.set(0.32, 0.12, 0);
+  headGroup.position.set(0.24, 0.10, 0);
 
-  const craniumGeo = new THREE.SphereGeometry(0.12, 16, 16);
-  craniumGeo.scale(1.25, 0.85, 0.95);
-  const cranium = new THREE.Mesh(craniumGeo, chitinDarkMat);
-  headGroup.add(cranium);
+  // Posterior Occipital Lobes
+  const occiputGeo = new THREE.SphereGeometry(0.085, 14, 14);
+  occiputGeo.scale(1.15, 0.85, 1.1);
+  const occiput = new THREE.Mesh(occiputGeo, chitinDarkMat);
+  headGroup.add(occiput);
 
-  const clypeusGeo = new THREE.ConeGeometry(0.06, 0.08, 8);
+  // Anterior Frons & Clypeus
+  const clypeusGeo = new THREE.ConeGeometry(0.065, 0.10, 10);
   clypeusGeo.rotateZ(-Math.PI / 2);
+  clypeusGeo.scale(0.85, 1, 1);
   const clypeus = new THREE.Mesh(clypeusGeo, chitinDarkMat);
-  clypeus.position.set(0.14, -0.02, 0);
+  clypeus.position.set(0.07, -0.015, 0);
   headGroup.add(clypeus);
 
-  // Compound Eyes
+  // Lateral Compound Eyes (convex faceted ellipsoids)
   [-1, 1].forEach((side) => {
-    const eyeGeo = new THREE.SphereGeometry(0.038, 12, 12);
-    eyeGeo.scale(1.1, 1.25, 0.7);
+    const eyeGeo = new THREE.SphereGeometry(0.03, 12, 12);
+    eyeGeo.scale(1.1, 1.35, 0.65);
     const eye = new THREE.Mesh(eyeGeo, eyeGlossMat);
-    eye.position.set(0.04, 0.04, side * 0.09);
-    eye.rotation.y = side * 0.35;
+    eye.position.set(0.02, 0.035, side * 0.075);
+    eye.rotation.set(side * 0.15, side * 0.35, 0.1);
     headGroup.add(eye);
   });
 
-  // Mandibles
-  const mandibleGeo = new THREE.ConeGeometry(0.022, 0.11, 8);
-  [-1, 1].forEach((side) => {
-    const mandible = new THREE.Mesh(mandibleGeo, chitinDarkMat);
-    mandible.position.set(0.16, -0.04, side * 0.035);
-    mandible.rotation.set(side * 0.25, side * 0.35, -Math.PI / 2 + 0.35);
-    headGroup.add(mandible);
+  // Curved Mandibles with Serrated Cutting Denticles
+  const mandibleL = new THREE.Group();
+  const mandibleR = new THREE.Group();
+
+  [{ grp: mandibleL, side: 1 }, { grp: mandibleR, side: -1 }].forEach(({ grp, side }) => {
+    grp.position.set(0.12, -0.035, side * 0.028);
+
+    // Main curved blade
+    const bladeGeo = new THREE.ConeGeometry(0.016, 0.09, 8);
+    bladeGeo.scale(0.5, 1, 1.2);
+    const blade = new THREE.Mesh(bladeGeo, mandibleMat);
+    blade.position.set(0.04, 0, side * 0.01);
+    blade.rotation.set(side * 0.45, side * 0.25, -Math.PI / 2 + 0.3);
+    grp.add(blade);
+
+    // Masticatory denticles (serrated teeth)
+    for (let t = 0; t < 4; t++) {
+      const tooth = new THREE.Mesh(new THREE.ConeGeometry(0.004, 0.012, 4), toothMat);
+      tooth.position.set(0.02 + t * 0.015, -0.005, side * (0.018 - t * 0.004));
+      tooth.rotation.set(0, 0, -Math.PI / 2);
+      grp.add(tooth);
+    }
+
+    headGroup.add(grp);
   });
 
-  // Geniculate Antennae
+  // Geniculate (Elbowed) Antennae (Scape + Pedicel + Flagellum)
   const antennaL = new THREE.Group();
   const antennaR = new THREE.Group();
 
   [{ grp: antennaL, side: 1 }, { grp: antennaR, side: -1 }].forEach(({ grp, side }) => {
-    grp.position.set(0.08, 0.06, side * 0.038);
+    grp.position.set(0.065, 0.045, side * 0.032);
 
-    const scapeGeo = new THREE.CylinderGeometry(0.006, 0.005, 0.19, 6);
+    // Torulus (Antennal socket)
+    const torulus = new THREE.Mesh(new THREE.SphereGeometry(0.007, 8, 8), chitinAmberMat);
+    grp.add(torulus);
+
+    // Scape (Long basal segment angled upward and forward)
+    const scapeGeo = new THREE.CylinderGeometry(0.0045, 0.0035, 0.16, 8);
     const scape = new THREE.Mesh(scapeGeo, chitinAmberMat);
-    scape.position.set(0.07, 0.06, side * 0.025);
-    scape.rotation.set(side * 0.3, -0.2, -0.75);
+    scape.position.set(0.06, 0.05, side * 0.022);
+    scape.rotation.set(side * 0.35, -0.2, -0.75);
     grp.add(scape);
 
-    const funiculusGeo = new THREE.CylinderGeometry(0.005, 0.003, 0.22, 6);
-    const funiculus = new THREE.Mesh(funiculusGeo, chitinAmberMat);
-    funiculus.position.set(0.19, 0.11, side * 0.065);
-    funiculus.rotation.set(side * 0.15, -0.4, 0.45);
-    grp.add(funiculus);
+    // Pedicel (Elbow hinge)
+    const pedicel = new THREE.Mesh(new THREE.SphereGeometry(0.0055, 8, 8), chitinAmberMat);
+    pedicel.position.set(0.12, 0.10, side * 0.042);
+    grp.add(pedicel);
+
+    // Funiculus / Flagellum (Segmented feeler pointing downward toward the substrate to palpate)
+    const flagellumGeo = new THREE.CylinderGeometry(0.004, 0.002, 0.18, 8);
+    const flagellum = new THREE.Mesh(flagellumGeo, chitinDarkMat);
+    flagellum.position.set(0.19, 0.04, side * 0.065);
+    flagellum.rotation.set(side * 0.15, -0.35, 0.55);
+    grp.add(flagellum);
+
+    // Sensory tip club
+    const club = new THREE.Mesh(new THREE.SphereGeometry(0.0045, 6, 6), chitinAmberMat);
+    club.position.set(0.25, -0.02, side * 0.08);
+    grp.add(club);
 
     headGroup.add(grp);
   });
 
   bodyGroup.add(headGroup);
 
-  // 2. Thorax (Mesosoma)
+  // Cervix (Flexible Neck)
+  const neckGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.04, 8);
+  neckGeo.rotateZ(Math.PI / 2);
+  const neck = new THREE.Mesh(neckGeo, chitinAmberMat);
+  neck.position.set(0.15, 0.09, 0);
+  bodyGroup.add(neck);
+
+  // ==========================================
+  // 2. THORAX (Mesosoma / Alitrunk)
+  // Pronotum, Mesonotum, Metanotum/Propodeum
+  // ==========================================
   const thoraxGroup = new THREE.Group();
 
-  const pronotum = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 14), chitinDarkMat);
-  pronotum.scale.set(1.0, 0.88, 0.82);
-  pronotum.position.set(0.15, 0.11, 0);
+  const pronotum = new THREE.Mesh(new THREE.SphereGeometry(0.085, 14, 14), chitinThoraxMat);
+  pronotum.scale.set(1.05, 0.88, 0.82);
+  pronotum.position.set(0.10, 0.095, 0);
 
-  const mesonotum = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), chitinDarkMat);
-  mesonotum.scale.set(1.2, 0.95, 0.78);
-  mesonotum.position.set(0.03, 0.12, 0);
+  const mesonotum = new THREE.Mesh(new THREE.SphereGeometry(0.10, 14, 14), chitinThoraxMat);
+  mesonotum.scale.set(1.15, 0.95, 0.76);
+  mesonotum.position.set(0.00, 0.105, 0);
 
-  const propodeum = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 14), chitinDarkMat);
-  propodeum.scale.set(1.0, 0.88, 0.78);
-  propodeum.position.set(-0.09, 0.1, 0);
+  const propodeum = new THREE.Mesh(new THREE.SphereGeometry(0.085, 14, 14), chitinThoraxMat);
+  propodeum.scale.set(0.95, 0.85, 0.74);
+  propodeum.position.set(-0.09, 0.088, 0);
 
-  thoraxGroup.add(pronotum, mesonotum, propodeum);
+  // Ventral thoracic sternite keel
+  const sternum = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.22, 8), chitinThoraxMat);
+  sternum.rotation.z = Math.PI / 2;
+  sternum.position.set(0.00, 0.045, 0);
+
+  thoraxGroup.add(pronotum, mesonotum, propodeum, sternum);
   bodyGroup.add(thoraxGroup);
 
-  // 3. Petiole
+  // ==========================================
+  // 3. PETIOLE (The Iconic Formicine Waist)
+  // Thin pedicel stem with upright squamiform node / scale
+  // ==========================================
   const petioleGroup = new THREE.Group();
-  petioleGroup.position.set(-0.17, 0.09, 0);
+  petioleGroup.position.set(-0.16, 0.08, 0);
 
-  const pedicelStem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.07, 8), chitinDarkMat);
+  const pedicelStem = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.06, 8), chitinAmberMat);
   pedicelStem.rotation.z = Math.PI / 2;
-  const petioleScale = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.09, 6), chitinDarkMat);
-  petioleScale.position.set(0, 0.04, 0);
+
+  const scaleGeo = new THREE.CylinderGeometry(0.038, 0.03, 0.02, 12);
+  scaleGeo.scale(0.35, 1.4, 0.9);
+  const petioleScale = new THREE.Mesh(scaleGeo, chitinDarkMat);
+  petioleScale.position.set(0, 0.035, 0);
+
   petioleGroup.add(pedicelStem, petioleScale);
   bodyGroup.add(petioleGroup);
 
-  // 4. Gaster (Segmented Abdomen)
+  // ==========================================
+  // 4. GASTER (Segmented Teardrop Abdomen)
+  // Tergites I, II, III, IV, and terminal acidopore
+  // ==========================================
   const gasterGroup = new THREE.Group();
-  gasterGroup.position.set(-0.21, 0.09, 0);
+  gasterGroup.position.set(-0.20, 0.08, 0);
 
-  const gastI = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 14), chitinDarkMat);
-  gastI.scale.set(1.0, 0.9, 0.85);
-  gastI.position.set(-0.06, 0.01, 0);
+  const gastI = new THREE.Mesh(new THREE.SphereGeometry(0.10, 14, 14), chitinDarkMat);
+  gastI.scale.set(0.9, 0.85, 0.8);
+  gastI.position.set(-0.05, 0.01, 0);
 
-  const gastII = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 16), chitinDarkMat);
-  gastII.scale.set(1.25, 0.95, 0.9);
-  gastII.position.set(-0.17, 0.01, 0);
+  const gastII = new THREE.Mesh(new THREE.SphereGeometry(0.145, 16, 16), chitinGlossMat);
+  gastII.scale.set(1.2, 0.95, 0.88);
+  gastII.position.set(-0.14, 0.01, 0);
 
-  const gastIII = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.2, 14), chitinDarkMat);
-  gastIII.rotation.z = Math.PI / 2 + 0.18;
-  gastIII.position.set(-0.32, -0.02, 0);
+  const gastIII = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.065, 0.11, 14), chitinDarkMat);
+  gastIII.rotation.z = Math.PI / 2 + 0.12;
+  gastIII.position.set(-0.25, -0.01, 0);
 
-  gasterGroup.add(gastI, gastII, gastIII);
+  const gastIV = new THREE.Mesh(new THREE.ConeGeometry(0.065, 0.12, 14), chitinDarkMat);
+  gastIV.rotation.z = Math.PI / 2 + 0.22;
+  gastIV.position.set(-0.35, -0.03, 0);
+
+  // Terminal acidopore nozzle
+  const acidopore = new THREE.Mesh(new THREE.ConeGeometry(0.015, 0.03, 8), chitinAmberMat);
+  acidopore.rotation.z = Math.PI / 2 + 0.22;
+  acidopore.position.set(-0.41, -0.045, 0);
+
+  gasterGroup.add(gastI, gastII, gastIII, gastIV, acidopore);
   bodyGroup.add(gasterGroup);
 
-  // 5. Hexapod Articulated Limbs
+  // ==========================================
+  // 5. HEXAPOD ARTICULATED LIMBS (6 Legs)
+  // All attach to ventral mesosoma with Coxa -> Trochanter -> Femur -> Tibia -> Tarsus
+  // ==========================================
   const legConfigs = [
-    { id: 'L1', origin: [0.15, 0.06, 0.07], side: 1, baseAngleY: 0.45, femurLen: 0.24, tibiaLen: 0.28, basePitch: 0.7 },
-    { id: 'R1', origin: [0.15, 0.06, -0.07], side: -1, baseAngleY: -0.45, femurLen: 0.24, tibiaLen: 0.28, basePitch: 0.7 },
-    { id: 'L2', origin: [0.03, 0.06, 0.08], side: 1, baseAngleY: 0.0, femurLen: 0.26, tibiaLen: 0.30, basePitch: 0.8 },
-    { id: 'R2', origin: [0.03, 0.06, -0.08], side: -1, baseAngleY: 0.0, femurLen: 0.26, tibiaLen: 0.30, basePitch: 0.8 },
-    { id: 'L3', origin: [-0.07, 0.06, 0.07], side: 1, baseAngleY: -0.55, femurLen: 0.28, tibiaLen: 0.34, basePitch: 0.9 },
-    { id: 'R3', origin: [-0.07, 0.06, -0.07], side: -1, baseAngleY: 0.55, femurLen: 0.28, tibiaLen: 0.34, basePitch: 0.9 },
+    // Prothoracic (Forelegs) - shorter, angled forward
+    { id: 'L1', origin: [0.09, 0.04, 0.038], side: 1, baseAngleY: 0.52, femurLen: 0.20, tibiaLen: 0.23, tarsusLen: 0.13, basePitch: 0.65, baseTibiaPitch: 0.95 },
+    { id: 'R1', origin: [0.09, 0.04, -0.038], side: -1, baseAngleY: -0.52, femurLen: 0.20, tibiaLen: 0.23, tarsusLen: 0.13, basePitch: 0.65, baseTibiaPitch: 0.95 },
+    // Mesothoracic (Midlegs) - medium length, lateral stance
+    { id: 'L2', origin: [0.00, 0.04, 0.045], side: 1, baseAngleY: 0.0, femurLen: 0.22, tibiaLen: 0.26, tarsusLen: 0.14, basePitch: 0.72, baseTibiaPitch: 1.05 },
+    { id: 'R2', origin: [0.00, 0.04, -0.045], side: -1, baseAngleY: 0.0, femurLen: 0.22, tibiaLen: 0.26, tarsusLen: 0.14, basePitch: 0.72, baseTibiaPitch: 1.05 },
+    // Metathoracic (Hindlegs) - longest, angled backward for driving propulsion
+    { id: 'L3', origin: [-0.08, 0.04, 0.040], side: 1, baseAngleY: -0.61, femurLen: 0.26, tibiaLen: 0.31, tarsusLen: 0.16, basePitch: 0.80, baseTibiaPitch: 1.15 },
+    { id: 'R3', origin: [-0.08, 0.04, -0.040], side: -1, baseAngleY: 0.61, femurLen: 0.26, tibiaLen: 0.31, tarsusLen: 0.16, basePitch: 0.80, baseTibiaPitch: 1.15 },
   ];
 
   const legRigs = [];
 
   legConfigs.forEach((cfg) => {
+    // 1. Coxa (rotates horizontally in yaw during sweep)
     const coxaGroup = new THREE.Group();
     coxaGroup.position.set(...cfg.origin);
     coxaGroup.rotation.y = cfg.baseAngleY;
 
-    const coxaMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.012, 0.06, 6), chitinAmberMat);
+    const coxaMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.010, 0.05, 8), chitinAmberMat);
     coxaMesh.rotation.x = cfg.side * 0.5;
     coxaGroup.add(coxaMesh);
 
-    const femurGroup = new THREE.Group();
-    femurGroup.position.set(0, 0.02, cfg.side * 0.03);
+    // Trochanter joint bead
+    const trochanter = new THREE.Mesh(new THREE.SphereGeometry(0.010, 8, 8), chitinAmberMat);
+    trochanter.position.set(0, 0.015, cfg.side * 0.025);
+    coxaGroup.add(trochanter);
 
-    const femurGeo = new THREE.CylinderGeometry(0.013, 0.009, cfg.femurLen, 6);
-    const femurMesh = new THREE.Mesh(femurGeo, chitinDarkMat);
-    femurMesh.position.set(0, cfg.femurLen * 0.45, cfg.side * cfg.femurLen * 0.4);
+    // 2. Femur Group (angles UP and OUT to form the elevated knee)
+    const femurGroup = new THREE.Group();
+    femurGroup.position.copy(trochanter.position);
+
+    const femurGeo = new THREE.CylinderGeometry(0.011, 0.007, cfg.femurLen, 8);
+    const femurMesh = new THREE.Mesh(femurGeo, chitinThoraxMat);
+    femurMesh.position.set(0, cfg.femurLen * 0.45, cfg.side * cfg.femurLen * 0.35);
     femurMesh.rotation.set(cfg.side * cfg.basePitch, 0, 0);
     femurGroup.add(femurMesh);
 
-    const knee = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), chitinAmberMat);
-    knee.position.set(0, cfg.femurLen * 0.85, cfg.side * cfg.femurLen * 0.75);
+    // Knee joint (femorotibial hinge)
+    const knee = new THREE.Mesh(new THREE.SphereGeometry(0.010, 8, 8), chitinAmberMat);
+    knee.position.set(0, cfg.femurLen * 0.85, cfg.side * cfg.femurLen * 0.70);
     femurGroup.add(knee);
 
+    // 3. Tibia Group (angles DOWN and OUT towards substrate)
     const tibiaGroup = new THREE.Group();
     tibiaGroup.position.copy(knee.position);
 
-    const tibiaGeo = new THREE.CylinderGeometry(0.009, 0.005, cfg.tibiaLen, 6);
+    const tibiaGeo = new THREE.CylinderGeometry(0.007, 0.004, cfg.tibiaLen, 8);
     const tibiaMesh = new THREE.Mesh(tibiaGeo, chitinDarkMat);
-    tibiaMesh.position.set(0, -cfg.tibiaLen * 0.45, cfg.side * cfg.tibiaLen * 0.35);
-    tibiaMesh.rotation.set(cfg.side * -0.65, 0, 0);
+    tibiaMesh.position.set(0, -cfg.tibiaLen * 0.45, cfg.side * cfg.tibiaLen * 0.32);
+    tibiaMesh.rotation.set(cfg.side * -cfg.baseTibiaPitch, 0, 0);
     tibiaGroup.add(tibiaMesh);
 
-    const tarsusMesh = new THREE.Mesh(new THREE.ConeGeometry(0.006, 0.05, 6), chitinAmberMat);
-    tarsusMesh.position.set(0, -cfg.tibiaLen * 0.9, cfg.side * cfg.tibiaLen * 0.65);
-    tarsusMesh.rotation.set(cfg.side * -0.2, 0, 0);
-    tibiaGroup.add(tarsusMesh);
+    // Calcar / Tibial spur
+    const spur = new THREE.Mesh(new THREE.ConeGeometry(0.003, 0.018, 4), chitinAmberMat);
+    spur.position.set(0, -cfg.tibiaLen * 0.85, cfg.side * cfg.tibiaLen * 0.60);
+    spur.rotation.set(cfg.side * -0.4, 0, 0);
+    tibiaGroup.add(spur);
 
+    // 4. Tarsus Foot (Multi-segmented foot resting on the paper)
+    const tarsusGroup = new THREE.Group();
+    tarsusGroup.position.set(0, -cfg.tibiaLen * 0.90, cfg.side * cfg.tibiaLen * 0.62);
+
+    // Basitarsus
+    const basitarsusGeo = new THREE.CylinderGeometry(0.004, 0.003, cfg.tarsusLen * 0.5, 6);
+    const basitarsus = new THREE.Mesh(basitarsusGeo, chitinAmberMat);
+    basitarsus.position.set(0.02, -0.01, cfg.side * 0.02);
+    basitarsus.rotation.set(cfg.side * -0.2, 0, -Math.PI / 2 + 0.3);
+    tarsusGroup.add(basitarsus);
+
+    // Distal tarsomeres
+    const tarsomeresGeo = new THREE.CylinderGeometry(0.003, 0.002, cfg.tarsusLen * 0.4, 6);
+    const tarsomeres = new THREE.Mesh(tarsomeresGeo, chitinAmberMat);
+    tarsomeres.position.set(0.05, -0.015, cfg.side * 0.035);
+    tarsomeres.rotation.set(cfg.side * -0.1, 0, -Math.PI / 2 + 0.1);
+    tarsusGroup.add(tarsomeres);
+
+    // Pretarsal Dual Claws (ungues gripping the paper)
+    [-1, 1].forEach((clawSide) => {
+      const claw = new THREE.Mesh(new THREE.ConeGeometry(0.0025, 0.012, 4), chitinDarkMat);
+      claw.position.set(0.07, -0.02, cfg.side * (0.04 + clawSide * 0.006));
+      claw.rotation.set(clawSide * 0.3, 0, -Math.PI / 2 - 0.4);
+      tarsusGroup.add(claw);
+    });
+
+    tibiaGroup.add(tarsusGroup);
     femurGroup.add(tibiaGroup);
     coxaGroup.add(femurGroup);
-    bodyGroup.add(coxaGroup);
+    thoraxGroup.add(coxaGroup);
 
     legRigs.push({
       id: cfg.id,
@@ -297,25 +438,30 @@ function createAuthenticAntMesh() {
       coxaGroup,
       femurGroup,
       tibiaGroup,
+      tarsusGroup,
       baseAngleY: cfg.baseAngleY,
       basePitch: cfg.basePitch,
+      baseTibiaPitch: cfg.baseTibiaPitch,
     });
   });
 
-  // Normal Vector Arrow
+  // Normal Vector Arrow (perpendicular indicator)
   const arrowDir = new THREE.Vector3(0, 1, 0);
-  const arrowOrigin = new THREE.Vector3(0, 0.28, 0);
-  const normalArrow = new THREE.ArrowHelper(arrowDir, arrowOrigin, 0.75, 0x38bdf8, 0.16, 0.08);
+  const arrowOrigin = new THREE.Vector3(0, 0.24, 0);
+  const normalArrow = new THREE.ArrowHelper(arrowDir, arrowOrigin, 0.70, 0x38bdf8, 0.14, 0.07);
   normalArrow.name = 'normalArrow';
   antRoot.add(normalArrow);
 
-  antRoot.scale.set(0.9, 0.9, 0.9);
+  // Scaled to authentic physical proportions relative to paper strip (width 1.35)
+  antRoot.scale.set(0.72, 0.72, 0.72);
   antRoot.userData = {
     bodyGroup,
     headGroup,
     gasterGroup,
     antennaL,
     antennaR,
+    mandibleL,
+    mandibleR,
     legRigs,
   };
   return antRoot;
@@ -1007,74 +1153,95 @@ export default function MobiusStrip3DLab() {
         const n = new THREE.Vector3().crossVectors(tu, g).normalize();
 
         // Position feet directly on paper top face
-        const antPos = c.clone().addScaledVector(n, d / 2 + 0.02);
+        const antPos = c.clone().addScaledVector(n, d / 2 + 0.004);
         antMeshRef.current.position.copy(antPos);
 
-        // Orientation Frame: X=g (ruling), Y=n (normal), Z=tu (tangent forward)
+        // Authentic Biomechanical Orientation Frame:
+        // Local +X = Tangent Forward (tu)
+        // Local +Y = Surface Normal Up (n)
+        // Local +Z = Lateral Left across width (tu x n)
+        const lateral = new THREE.Vector3().crossVectors(tu, n).normalize();
         const rotMatrix = new THREE.Matrix4();
-        rotMatrix.makeBasis(g, n, tu);
+        rotMatrix.makeBasis(tu, n, lateral);
         antMeshRef.current.setRotationFromMatrix(rotMatrix);
 
-        // True Biomechanical Tripod Gait Kinematics
-        const { bodyGroup, gasterGroup, antennaL, antennaR, legRigs } = antMeshRef.current.userData || {};
+        // True Biomechanical Alternating Tripod Gait Kinematics
+        const { bodyGroup, headGroup, gasterGroup, antennaL, antennaR, mandibleL, mandibleR, legRigs } = antMeshRef.current.userData || {};
 
         if (legRigs && legRigs.length === 6) {
-          const gaitPhase = u * 24; // Realistic scurrying step frequency
+          // Physical stride frequency calibrated to ground travel speed (eliminates slipping)
+          const gaitPhase = u * 48;
+          const sweepAmp = 0.26;
 
-          // Tripod A: L1 (index 0), R2 (index 3), L3 (index 4)
-          // Tripod B: R1 (index 1), L2 (index 2), R3 (index 5)
+          // Tripod A: L1 (idx 0), R2 (idx 3), L3 (idx 4)
+          // Tripod B: R1 (idx 1), L2 (idx 2), R3 (idx 5)
           const tripods = [
             { indices: [0, 3, 4], phase: gaitPhase },
             { indices: [1, 2, 5], phase: gaitPhase + Math.PI },
           ];
 
           tripods.forEach(({ indices, phase }) => {
-            const swingCycle = Math.sin(phase);
-            const stanceCycle = Math.cos(phase);
-            const isSwing = swingCycle >= 0;
+            const psi = ((phase % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            const isStance = psi <= Math.PI;
 
             indices.forEach((idx) => {
               const rig = legRigs[idx];
               if (!rig) return;
 
-              // 1. Coxa Protraction / Retraction (horizontal stepping sweep)
-              rig.coxaGroup.rotation.y = rig.baseAngleY + (stanceCycle * 0.22);
+              if (isStance) {
+                // Stance Phase: Foot firmly planted on paper, leg pushes backward relative to body
+                const p = psi / Math.PI;
+                const sweep = Math.cos(p * Math.PI) * sweepAmp;
 
-              // 2. Femur Elevation & Knee Flexion
-              if (isSwing) {
-                // Lift leg off paper during swing
-                const lift = swingCycle * 0.35;
-                rig.femurGroup.rotation.z = -lift * 0.5;
-                rig.femurGroup.rotation.x = rig.side * (rig.basePitch - lift * 0.6);
-                rig.tibiaGroup.rotation.x = rig.side * (-0.65 + lift * 0.4);
-              } else {
-                // Planted firmly on paper during stance
+                rig.coxaGroup.rotation.y = rig.baseAngleY + sweep;
                 rig.femurGroup.rotation.z = 0;
                 rig.femurGroup.rotation.x = rig.side * rig.basePitch;
-                rig.tibiaGroup.rotation.x = rig.side * -0.65;
+                rig.tibiaGroup.rotation.x = rig.side * -rig.baseTibiaPitch;
+              } else {
+                // Swing Phase: Smooth parabolic lift and forward protraction (zero velocity shock)
+                const s = (psi - Math.PI) / Math.PI;
+                const sweep = -Math.cos(s * Math.PI) * sweepAmp;
+                const lift = Math.pow(Math.sin(s * Math.PI), 2) * 0.42;
+
+                rig.coxaGroup.rotation.y = rig.baseAngleY + sweep;
+                rig.femurGroup.rotation.z = -lift * 0.65;
+                rig.femurGroup.rotation.x = rig.side * (rig.basePitch - lift * 0.45);
+                rig.tibiaGroup.rotation.x = rig.side * (-rig.baseTibiaPitch + lift * 0.55);
               }
             });
           });
 
-          // Organic Body Motion (Wobble & Heave)
+          // Organic Body Kinematics (Thoracic yaw sway, vertical heave, and roll)
           if (bodyGroup) {
-            bodyGroup.rotation.y = Math.sin(gaitPhase) * 0.04;
-            bodyGroup.position.y = Math.abs(Math.sin(gaitPhase)) * 0.012;
-            bodyGroup.rotation.z = Math.sin(gaitPhase) * 0.025;
+            bodyGroup.rotation.y = Math.sin(gaitPhase) * 0.035;
+            bodyGroup.position.y = Math.sin(gaitPhase * 2) * 0.007;
+            bodyGroup.rotation.x = Math.sin(gaitPhase) * 0.016;
           }
 
-          // Antennae active sensory palpation
-          if (antennaL && antennaR) {
-            const timeSec = performance.now() / 1000;
-            antennaL.rotation.y = Math.sin(timeSec * 7) * 0.16 + 0.1;
-            antennaL.rotation.z = Math.cos(timeSec * 8) * 0.12;
-            antennaR.rotation.y = -Math.cos(timeSec * 7.5) * 0.16 - 0.1;
-            antennaR.rotation.z = Math.sin(timeSec * 8.5) * 0.12;
+          // Head stabilization towards forward horizon
+          if (headGroup) {
+            headGroup.rotation.y = -Math.sin(gaitPhase) * 0.02;
           }
 
-          // Gaster inertia / breathing
+          // Gaster inertial lag and physiological breathing bob
           if (gasterGroup) {
-            gasterGroup.rotation.x = Math.sin(gaitPhase - 0.6) * 0.04;
+            gasterGroup.rotation.y = Math.sin(gaitPhase - 0.75) * 0.055;
+            gasterGroup.rotation.z = Math.sin(gaitPhase * 2 - 0.5) * 0.035;
+          }
+
+          // Active Sensory Antennae Palpation (tactile surface probing)
+          const timeSec = performance.now() / 1000;
+          if (antennaL && antennaR) {
+            antennaL.rotation.y = Math.sin(timeSec * 5.2) * 0.15 + 0.12;
+            antennaL.rotation.z = Math.sin(timeSec * 9.8) * 0.16 - 0.22;
+            antennaR.rotation.y = -Math.cos(timeSec * 5.5) * 0.15 - 0.12;
+            antennaR.rotation.z = Math.cos(timeSec * 10.2) * 0.16 - 0.22;
+          }
+
+          // Subtle Mandible Micro-Flexion
+          if (mandibleL && mandibleR) {
+            mandibleL.rotation.z = -0.3 + Math.sin(timeSec * 2.8) * 0.04;
+            mandibleR.rotation.z = 0.3 - Math.sin(timeSec * 2.8) * 0.04;
           }
         }
 
@@ -1084,9 +1251,11 @@ export default function MobiusStrip3DLab() {
         }
 
         if (cameraFollowAnt && cameraRef.current && controlsRef.current) {
-          const camOffset = n.clone().multiplyScalar(2.6).add(tu.clone().multiplyScalar(-3.2));
+          // Dynamic chase camera directly behind the ant's back looking forward along the strip
+          const camOffset = n.clone().multiplyScalar(1.6).add(tu.clone().multiplyScalar(-2.6));
           cameraRef.current.position.copy(antMeshRef.current.position).add(camOffset);
-          controlsRef.current.target.copy(antMeshRef.current.position);
+          const lookAhead = antMeshRef.current.position.clone().addScaledVector(tu, 0.9);
+          controlsRef.current.target.copy(lookAhead);
           controlsRef.current.update();
         }
       }
@@ -1306,6 +1475,22 @@ export default function MobiusStrip3DLab() {
 
           return nextU;
         });
+      }
+
+      // Real-time organic sensory palpation & respiration on every frame
+      if (antMeshRef.current && antMeshRef.current.visible) {
+        const { antennaL, antennaR, mandibleL, mandibleR } = antMeshRef.current.userData || {};
+        const timeSec = time / 1000;
+        if (antennaL && antennaR) {
+          antennaL.rotation.y = Math.sin(timeSec * 5.2) * 0.15 + 0.12;
+          antennaL.rotation.z = Math.sin(timeSec * 9.8) * 0.16 - 0.22;
+          antennaR.rotation.y = -Math.cos(timeSec * 5.5) * 0.15 - 0.12;
+          antennaR.rotation.z = Math.cos(timeSec * 10.2) * 0.16 - 0.22;
+        }
+        if (mandibleL && mandibleR) {
+          mandibleL.rotation.z = -0.3 + Math.sin(timeSec * 2.8) * 0.04;
+          mandibleR.rotation.z = 0.3 - Math.sin(timeSec * 2.8) * 0.04;
+        }
       }
 
       if (rendererRef.current && sceneRef.current && cameraRef.current) {
