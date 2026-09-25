@@ -1356,41 +1356,7 @@ export default function MobiusStrip3DLab() {
     bounceLight.position.set(0, -10, 0);
     scene.add(bounceLight);
 
-    // ── Studio Measurement Pedestal ──
-    const pedestalGroup = new THREE.Group();
-    pedestalGroup.position.y = -2.8;
 
-    const turntableGeo = new THREE.CylinderGeometry(5.2, 5.4, 0.15, 64);
-    const turntableMat = new THREE.MeshStandardMaterial({
-      color: 0x0f1422,
-      roughness: 0.6,
-      metalness: 0.3,
-    });
-    const turntable = new THREE.Mesh(turntableGeo, turntableMat);
-    turntable.receiveShadow = true;
-    pedestalGroup.add(turntable);
-
-    [1.5, 2.5, 3.5, 4.5].forEach((radius) => {
-      const ringGeo = new THREE.RingGeometry(radius - 0.015, radius + 0.015, 64);
-      ringGeo.rotateX(-Math.PI / 2);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x334155,
-        side: THREE.DoubleSide,
-      });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.position.y = 0.08;
-      pedestalGroup.add(ring);
-    });
-
-    const shadowGeo = new THREE.PlaneGeometry(10, 10);
-    shadowGeo.rotateX(-Math.PI / 2);
-    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.35 });
-    const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
-    shadowPlane.position.y = 0.085;
-    shadowPlane.receiveShadow = true;
-    pedestalGroup.add(shadowPlane);
-
-    scene.add(pedestalGroup);
 
     // Ant Explorer Probe
     const ant = createAuthenticAntMesh();
