@@ -1437,6 +1437,7 @@ Even when network cables are pristine, enforcing strict linearizable consistency
     relatedSlugs: ['teslers-law', 'halting-problem', 'brooks-law'],
     published: true,
     featured: true,
+    isNew: true,
   },
   {
     id: '24',
@@ -1499,6 +1500,7 @@ When power tools hide critical configuration behind dumbed-down wizards, profess
     relatedSlugs: ['hicks-law', 'brooks-law', 'cap-theorem'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '25',
@@ -1628,6 +1630,7 @@ Tight, aggressive time constraints enforce **ruthless prioritization**: they for
     relatedSlugs: ['brooks-law', 'hofstadters-law', 'goodharts-law'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '27',
@@ -1694,6 +1697,7 @@ How do seasoned engineers survive Hofstadter's Law?
     relatedSlugs: ['parkinsons-law', 'brooks-law', 'halting-problem'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '28',
@@ -1759,6 +1763,7 @@ Assuming good faith transforms toxic finger-pointing into systemic resilience.`,
     relatedSlugs: ['occams-razor', 'murphys-law', 'goodharts-law'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '29',
@@ -1828,6 +1833,7 @@ The Pareto Principle is not an excuse to ignore the remaining 80%. It is a tacti
     relatedSlugs: ['goodharts-law', 'parkinsons-law', 'brooks-law'],
     published: true,
     featured: true,
+    isNew: true,
   },
   {
     id: '30',
@@ -1897,6 +1903,7 @@ Enlightened modern technology companies bypass the Peter Principle through **Dua
     relatedSlugs: ['dunning-kruger-effect', 'parkinsons-law', 'brooks-law'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '31',
@@ -1973,6 +1980,7 @@ Hick's Law is the secret mathematical weapon behind the world's most successful 
     relatedSlugs: ['teslers-law', 'dunning-kruger-effect', 'parkinsons-law'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '32',
@@ -2049,6 +2057,7 @@ How do intelligent engineering teams survive Goodhart's Law?
     relatedSlugs: ['pareto-principle', 'parkinsons-law', 'peter-principle'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '33',
@@ -2114,6 +2123,7 @@ Popular culture often maps the Dunning-Kruger effect across an emotional curve:
     relatedSlugs: ['peter-principle', 'hanlons-razor', 'cognitive-dissonance'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '34',
@@ -2187,6 +2197,7 @@ Occam's Razor is frequently misunderstood:
     relatedSlugs: ['hanlons-razor', 'bayes-theorem', 'chestertons-fence'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '35',
@@ -2261,6 +2272,7 @@ Chesterton was not a dogmatic conservative arguing that no fence should ever be 
     relatedSlugs: ['occams-razor', 'teslers-law', 'murphys-law'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '36',
@@ -2338,6 +2350,7 @@ Brooks noted that the law specifically applies to **late projects**:
     relatedSlugs: ['parkinsons-law', 'hofstadters-law', 'teslers-law'],
     published: true,
     featured: false,
+    isNew: true,
   },
   {
     id: '37',
