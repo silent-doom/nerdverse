@@ -31,29 +31,21 @@
   cursor: grabbing;
 }
 
-/* ── Top Floating Header ── */
-.topHeader {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 10;
+/* ── Top Dedicated Laboratory Header ── */
+.labHeader {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  pointer-events: none;
+  align-items: center;
+  padding: 16px 20px;
+  background: #090d16;
+  border-bottom: 1px solid #1e2638;
+  gap: 16px;
   flex-wrap: wrap;
-  gap: 12px;
 }
 
 .headerTitleBox {
-  background: rgba(11, 16, 26, 0.92);
-  backdrop-filter: blur(12px);
-  border: 1px solid #202d44;
-  border-radius: 8px;
-  padding: 10px 16px;
-  pointer-events: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
 }
 
 .labBadge {
@@ -65,11 +57,11 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #38bdf8;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .headerTitle {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
   color: #f8fafc;
   margin: 0;
@@ -77,9 +69,9 @@
 }
 
 .headerSubtitle {
-  font-size: 11px;
+  font-size: 12px;
   color: #94a3b8;
-  margin: 2px 0 0 0;
+  margin: 3px 0 0 0;
 }
 
 .headerActions {
@@ -157,7 +149,7 @@
 /* ── In-Canvas Floating Telemetry Overlay ── */
 .floatingTelemetry {
   position: absolute;
-  top: 76px;
+  top: 16px;
   left: 16px;
   z-index: 10;
   display: flex;
@@ -168,12 +160,12 @@
 }
 
 .telemetryCard {
-  background: rgba(9, 13, 22, 0.88);
-  backdrop-filter: blur(12px);
-  border: 1px solid #202d44;
+  background: rgba(9, 13, 22, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 12px 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
   pointer-events: auto;
 }
 

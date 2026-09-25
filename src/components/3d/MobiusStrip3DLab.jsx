@@ -1310,8 +1310,8 @@ export default function MobiusStrip3DLab() {
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
-    camera.position.set(0, -8.0, 6.2);
+    const camera = new THREE.PerspectiveCamera(44, width / height, 0.1, 100);
+    camera.position.set(0, -9.2, 7.8);
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -1329,6 +1329,8 @@ export default function MobiusStrip3DLab() {
     controls.dampingFactor = 0.05;
     controls.maxDistance = 25;
     controls.minDistance = 2.5;
+    controls.target.set(0, 0, 0);
+    controls.update();
     controlsRef.current = controls;
 
     // ── Neutral Photographic Studio Lighting ──
@@ -1472,6 +1474,49 @@ export default function MobiusStrip3DLab() {
 
   return (
     <div className={styles.labContainer} data-testid="mobius-strip-3d-lab">
+      {/* ── Top Dedicated Laboratory Header ── */}
+      <header className={styles.labHeader}>
+        <div className={styles.headerTitleBox}>
+          <div className={styles.labBadge}>
+            <Icon name="zap" size={12} />
+            <span>Listing &amp; Möbius (1858) · Non-Orientable Manifold</span>
+          </div>
+          <h2 className={styles.headerTitle}>Möbius Strip Interactive Laboratory</h2>
+          <p className={styles.headerSubtitle}>
+            Empirical 3D simulation of one-sided topology, normal vector inversion, and cutting paradoxes.
+          </p>
+        </div>
+
+        <div className={styles.headerActions}>
+          <button
+            className={`${styles.actionBtn} ${soundEnabled ? styles.actionBtnActive : ''}`}
+            onClick={() => {
+              audioEngine.init();
+              setSoundEnabled((prev) => !prev);
+            }}
+            title={soundEnabled ? 'Mute Audio' : 'Enable Audio'}
+          >
+            <Icon name={soundEnabled ? 'volume-2' : 'volume-x'} size={16} />
+          </button>
+
+          <button
+            className={`${styles.actionBtn} ${autoRotate ? styles.actionBtnActive : ''}`}
+            onClick={() => setAutoRotate((prev) => !prev)}
+            title="Auto-Rotate Camera"
+          >
+            <Icon name="refresh-cw" size={16} />
+          </button>
+
+          <button
+            className={`${styles.actionBtn} ${guideOpen ? styles.actionBtnActive : ''}`}
+            onClick={() => setGuideOpen((prev) => !prev)}
+            title="Interactive Lab Guide"
+          >
+            <Icon name="help-circle" size={16} />
+          </button>
+        </div>
+      </header>
+
       {/* ── Mode Selection Navigation Bar ── */}
       <div className={styles.modeBar}>
         <button
@@ -1529,48 +1574,6 @@ export default function MobiusStrip3DLab() {
 
       {/* ── Main 3D Canvas Viewport ── */}
       <div className={styles.canvasContainer}>
-        {/* Top Header Floating Overlay */}
-        <div className={styles.topHeader}>
-          <div className={styles.headerTitleBox}>
-            <div className={styles.labBadge}>
-              <Icon name="zap" size={12} />
-              <span>Listing &amp; Möbius (1858) · Non-Orientable Manifold</span>
-            </div>
-            <h2 className={styles.headerTitle}>Möbius Strip Interactive Laboratory</h2>
-            <p className={styles.headerSubtitle}>
-              Empirical 3D simulation of one-sided topology, normal vector inversion, and cutting paradoxes.
-            </p>
-          </div>
-
-          <div className={styles.headerActions}>
-            <button
-              className={`${styles.actionBtn} ${soundEnabled ? styles.actionBtnActive : ''}`}
-              onClick={() => {
-                audioEngine.init();
-                setSoundEnabled((prev) => !prev);
-              }}
-              title={soundEnabled ? 'Mute Audio' : 'Enable Audio'}
-            >
-              <Icon name={soundEnabled ? 'volume-2' : 'volume-x'} size={16} />
-            </button>
-
-            <button
-              className={`${styles.actionBtn} ${autoRotate ? styles.actionBtnActive : ''}`}
-              onClick={() => setAutoRotate((prev) => !prev)}
-              title="Auto-Rotate Camera"
-            >
-              <Icon name="refresh-cw" size={16} />
-            </button>
-
-            <button
-              className={`${styles.actionBtn} ${guideOpen ? styles.actionBtnActive : ''}`}
-              onClick={() => setGuideOpen((prev) => !prev)}
-              title="Interactive Lab Guide"
-            >
-              <Icon name="help-circle" size={16} />
-            </button>
-          </div>
-        </div>
 
         {/* Floating Telemetry Box */}
         <div className={styles.floatingTelemetry}>
