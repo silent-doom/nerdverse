@@ -489,37 +489,40 @@ function createScissorsMesh() {
   });
 
   // Pivot screw
-  const pivot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.08, 12), pivotMat);
+  const pivot = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.08, 12), pivotMat);
   pivot.rotation.x = Math.PI / 2;
   group.add(pivot);
 
-  // Blade 1
-  const blade1 = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.8, 4), steelMat);
+  // Arm 1 (blade + handle, pivots around Z)
+  const arm1 = new THREE.Group();
+  const blade1 = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.75, 4), steelMat);
   blade1.scale.set(0.2, 1, 1);
-  blade1.position.set(0.38, 0.05, 0.02);
-  blade1.rotation.z = -Math.PI / 2 + 0.15;
-  group.add(blade1);
+  blade1.position.set(0.36, 0, 0.02);
+  blade1.rotation.z = -Math.PI / 2;
+  arm1.add(blade1);
 
-  // Blade 2
-  const blade2 = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.8, 4), steelMat);
-  blade2.scale.set(0.2, 1, 1);
-  blade2.position.set(0.38, -0.05, -0.02);
-  blade2.rotation.z = -Math.PI / 2 - 0.15;
-  group.add(blade2);
-
-  // Handle 1 (loop)
-  const loopGeo1 = new THREE.TorusGeometry(0.16, 0.04, 8, 24);
+  const loopGeo1 = new THREE.TorusGeometry(0.14, 0.035, 8, 24);
   const handle1 = new THREE.Mesh(loopGeo1, handleMat);
-  handle1.position.set(-0.35, 0.14, 0);
-  group.add(handle1);
+  handle1.position.set(-0.32, 0, 0.02);
+  arm1.add(handle1);
+  group.add(arm1);
 
-  // Handle 2 (loop)
-  const loopGeo2 = new THREE.TorusGeometry(0.16, 0.04, 8, 24);
+  // Arm 2 (blade + handle, pivots around Z)
+  const arm2 = new THREE.Group();
+  const blade2 = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.75, 4), steelMat);
+  blade2.scale.set(0.2, 1, 1);
+  blade2.position.set(0.36, 0, -0.02);
+  blade2.rotation.z = -Math.PI / 2;
+  arm2.add(blade2);
+
+  const loopGeo2 = new THREE.TorusGeometry(0.14, 0.035, 8, 24);
   const handle2 = new THREE.Mesh(loopGeo2, handleMat);
-  handle2.position.set(-0.35, -0.14, 0);
-  group.add(handle2);
+  handle2.position.set(-0.32, 0, -0.02);
+  arm2.add(handle2);
+  group.add(arm2);
 
-  group.scale.set(0.75, 0.75, 0.75);
+  group.userData = { arm1, arm2 };
+  group.scale.set(0.7, 0.7, 0.7);
   return group;
 }
 
@@ -786,6 +789,330 @@ function buildPhysicalPaperStripGeometry(R, w, d, k, hSag = 0.35, vMin = -w / 2,
   return geo;
 }
 
+/**
+ * Builds the authentic single continuous ribbon of length 4*PI for Midline Cut.
+ * Parameter U runs from 0 to 4*PI (total circumference 2L).
+ * Has true paper thickness d, top face, bottom face, and edge rims.
+ */
+function buildSingleDoubleLengthLoopGeometry(R, w, d, hSag = 0.32, separationProgress = 0.0) {
+  const uSegs = 200;
+  const vSegs = 4;
+  const positions = [];
+  const normals = [];
+  const uvs = [];
+  const indices = [];
+
+  function addQuad(i1, i2, i3, i4) {
+    indices.push(i1, i2, i4);
+    indices.push(i2, i3, i4);
+  }
+
+  let vertOffset = 0;
+  const gap = 0.02 + separationProgress * 0.38;
+  const halfW = w / 2 - gap;
+
+  // 1. Top Face (t = +d/2)
+  const topStart = vertOffset;
+  for (let i = 0; i <= uSegs; i++) {
+    const U = (i / uSegs) * 4 * Math.PI;
+    let baseU, side;
+    if (U <= 2 * Math.PI) {
+      baseU = U;
+      side = 1;
+    } else {
+      baseU = U - 2 * Math.PI;
+      side = -1;
+    }
+
+    const c = getCenterlinePoint(baseU, R, hSag);
+    const tu = getCenterlineTangent(baseU, R, hSag);
+    const g = getRulingVector(baseU, 1, tu);
+    const n = new THREE.Vector3().crossVectors(tu, g).normalize();
+
+    const unfoldDispN = side * separationProgress * 0.75 * Math.sin(U / 2);
+    const unfoldDispG = side * separationProgress * 0.40 * Math.cos(U / 2);
+
+    for (let j = 0; j <= vSegs; j++) {
+      const fracV = j / vSegs;
+      const v = side * (gap + fracV * halfW);
+      const pt = c.clone()
+        .addScaledVector(g, v + unfoldDispG)
+        .addScaledVector(n, d / 2 + unfoldDispN);
+
+      positions.push(pt.x, pt.y, pt.z);
+      normals.push(n.x, n.y, n.z);
+      uvs.push(i / uSegs, j / vSegs);
+      vertOffset++;
+    }
+  }
+
+  for (let i = 0; i < uSegs; i++) {
+    for (let j = 0; j < vSegs; j++) {
+      const row1 = topStart + i * (vSegs + 1) + j;
+      const row2 = topStart + (i + 1) * (vSegs + 1) + j;
+      addQuad(row1, row2, row2 + 1, row1 + 1);
+    }
+  }
+
+  // 2. Bottom Face (t = -d/2)
+  const botStart = vertOffset;
+  for (let i = 0; i <= uSegs; i++) {
+    const U = (i / uSegs) * 4 * Math.PI;
+    let baseU, side;
+    if (U <= 2 * Math.PI) {
+      baseU = U;
+      side = 1;
+    } else {
+      baseU = U - 2 * Math.PI;
+      side = -1;
+    }
+
+    const c = getCenterlinePoint(baseU, R, hSag);
+    const tu = getCenterlineTangent(baseU, R, hSag);
+    const g = getRulingVector(baseU, 1, tu);
+    const n = new THREE.Vector3().crossVectors(tu, g).normalize();
+
+    const unfoldDispN = side * separationProgress * 0.75 * Math.sin(U / 2);
+    const unfoldDispG = side * separationProgress * 0.40 * Math.cos(U / 2);
+
+    for (let j = 0; j <= vSegs; j++) {
+      const fracV = j / vSegs;
+      const v = side * (gap + fracV * halfW);
+      const pt = c.clone()
+        .addScaledVector(g, v + unfoldDispG)
+        .addScaledVector(n, -d / 2 + unfoldDispN);
+
+      positions.push(pt.x, pt.y, pt.z);
+      normals.push(-n.x, -n.y, -n.z);
+      uvs.push(i / uSegs, j / vSegs);
+      vertOffset++;
+    }
+  }
+
+  for (let i = 0; i < uSegs; i++) {
+    for (let j = 0; j < vSegs; j++) {
+      const row1 = botStart + i * (vSegs + 1) + j;
+      const row2 = botStart + (i + 1) * (vSegs + 1) + j;
+      addQuad(row1, row1 + 1, row2 + 1, row2);
+    }
+  }
+
+  // 3. Cut inner rim (j = 0)
+  const innerStart = vertOffset;
+  for (let i = 0; i <= uSegs; i++) {
+    const U = (i / uSegs) * 4 * Math.PI;
+    let baseU, side;
+    if (U <= 2 * Math.PI) {
+      baseU = U;
+      side = 1;
+    } else {
+      baseU = U - 2 * Math.PI;
+      side = -1;
+    }
+
+    const c = getCenterlinePoint(baseU, R, hSag);
+    const tu = getCenterlineTangent(baseU, R, hSag);
+    const g = getRulingVector(baseU, 1, tu);
+    const n = new THREE.Vector3().crossVectors(tu, g).normalize();
+
+    const unfoldDispN = side * separationProgress * 0.75 * Math.sin(U / 2);
+    const unfoldDispG = side * separationProgress * 0.40 * Math.cos(U / 2);
+
+    const v = side * gap;
+    const pTop = c.clone().addScaledVector(g, v + unfoldDispG).addScaledVector(n, d / 2 + unfoldDispN);
+    const pBot = c.clone().addScaledVector(g, v + unfoldDispG).addScaledVector(n, -d / 2 + unfoldDispN);
+
+    positions.push(pTop.x, pTop.y, pTop.z);
+    normals.push(-side * g.x, -side * g.y, -side * g.z);
+    uvs.push(i / uSegs, 0);
+
+    positions.push(pBot.x, pBot.y, pBot.z);
+    normals.push(-side * g.x, -side * g.y, -side * g.z);
+    uvs.push(i / uSegs, 1);
+    vertOffset += 2;
+  }
+
+  for (let i = 0; i < uSegs; i++) {
+    const i1 = innerStart + i * 2;
+    const i2 = innerStart + (i + 1) * 2;
+    addQuad(i1, i1 + 1, i2 + 1, i2);
+  }
+
+  // 4. Natural outer rim (j = vSegs)
+  const outerStart = vertOffset;
+  for (let i = 0; i <= uSegs; i++) {
+    const U = (i / uSegs) * 4 * Math.PI;
+    let baseU, side;
+    if (U <= 2 * Math.PI) {
+      baseU = U;
+      side = 1;
+    } else {
+      baseU = U - 2 * Math.PI;
+      side = -1;
+    }
+
+    const c = getCenterlinePoint(baseU, R, hSag);
+    const tu = getCenterlineTangent(baseU, R, hSag);
+    const g = getRulingVector(baseU, 1, tu);
+    const n = new THREE.Vector3().crossVectors(tu, g).normalize();
+
+    const unfoldDispN = side * separationProgress * 0.75 * Math.sin(U / 2);
+    const unfoldDispG = side * separationProgress * 0.40 * Math.cos(U / 2);
+
+    const v = side * (gap + halfW);
+    const pTop = c.clone().addScaledVector(g, v + unfoldDispG).addScaledVector(n, d / 2 + unfoldDispN);
+    const pBot = c.clone().addScaledVector(g, v + unfoldDispG).addScaledVector(n, -d / 2 + unfoldDispN);
+
+    positions.push(pTop.x, pTop.y, pTop.z);
+    normals.push(side * g.x, side * g.y, side * g.z);
+    uvs.push(i / uSegs, 0);
+
+    positions.push(pBot.x, pBot.y, pBot.z);
+    normals.push(side * g.x, side * g.y, side * g.z);
+    uvs.push(i / uSegs, 1);
+    vertOffset += 2;
+  }
+
+  for (let i = 0; i < uSegs; i++) {
+    const i1 = outerStart + i * 2;
+    const i2 = outerStart + (i + 1) * 2;
+    addQuad(i1, i2, i2 + 1, i1 + 1);
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/**
+ * Builds the two physically interlinked loops for One-Third Offset Cut:
+ * Loop 1: Narrow Möbius strip (L length, 1 half-twist)
+ * Loop 2: Double-length loop (2L length, 4 half-twists)
+ * Linked together like chain links!
+ */
+function buildInterlockedOffsetLoopsGeometry(R, w, d, hSag = 0.32, separationProgress = 0.0) {
+  // Loop 1: Inner Möbius strip between v = -w/6 and w/6
+  const geoMobius = buildPhysicalPaperStripGeometry(
+    R, w, d, 1, hSag,
+    -w / 6 + 0.015, w / 6 - 0.015, 2 * Math.PI, separationProgress * 0.45
+  );
+
+  // Loop 2: Double-length outer loop (width w/3), threading through Loop 1
+  const uSegs = 200;
+  const vSegs = 4;
+  const positions = [];
+  const normals = [];
+  const uvs = [];
+  const indices = [];
+
+  function addQuad(i1, i2, i3, i4) {
+    indices.push(i1, i2, i4);
+    indices.push(i2, i3, i4);
+  }
+
+  let vertOffset = 0;
+  const gap = 0.03 + separationProgress * 0.35;
+
+  const topStart = vertOffset;
+  for (let i = 0; i <= uSegs; i++) {
+    const U = (i / uSegs) * 4 * Math.PI;
+    let baseU, side;
+    if (U <= 2 * Math.PI) {
+      baseU = U;
+      side = 1;
+    } else {
+      baseU = U - 2 * Math.PI;
+      side = -1;
+    }
+
+    const c = getCenterlinePoint(baseU, R, hSag);
+    const tu = getCenterlineTangent(baseU, R, hSag);
+    const g = getRulingVector(baseU, 1, tu);
+    const n = new THREE.Vector3().crossVectors(tu, g).normalize();
+
+    // Pulls in -Z / -Y to demonstrate topological chain-link interlock
+    const unfoldDispN = -side * separationProgress * 0.65 * Math.sin(U / 2);
+    const unfoldDispG = -side * separationProgress * 0.35 * Math.cos(U / 2);
+
+    for (let j = 0; j <= vSegs; j++) {
+      const fracV = j / vSegs;
+      const v = side * (w / 6 + gap + fracV * (w / 2 - (w / 6 + gap)));
+      const pt = c.clone()
+        .addScaledVector(g, v + unfoldDispG)
+        .addScaledVector(n, d / 2 + unfoldDispN);
+
+      positions.push(pt.x, pt.y, pt.z);
+      normals.push(n.x, n.y, n.z);
+      uvs.push(i / uSegs, j / vSegs);
+      vertOffset++;
+    }
+  }
+
+  for (let i = 0; i < uSegs; i++) {
+    for (let j = 0; j < vSegs; j++) {
+      const row1 = topStart + i * (vSegs + 1) + j;
+      const row2 = topStart + (i + 1) * (vSegs + 1) + j;
+      addQuad(row1, row2, row2 + 1, row1 + 1);
+    }
+  }
+
+  // Bottom face for loop 2
+  const botStart = vertOffset;
+  for (let i = 0; i <= uSegs; i++) {
+    const U = (i / uSegs) * 4 * Math.PI;
+    let baseU, side;
+    if (U <= 2 * Math.PI) {
+      baseU = U;
+      side = 1;
+    } else {
+      baseU = U - 2 * Math.PI;
+      side = -1;
+    }
+
+    const c = getCenterlinePoint(baseU, R, hSag);
+    const tu = getCenterlineTangent(baseU, R, hSag);
+    const g = getRulingVector(baseU, 1, tu);
+    const n = new THREE.Vector3().crossVectors(tu, g).normalize();
+
+    const unfoldDispN = -side * separationProgress * 0.65 * Math.sin(U / 2);
+    const unfoldDispG = -side * separationProgress * 0.35 * Math.cos(U / 2);
+
+    for (let j = 0; j <= vSegs; j++) {
+      const fracV = j / vSegs;
+      const v = side * (w / 6 + gap + fracV * (w / 2 - (w / 6 + gap)));
+      const pt = c.clone()
+        .addScaledVector(g, v + unfoldDispG)
+        .addScaledVector(n, -d / 2 + unfoldDispN);
+
+      positions.push(pt.x, pt.y, pt.z);
+      normals.push(-n.x, -n.y, -n.z);
+      uvs.push(i / uSegs, j / vSegs);
+      vertOffset++;
+    }
+  }
+
+  for (let i = 0; i < uSegs; i++) {
+    for (let j = 0; j < vSegs; j++) {
+      const row1 = botStart + i * (vSegs + 1) + j;
+      const row2 = botStart + (i + 1) * (vSegs + 1) + j;
+      addQuad(row1, row1 + 1, row2 + 1, row2);
+    }
+  }
+
+  const geoDouble = new THREE.BufferGeometry();
+  geoDouble.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geoDouble.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geoDouble.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geoDouble.setIndex(indices);
+  geoDouble.computeVertexNormals();
+
+  return { geoMobius, geoDouble };
+}
+
 export default function MobiusStrip3DLab() {
   const mountRef = useRef(null);
 
@@ -806,6 +1133,8 @@ export default function MobiusStrip3DLab() {
   const [cutType, setCutType] = useState('midline');
   const [cutProgress, setCutProgress] = useState(0.0);
   const [separationProgress, setSeparationProgress] = useState(0.0);
+  const [isAutoCutting, setIsAutoCutting] = useState(false);
+  const [userPrediction, setUserPrediction] = useState(null);
 
   // Mode 3: Topology Parameters
   const [halfTwists, setHalfTwists] = useState(1);
@@ -924,81 +1253,127 @@ export default function MobiusStrip3DLab() {
     const isParchment = surfaceTheme === 'parchment';
     const cardTexture = createCardstockTexture(surfaceTheme);
 
-    // Mode 2: Scissors Paradox Meshes with Physical Paper Thickness
+    // Mode 2: Scissors Paradox Meshes with Physical Paper Realism
     if (activeMode === 'scissors') {
       const group = new THREE.Group();
-      const cutAngleLimit = Math.max(0.1, cutProgress * 2 * Math.PI);
 
-      if (cutType === 'midline') {
-        const gap = 0.03 + separationProgress * 0.35;
-        const unfoldStretch = separationProgress * 1.5;
-
-        // Sub-strip 1: Left Paper Half
-        const geoLeft = buildPhysicalPaperStripGeometry(
-          R, w, d, k, paperSag,
-          -w / 2, -gap, cutAngleLimit, unfoldStretch
-        );
-        const matLeft = new THREE.MeshPhysicalMaterial({
-          color: 0x3b82f6,
-          roughness: 0.5,
-          metalness: 0.05,
-          clearcoat: 0.1,
+      if (cutProgress < 1.0) {
+        // Cut in progress or at start: Render base intact strip
+        const baseGeo = buildPhysicalPaperStripGeometry(R, w, d, 1, paperSag, -w / 2, w / 2, 2 * Math.PI, 0);
+        const baseMat = new THREE.MeshPhysicalMaterial({
+          map: cardTexture,
+          color: isParchment ? 0xfaf6eb : 0x1e293b,
+          roughness: isParchment ? 0.65 : 0.35,
+          metalness: isParchment ? 0.02 : 0.25,
+          clearcoat: isParchment ? 0.12 : 0.35,
+          clearcoatRoughness: 0.4,
           wireframe: isWireframe,
         });
-        const meshLeft = new THREE.Mesh(geoLeft, matLeft);
-        meshLeft.castShadow = true;
+        const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+        baseMesh.castShadow = true;
+        baseMesh.receiveShadow = true;
+        group.add(baseMesh);
 
-        // Sub-strip 2: Right Paper Half
-        const geoRight = buildPhysicalPaperStripGeometry(
-          R, w, d, k, paperSag,
-          gap, w / 2, cutAngleLimit, -unfoldStretch
-        );
-        const matRight = new THREE.MeshPhysicalMaterial({
-          color: 0xf59e0b,
-          roughness: 0.5,
-          metalness: 0.05,
-          clearcoat: 0.1,
-          wireframe: isWireframe,
-        });
-        const meshRight = new THREE.Mesh(geoRight, matRight);
-        meshRight.castShadow = true;
+        // 3D Guideline and Incision Seam
+        const totalU = cutProgress * 4 * Math.PI;
+        const lineSegs = 140;
+        const linePositions = [];
+        const cutPositions = [];
 
-        group.add(meshLeft, meshRight);
+        for (let i = 0; i <= lineSegs; i++) {
+          const curU = (i / lineSegs) * (4 * Math.PI);
+          let baseU, curV;
+          if (curU <= 2 * Math.PI) {
+            baseU = curU;
+            curV = cutType === 'midline' ? 0 : -w / 6;
+          } else {
+            baseU = curU - 2 * Math.PI;
+            curV = cutType === 'midline' ? 0 : w / 6;
+          }
+
+          const c = getCenterlinePoint(baseU, R, paperSag);
+          const tu = getCenterlineTangent(baseU, R, paperSag);
+          const g = getRulingVector(baseU, 1, tu);
+          const n = new THREE.Vector3().crossVectors(tu, g).normalize();
+          const pt = c.clone().addScaledVector(g, curV).addScaledVector(n, d / 2 + 0.008);
+
+          if (curU <= totalU) {
+            cutPositions.push(pt.x, pt.y, pt.z);
+          } else {
+            linePositions.push(pt.x, pt.y, pt.z);
+          }
+        }
+
+        // Active incision slit (red incision line where scissors cut)
+        if (cutPositions.length >= 6) {
+          const cutGeo = new THREE.BufferGeometry();
+          cutGeo.setAttribute('position', new THREE.Float32BufferAttribute(cutPositions, 3));
+          const cutMat = new THREE.LineBasicMaterial({ color: 0xef4444, linewidth: 3 });
+          const cutLine = new THREE.Line(cutGeo, cutMat);
+          group.add(cutLine);
+        }
+
+        // Dotted guideline ahead of scissors
+        if (linePositions.length >= 6) {
+          const guideGeo = new THREE.BufferGeometry();
+          guideGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+          const guideMat = new THREE.LineDashedMaterial({
+            color: 0x94a3b8,
+            dashSize: 0.15,
+            gapSize: 0.08,
+          });
+          const guideLine = new THREE.Line(guideGeo, guideMat);
+          guideLine.computeLineDistances();
+          group.add(guideLine);
+        }
       } else {
-        const gap = 0.04 + separationProgress * 0.4;
-        const interlinkOffset = separationProgress * 0.85;
+        // Cut is COMPLETE (cutProgress === 1.0)
+        if (cutType === 'midline') {
+          // ONE SINGLE continuous loop of double length (4*PI) and 4 half-twists!
+          const singleGeo = buildSingleDoubleLengthLoopGeometry(R, w, d, paperSag, separationProgress);
+          const singleMat = new THREE.MeshPhysicalMaterial({
+            map: cardTexture,
+            color: isParchment ? 0xfaf6eb : 0x1e293b,
+            roughness: isParchment ? 0.65 : 0.35,
+            metalness: isParchment ? 0.02 : 0.25,
+            clearcoat: isParchment ? 0.2 : 0.4,
+            wireframe: isWireframe,
+            side: THREE.DoubleSide,
+          });
+          const singleMesh = new THREE.Mesh(singleGeo, singleMat);
+          singleMesh.castShadow = true;
+          singleMesh.receiveShadow = true;
+          group.add(singleMesh);
+        } else {
+          // ONE-THIRD CUT: TWO interlocked loops (one thin Mobius + one double loop)
+          const { geoMobius, geoDouble } = buildInterlockedOffsetLoopsGeometry(R, w, d, paperSag, separationProgress);
 
-        // Thin loop
-        const geoThin = buildPhysicalPaperStripGeometry(
-          R, w, d, k, paperSag,
-          -w / 2, -w / 6, cutAngleLimit, interlinkOffset
-        );
-        const matThin = new THREE.MeshPhysicalMaterial({
-          color: 0xeab308,
-          roughness: 0.45,
-          metalness: 0.08,
-          clearcoat: 0.1,
-          wireframe: isWireframe,
-        });
-        const meshThin = new THREE.Mesh(geoThin, matThin);
-        meshThin.castShadow = true;
+          const matMobius = new THREE.MeshPhysicalMaterial({
+            map: cardTexture,
+            color: 0xf59e0b,
+            roughness: 0.5,
+            metalness: 0.1,
+            clearcoat: 0.2,
+            wireframe: isWireframe,
+            side: THREE.DoubleSide,
+          });
+          const meshMobius = new THREE.Mesh(geoMobius, matMobius);
+          meshMobius.castShadow = true;
 
-        // Thick double loop
-        const geoThick = buildPhysicalPaperStripGeometry(
-          R, w, d, k, paperSag,
-          -w / 6 + gap, w / 2, cutAngleLimit, -interlinkOffset
-        );
-        const matThick = new THREE.MeshPhysicalMaterial({
-          color: 0x10b981,
-          roughness: 0.45,
-          metalness: 0.08,
-          clearcoat: 0.1,
-          wireframe: isWireframe,
-        });
-        const meshThick = new THREE.Mesh(geoThick, matThick);
-        meshThick.castShadow = true;
+          const matDouble = new THREE.MeshPhysicalMaterial({
+            map: cardTexture,
+            color: 0x38bdf8,
+            roughness: 0.5,
+            metalness: 0.1,
+            clearcoat: 0.2,
+            wireframe: isWireframe,
+            side: THREE.DoubleSide,
+          });
+          const meshDouble = new THREE.Mesh(geoDouble, matDouble);
+          meshDouble.castShadow = true;
 
-        group.add(meshThin, meshThick);
+          group.add(meshMobius, meshDouble);
+        }
       }
 
       cutGroupRef.current = group;
@@ -1263,27 +1638,49 @@ export default function MobiusStrip3DLab() {
 
     // 2. Scissors Tool Placement in Mode 2
     if (scissorsMeshRef.current) {
-      if (activeMode !== 'scissors') {
+      if (activeMode !== 'scissors' || cutProgress >= 1.0) {
         scissorsMeshRef.current.visible = false;
       } else {
         scissorsMeshRef.current.visible = true;
-        const u = cutProgress * 2 * Math.PI;
+        const totalU = cutProgress * 4 * Math.PI;
+        let baseU, vOffset;
+        if (totalU <= 2 * Math.PI) {
+          baseU = totalU;
+          vOffset = cutType === 'midline' ? 0 : -ribbonWidth / 6;
+        } else {
+          baseU = totalU - 2 * Math.PI;
+          vOffset = cutType === 'midline' ? 0 : ribbonWidth / 6;
+        }
 
-        const c = getCenterlinePoint(u, R, paperSag);
-        const tu = getCenterlineTangent(u, R, paperSag);
-        const g = getRulingVector(u, k, tu);
+        const c = getCenterlinePoint(baseU, R, paperSag);
+        const tu = getCenterlineTangent(baseU, R, paperSag);
+        const g = getRulingVector(baseU, k, tu);
         const n = new THREE.Vector3().crossVectors(tu, g).normalize();
 
-        const vOffset = cutType === 'midline' ? 0 : -ribbonWidth / 6;
         const scissorPos = c.clone()
           .addScaledVector(g, vOffset)
-          .addScaledVector(n, d / 2 + 0.15);
+          .addScaledVector(n, d / 2 + 0.08);
 
         scissorsMeshRef.current.position.copy(scissorPos);
 
+        const dir = tu.clone().normalize();
+        const up = n.clone().normalize();
+        const right = new THREE.Vector3().crossVectors(dir, up).normalize();
+
         const rotMatrix = new THREE.Matrix4();
-        rotMatrix.makeBasis(g, n, tu);
+        rotMatrix.makeBasis(dir, up, right);
         scissorsMeshRef.current.setRotationFromMatrix(rotMatrix);
+
+        if (scissorsMeshRef.current.userData) {
+          const { arm1, arm2 } = scissorsMeshRef.current.userData;
+          if (arm1 && arm2) {
+            const snipAngle = isAutoCutting
+              ? (Math.sin(performance.now() * 0.018) * 0.5 + 0.5) * 0.16 + 0.04
+              : 0.06;
+            arm1.rotation.z = snipAngle;
+            arm2.rotation.z = -snipAngle;
+          }
+        }
       }
     }
   }, [
@@ -1297,6 +1694,7 @@ export default function MobiusStrip3DLab() {
     activeMode,
     showNormalVector,
     cameraFollowAnt,
+    isAutoCutting,
   ]);
 
   // Setup Three.js WebGL Scene with Studio Lighting & Pedestal
@@ -1445,6 +1843,30 @@ export default function MobiusStrip3DLab() {
         });
       }
 
+      if (activeMode === 'scissors' && isAutoCutting) {
+        setCutProgress((prev) => {
+          const step = delta * playbackSpeed * 0.12;
+          const next = prev + step;
+
+          if (prev < 0.5 && next >= 0.5) {
+            audioEngine.playChime(520, 0.4);
+          }
+
+          if (next >= 1.0) {
+            setIsAutoCutting(false);
+            setSeparationProgress(0.35);
+            audioEngine.playSnip();
+            return 1.0;
+          }
+
+          if (Math.floor(next * 24) > Math.floor(prev * 24)) {
+            audioEngine.playSnip();
+          }
+
+          return next;
+        });
+      }
+
       // Real-time organic sensory palpation & respiration on every frame
       if (antMeshRef.current && antMeshRef.current.visible) {
         const { antennaL, antennaR, mandibleL, mandibleR } = antMeshRef.current.userData || {};
@@ -1470,7 +1892,7 @@ export default function MobiusStrip3DLab() {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [activeMode, isPlaying, playbackSpeed, autoRotate]);
+  }, [activeMode, isPlaying, isAutoCutting, playbackSpeed, autoRotate]);
 
   return (
     <div className={styles.labContainer} data-testid="mobius-strip-3d-lab">
@@ -1577,49 +1999,119 @@ export default function MobiusStrip3DLab() {
 
         {/* Floating Telemetry Box */}
         <div className={styles.floatingTelemetry}>
-          <div className={styles.telemetryCard}>
-            <div className={styles.telemetryRow}>
-              <span className={styles.telemetryLabel}>Traversal Arc Length</span>
-              <span className={`${styles.telemetryValue} ${styles.telemetryValueCyan}`}>
-                {telemetry.arcLengthTraveled} / {telemetry.totalDoubleLength} m
-              </span>
-            </div>
+          {activeMode === 'scissors' ? (
+            <div className={styles.telemetryCard}>
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Scissors Cut Arc</span>
+                <span className={`${styles.telemetryValue} ${styles.telemetryValueCyan}`}>
+                  {(cutProgress * 4 * Math.PI * ribbonRadius).toFixed(2)} / {(4 * Math.PI * ribbonRadius).toFixed(2)} m
+                </span>
+              </div>
 
-            <div className={styles.telemetryRow}>
-              <span className={styles.telemetryLabel}>Normal Vector (n̂)</span>
-              <span className={styles.telemetryValue}>
-                ({telemetry.nx}, {telemetry.ny}, {telemetry.nz})
-              </span>
-            </div>
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Cutting Circuit</span>
+                <span className={`${styles.telemetryValue} ${styles.telemetryValueAmber}`}>
+                  {cutProgress < 0.5
+                    ? `Lap 1 of 2 (${(cutProgress * 720).toFixed(0)}° / 360°)`
+                    : cutProgress < 1.0
+                    ? `Lap 2 of 2 (${(cutProgress * 720).toFixed(0)}° / 720°)`
+                    : 'Cut Complete (720°)'}
+                </span>
+              </div>
 
-            <div className={styles.telemetryRow}>
-              <span className={styles.telemetryLabel}>Twist Angle (u/2)</span>
-              <span className={`${styles.telemetryValue} ${styles.telemetryValueAmber}`}>
-                {telemetry.twistAngleDeg}°
-              </span>
-            </div>
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Active Surface Face</span>
+                <span className={styles.telemetryValue}>
+                  {cutProgress < 0.5 ? 'Side A (Outer Surface)' : cutProgress < 1.0 ? 'Side B (Inverted Face)' : 'Fully Bisected'}
+                </span>
+              </div>
 
-            <div className={styles.telemetryRow}>
-              <span className={styles.telemetryLabel}>Loop Circuit</span>
-              <span className={styles.telemetryValue}>
-                Loop {telemetry.loopNumber} of 2 ({((traversalU / (4 * Math.PI)) * 100).toFixed(0)}%)
-              </span>
-            </div>
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Paper Topology</span>
+                <span className={`${styles.telemetryValue} ${cutProgress < 1.0 ? styles.telemetryValueCyan : styles.telemetryValueEmerald}`}>
+                  {cutProgress < 1.0
+                    ? '1 Continuous Piece (Not Split)'
+                    : cutType === 'midline'
+                    ? '1 Single Double-Length Ribbon'
+                    : '2 Interlocked Chain Links'}
+                </span>
+              </div>
 
-            <div className={styles.statusIndicator}>
-              <div
-                className={`${styles.statusDot} ${
-                  telemetry.loopNumber === 1 ? styles.statusDotCyan : styles.statusDotCrimson
-                }`}
-              />
-              <span>{telemetry.sideName}</span>
-            </div>
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Resulting Half-Twists</span>
+                <span className={`${styles.telemetryValue} ${styles.telemetryValueEmerald}`}>
+                  {cutType === 'midline' ? '4 Half-Twists (720°)' : '1 Möbius (180°) + 1 Double (720°)'}
+                </span>
+              </div>
 
-            <div className={styles.statusIndicator}>
-              <div className={`${styles.statusDot} ${styles.statusDotEmerald}`} />
-              <span>Chirality: {telemetry.chirality}</span>
+              <div className={styles.statusIndicator}>
+                <div
+                  className={`${styles.statusDot} ${
+                    cutProgress < 1.0
+                      ? cutProgress < 0.5
+                        ? styles.statusDotCyan
+                        : styles.statusDotCrimson
+                      : styles.statusDotEmerald
+                  }`}
+                />
+                <span>
+                  {cutProgress === 0
+                    ? 'Scissors ready at taped seam (u = 0)'
+                    : cutProgress < 0.5
+                    ? 'Lap 1: Slicing outer surface'
+                    : cutProgress < 1.0
+                    ? 'Lap 2: Slicing inverted surface'
+                    : cutType === 'midline'
+                    ? 'Result: Single 2L orientable loop'
+                    : 'Result: Two physically linked rings'}
+                </span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className={styles.telemetryCard}>
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Traversal Arc Length</span>
+                <span className={`${styles.telemetryValue} ${styles.telemetryValueCyan}`}>
+                  {telemetry.arcLengthTraveled} / {telemetry.totalDoubleLength} m
+                </span>
+              </div>
+
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Normal Vector (n̂)</span>
+                <span className={styles.telemetryValue}>
+                  ({telemetry.nx}, {telemetry.ny}, {telemetry.nz})
+                </span>
+              </div>
+
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Twist Angle (u/2)</span>
+                <span className={`${styles.telemetryValue} ${styles.telemetryValueAmber}`}>
+                  {telemetry.twistAngleDeg}°
+                </span>
+              </div>
+
+              <div className={styles.telemetryRow}>
+                <span className={styles.telemetryLabel}>Loop Circuit</span>
+                <span className={styles.telemetryValue}>
+                  Loop {telemetry.loopNumber} of 2 ({((traversalU / (4 * Math.PI)) * 100).toFixed(0)}%)
+                </span>
+              </div>
+
+              <div className={styles.statusIndicator}>
+                <div
+                  className={`${styles.statusDot} ${
+                    telemetry.loopNumber === 1 ? styles.statusDotCyan : styles.statusDotCrimson
+                  }`}
+                />
+                <span>{telemetry.sideName}</span>
+              </div>
+
+              <div className={styles.statusIndicator}>
+                <div className={`${styles.statusDot} ${styles.statusDotEmerald}`} />
+                <span>Chirality: {telemetry.chirality}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Floating Gizmo Hint */}
@@ -1703,13 +2195,87 @@ export default function MobiusStrip3DLab() {
         {/* Mode 2: Scissors Paradox Controls */}
         {activeMode === 'scissors' && (
           <>
+            {/* Step 1: The Prediction Challenge */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '8px',
+                padding: '8px 12px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '6px',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+                marginBottom: '10px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                <Icon name="help-circle" size={14} />
+                <span style={{ color: '#94a3b8', fontWeight: 600 }}>Thought Experiment Challenge:</span>
+                <span style={{ color: '#f8fafc' }}>
+                  {cutType === 'midline'
+                    ? 'What happens when you cut a Möbius strip down the center?'
+                    : 'What happens with a 1/3 offset cut?'}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {cutType === 'midline' ? (
+                  <>
+                    <button
+                      className={`${styles.pillBtn} ${userPrediction === 'two_loops' ? styles.pillBtnActive : ''}`}
+                      onClick={() => {
+                        setUserPrediction('two_loops');
+                        audioEngine.playStep();
+                      }}
+                    >
+                      2 Separate Loops (Intuition)
+                    </button>
+                    <button
+                      className={`${styles.pillBtn} ${userPrediction === 'one_loop' ? styles.pillBtnActive : ''}`}
+                      onClick={() => {
+                        setUserPrediction('one_loop');
+                        audioEngine.playStep();
+                      }}
+                    >
+                      1 Single Double-Length Loop
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className={`${styles.pillBtn} ${userPrediction === 'offset_disconnected' ? styles.pillBtnActive : ''}`}
+                      onClick={() => {
+                        setUserPrediction('offset_disconnected');
+                        audioEngine.playStep();
+                      }}
+                    >
+                      2 Disconnected Loops
+                    </button>
+                    <button
+                      className={`${styles.pillBtn} ${userPrediction === 'offset_interlocked' ? styles.pillBtnActive : ''}`}
+                      onClick={() => {
+                        setUserPrediction('offset_interlocked');
+                        audioEngine.playStep();
+                      }}
+                    >
+                      2 Interlocked Chain Links
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Primary Control Row */}
             <div className={styles.primaryControlRow}>
+              {/* Cut Selector Pills */}
               <div className={styles.pillGroup}>
                 <button
                   className={`${styles.pillBtn} ${cutType === 'midline' ? styles.pillBtnActive : ''}`}
                   onClick={() => {
                     setCutType('midline');
-                    setCutProgress(1.0);
+                    setUserPrediction(null);
                     audioEngine.playSnip();
                   }}
                 >
@@ -1719,7 +2285,7 @@ export default function MobiusStrip3DLab() {
                   className={`${styles.pillBtn} ${cutType === 'offset' ? styles.pillBtnActive : ''}`}
                   onClick={() => {
                     setCutType('offset');
-                    setCutProgress(1.0);
+                    setUserPrediction(null);
                     audioEngine.playSnip();
                   }}
                 >
@@ -1727,25 +2293,84 @@ export default function MobiusStrip3DLab() {
                 </button>
               </div>
 
+              {/* Scissor Actions */}
+              <div className={styles.playbackButtonGroup}>
+                <button
+                  className={styles.playBtn}
+                  onClick={() => {
+                    audioEngine.init();
+                    if (cutProgress >= 1.0) {
+                      setCutProgress(0.0);
+                      setSeparationProgress(0.0);
+                    }
+                    setIsAutoCutting((prev) => !prev);
+                  }}
+                >
+                  <Icon name={isAutoCutting ? 'pause' : 'scissors'} size={15} />
+                  <span>{isAutoCutting ? 'Pause Cutting' : cutProgress >= 1.0 ? 'Re-Snip Ribbon' : 'Auto-Cut Ribbon (720°)'}</span>
+                </button>
+
+                <button
+                  className={styles.secondaryBtn}
+                  onClick={() => {
+                    audioEngine.init();
+                    audioEngine.playSnip();
+                    setIsAutoCutting(false);
+                    setCutProgress((prev) => {
+                      const next = Math.min(1.0, prev + 15 / 720);
+                      if (next >= 1.0 && separationProgress === 0) {
+                        setSeparationProgress(0.35);
+                      }
+                      return next;
+                    });
+                  }}
+                  title="Snip ahead 15°"
+                >
+                  <Icon name="scissors" size={14} />
+                  <span>Snip (+15°)</span>
+                </button>
+
+                <button
+                  className={styles.secondaryBtn}
+                  onClick={() => {
+                    audioEngine.init();
+                    setIsAutoCutting(false);
+                    setCutProgress(0.0);
+                    setSeparationProgress(0.0);
+                  }}
+                >
+                  <Icon name="rotate-ccw" size={14} />
+                  <span>Reset Band</span>
+                </button>
+              </div>
+
+              {/* Scrubber 1: Cut Completion */}
               <div className={styles.timelineScrubber}>
                 <div className={styles.timelineHeader}>
                   <span className={styles.timelineLabel}>Scissors Cut Completion</span>
-                  <span className={styles.timelineValue}>{(cutProgress * 100).toFixed(0)}%</span>
+                  <span className={styles.timelineValue}>
+                    {(cutProgress * 100).toFixed(0)}% ({(cutProgress * 720).toFixed(0)}° / 720°)
+                  </span>
                 </div>
                 <input
                   type="range"
-                  min="0.1"
+                  min="0.0"
                   max="1.0"
-                  step="0.05"
+                  step="0.01"
                   value={cutProgress}
                   onChange={(e) => {
-                    setCutProgress(parseFloat(e.target.value));
+                    const val = parseFloat(e.target.value);
+                    setCutProgress(val);
+                    if (val >= 1.0 && separationProgress === 0) {
+                      setSeparationProgress(0.35);
+                    }
                     audioEngine.playSnip();
                   }}
                   className={styles.sliderTrack}
                 />
               </div>
 
+              {/* Scrubber 2: Unfold / Separation Displacement */}
               <div className={styles.timelineScrubber}>
                 <div className={styles.timelineHeader}>
                   <span className={styles.timelineLabel}>Unfold / Separation Displacement</span>
@@ -1763,6 +2388,7 @@ export default function MobiusStrip3DLab() {
               </div>
             </div>
 
+            {/* Dynamic Educational Paradox Banner */}
             <div className={styles.paradoxBanner}>
               <div className={styles.paradoxIcon}>
                 <Icon name="scissors" size={18} />
@@ -1773,14 +2399,54 @@ export default function MobiusStrip3DLab() {
                     ? 'Center Cut Result: ONE Single Double-Length Ribbon (4 Half-Twists)'
                     : '1/3 Cut Result: TWO Interlocked Rings (1 Möbius + 1 Double-Length Loop)'}
                 </div>
-                {cutType === 'midline' ? (
+
+                {/* Dynamic Stage Commentary */}
+                {cutProgress === 0 ? (
                   <span>
-                    Watch the red scissors blade slice through the physical paper ribbon. Unlike a cylinder which cuts into 2 loops, cutting down the centerline produces <strong>one single continuous loop</strong> of double length (2<em>L</em>), half width, with <strong>four half-twists (720°)</strong>.
+                    <strong>Step 1 (Start):</strong> The scissors are positioned at the taped seam (<em>u</em> = 0). Click <strong>Auto-Cut Ribbon (720°)</strong> or click <strong>Snip (+15°)</strong> to begin slicing down the midline.
+                  </span>
+                ) : cutProgress < 0.48 ? (
+                  <span>
+                    <strong>Lap 1 in Progress (0° to 360°):</strong> The scissors are cutting along Side A. Notice the red incision seam opening behind the blades.
+                  </span>
+                ) : cutProgress >= 0.48 && cutProgress < 0.55 ? (
+                  <span style={{ color: '#38bdf8' }}>
+                    <strong>The 360° Milestone Paradox!</strong> The scissors have traveled a full 360° circle back to the taped seam, yet the paper has <strong>NOT separated</strong>! Because the strip has a 180° twist, the scissors are now cutting the opposite side of the sheet. Slicing must continue for another 360° (720° total) to reach the initial puncture!
+                  </span>
+                ) : cutProgress < 1.0 ? (
+                  <span>
+                    <strong>Lap 2 in Progress (360° to 720°):</strong> The scissors are slicing the remaining paper on Side B. Once they reach 720°, the cut will finally meet the starting hole!
                   </span>
                 ) : (
                   <span>
-                    Cutting at a 1/3 offset produces <strong>two physically interlinked rings</strong>: one thin Möbius strip of length <em>L</em> linked through a longer two-sided ribbon of length 2<em>L</em>, forming a topological chain link!
+                    {cutType === 'midline' ? (
+                      <>
+                        <strong>The Cut is Complete (720°):</strong> Unlike a standard cylinder which falls into two independent rings, the single-sided Möbius strip produces <strong>ONE single continuous loop</strong> of twice the length (2<em>L</em> = 4π<em>R</em>), half the width, with <strong>four half-twists (720°)</strong>. Drag the <strong>Unfold / Separation Displacement</strong> slider above to relax the ribbon and verify its single continuous perimeter!
+                      </>
+                    ) : (
+                      <>
+                        <strong>The Cut is Complete (720°):</strong> Cutting at 1/3 offset produces <strong>two physically interlocked rings</strong>: one narrow Möbius strip of length <em>L</em> (180° twist) linked through a double-length ribbon of length 2<em>L</em> (720° twist) like chain links! Drag the <strong>Unfold</strong> slider to pull them in opposite directions.
+                      </>
+                    )}
                   </span>
+                )}
+
+                {/* User prediction feedback */}
+                {userPrediction && cutProgress >= 0.5 && (
+                  <div style={{ marginTop: '6px', fontSize: '11px', color: '#94a3b8' }}>
+                    {userPrediction === 'two_loops' && (
+                      <span>Your prediction: <em>2 Separate Loops</em>. Intuitively expected, but topology defies everyday intuition—it remained a single continuous loop!</span>
+                    )}
+                    {userPrediction === 'one_loop' && (
+                      <span>Your prediction: <em>1 Single Double-Length Loop</em>. Spot on! You anticipated the 720° non-orientable topological return.</span>
+                    )}
+                    {userPrediction === 'offset_disconnected' && (
+                      <span>Your prediction: <em>2 Disconnected Loops</em>. In reality, the loops cannot be pulled apart—they are topologically linked!</span>
+                    )}
+                    {userPrediction === 'offset_interlocked' && (
+                      <span>Your prediction: <em>2 Interlocked Chain Links</em>. Exactly right! The linking number between the two components is 1.</span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
