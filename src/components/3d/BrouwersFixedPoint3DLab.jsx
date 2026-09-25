@@ -27,10 +27,10 @@ class BrouwerAudioEngine {
     }
   }
 
-  playSwirl(frequency = 180, duration = 0.3) {
+  playSwirl(frequency = 180, duration = 0.4) {
     if (this.isMuted || !this.ctx) return;
     const nowMs = performance.now();
-    if (nowMs - this.lastPlay < 80) return;
+    if (nowMs - this.lastPlay < 70) return;
     this.lastPlay = nowMs;
 
     try {
@@ -40,14 +40,14 @@ class BrouwerAudioEngine {
       const filter = this.ctx.createBiquadFilter();
 
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(350, now);
-      filter.frequency.exponentialRampToValueAtTime(150, now + duration);
+      filter.frequency.setValueAtTime(380, now);
+      filter.frequency.exponentialRampToValueAtTime(140, now + duration);
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(frequency, now);
-      osc.frequency.linearRampToValueAtTime(frequency * 0.7, now + duration);
+      osc.frequency.linearRampToValueAtTime(frequency * 0.65, now + duration);
 
-      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.setValueAtTime(0.09, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
       osc.connect(filter);
@@ -61,7 +61,7 @@ class BrouwerAudioEngine {
     }
   }
 
-  playChime(frequency = 659.25, duration = 0.25) {
+  playChime(frequency = 659.25, duration = 0.28) {
     if (this.isMuted || !this.ctx) return;
     try {
       const now = this.ctx.currentTime;
@@ -72,7 +72,7 @@ class BrouwerAudioEngine {
       osc.frequency.setValueAtTime(frequency, now);
       osc.frequency.exponentialRampToValueAtTime(frequency * 1.5, now + duration);
 
-      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.setValueAtTime(0.16, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
       osc.connect(gain);
@@ -84,6 +84,30 @@ class BrouwerAudioEngine {
       // Audio suppression fallback
     }
   }
+
+  playCrumple() {
+    if (this.isMuted || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch {
+      // Audio suppression fallback
+    }
+  }
 }
 
 const audioEngine = new BrouwerAudioEngine();
@@ -91,14 +115,13 @@ const audioEngine = new BrouwerAudioEngine();
 export default function BrouwersFixedPoint3DLab() {
   const mountRef = useRef(null);
 
-  // Active Lab Mode: 'coffee' (Fluid Vortex) | 'map' (Crumpled Map Invariant)
+  // Active Lab Mode: 'coffee' | 'map' | 'dual'
   const [activeMode, setActiveMode] = useState('coffee');
 
   // Mode 1: Coffee Cup Stir Controls
-  const [stirSpeed, setStirSpeed] = useState(45); // RPM: 0 to 120
+  const [stirSpeed, setStirSpeed] = useState(55); // RPM: 0 to 120
   const [vortexEccentricityX, setVortexEccentricityX] = useState(0.0); // -0.8 to 0.8
   const [vortexEccentricityY, setVortexEccentricityY] = useState(0.0); // -0.8 to 0.8
-  const [viscosity, setViscosity] = useState('medium'); // 'low' | 'medium' | 'high'
   const [showVectors, setShowVectors] = useState(true);
 
   // Mode 2: Crumpled Map Invariant Controls
@@ -107,9 +130,12 @@ export default function BrouwersFixedPoint3DLab() {
   const [compressionScale, setCompressionScale] = useState(75); // 50 to 95%
   const [showLaserBeam, setShowLaserBeam] = useState(true);
 
+  // Animation Triggers
+  const [isStirringActive, setIsStirringActive] = useState(false);
+  const [isCrumplingActive, setIsCrumplingActive] = useState(false);
+
   // General Simulation State
   const [isAudioMuted, setIsAudioMuted] = useState(false);
-  const [isSimulating, setIsSimulating] = useState(true);
 
   // Three.js References
   const sceneRef = useRef(null);
@@ -121,18 +147,25 @@ export default function BrouwersFixedPoint3DLab() {
   // Mesh Groups
   const coffeeGroupRef = useRef(null);
   const mapGroupRef = useRef(null);
+  const spoonRef = useRef(null);
   const tracerParticlesRef = useRef(null);
   const liquidSurfaceRef = useRef(null);
   const vectorArrowsRef = useRef([]);
   const fixedPointBeaconRef = useRef(null);
+  const pulseRingRef = useRef(null);
   const crumpledMeshRef = useRef(null);
   const laserBeamRef = useRef(null);
+  const mapTargetGroupRef = useRef(null);
+
+  // Animation Timers / States (Refs for 60fps render loop)
+  const stirAnimTimeRef = useRef(0);
+  const crumpleAnimTimeRef = useRef(0);
 
   // Telemetry Metrics
   const [telemetry, setTelemetry] = useState({
-    fixedPointX: 0.0,
-    fixedPointY: 0.0,
-    fixedPointZ: 0.8,
+    fixedPointX: '0.000',
+    fixedPointY: '0.000',
+    fixedPointZ: '0.860',
     residualError: '0.00000000',
     velocityAtPoint: '0.0000 mm/s',
     domainStatus: 'Compact Convex K ⊂ ℝ³',
@@ -149,19 +182,36 @@ export default function BrouwersFixedPoint3DLab() {
   // Trigger Stir Fluid Grid (Challenge 1 action)
   const handleStirAction = useCallback(() => {
     audioEngine.init();
-    audioEngine.playSwirl(240, 0.5);
-    setStirSpeed((prev) => Math.min(prev + 30, 110));
-    setVortexEccentricityX((Math.random() - 0.5) * 0.9);
-    setVortexEccentricityY((Math.random() - 0.5) * 0.9);
+    audioEngine.playSwirl(260, 0.6);
+    setIsStirringActive(true);
+    stirAnimTimeRef.current = 4.0; // 4-second vigorous stirring sequence
+
+    // Shift vortex center dynamically to prove invariance everywhere
+    const nextVx = (Math.random() - 0.5) * 0.9;
+    const nextVz = (Math.random() - 0.5) * 0.9;
+    setVortexEccentricityX(nextVx);
+    setVortexEccentricityY(nextVz);
+    setStirSpeed((prev) => Math.min(prev + 25, 115));
   }, []);
 
   // Trigger Crumple Coordinate Map (Challenge 2 action)
   const handleCrumpleAction = useCallback(() => {
     audioEngine.init();
-    audioEngine.playChime(784, 0.3);
-    setCrumpleIntensity((prev) => (prev > 80 ? 25 : prev + 25));
-    setMapRotation((prev) => (prev + 45) % 360);
+    audioEngine.playCrumple();
+    setIsCrumplingActive(true);
+    crumpleAnimTimeRef.current = 3.5; // 3.5-second progressive folding sequence
+
+    setCrumpleIntensity((prev) => (prev > 80 ? 30 : prev + 25));
+    setMapRotation((prev) => (prev + 55) % 360);
+    setCompressionScale((prev) => (prev < 65 ? 85 : prev - 10));
   }, []);
+
+  // Trigger Dual Action: Both Experiments Simultaneously!
+  const handleDualAction = useCallback(() => {
+    handleStirAction();
+    handleCrumpleAction();
+    audioEngine.playChime(880, 0.4);
+  }, [handleStirAction, handleCrumpleAction]);
 
   // Three.js Scene Initialization
   useEffect(() => {
@@ -196,58 +246,58 @@ export default function BrouwersFixedPoint3DLab() {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.02; // Prevent going beneath studio table
-    controls.minDistance = 3.5;
-    controls.maxDistance = 15;
+    controls.maxPolarAngle = Math.PI / 2 - 0.02;
+    controls.minDistance = 3.2;
+    controls.maxDistance = 18;
     controls.target.set(0, 0.4, 0);
     controlsRef.current = controls;
 
     // 5. Studio Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
     scene.add(ambientLight);
 
-    const mainKeyLight = new THREE.DirectionalLight(0xfff7ed, 2.2);
-    mainKeyLight.position.set(5, 10, 6);
+    const mainKeyLight = new THREE.DirectionalLight(0xfff7ed, 2.4);
+    mainKeyLight.position.set(6, 11, 7);
     mainKeyLight.castShadow = true;
     mainKeyLight.shadow.mapSize.width = 1024;
     mainKeyLight.shadow.mapSize.height = 1024;
     scene.add(mainKeyLight);
 
-    const softFillLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
-    softFillLight.position.set(-6, 4, -4);
+    const softFillLight = new THREE.DirectionalLight(0x38bdf8, 1.3);
+    softFillLight.position.set(-7, 5, -4);
     scene.add(softFillLight);
 
-    const bottomRimLight = new THREE.PointLight(0xeab308, 0.8, 10);
-    bottomRimLight.position.set(0, -1, 3);
+    const bottomRimLight = new THREE.PointLight(0xeab308, 0.9, 12);
+    bottomRimLight.position.set(0, -0.8, 3.5);
     scene.add(bottomRimLight);
 
-    // Studio Table Surface
-    const tableGeo = new THREE.CylinderGeometry(4.8, 4.8, 0.15, 64);
+    // Studio Table Platform
+    const tableGeo = new THREE.CylinderGeometry(6.5, 6.5, 0.18, 64);
     const tableMat = new THREE.MeshStandardMaterial({
-      color: 0x11131a,
+      color: 0x10131c,
       roughness: 0.85,
-      metalness: 0.1,
+      metalness: 0.12,
     });
     const tableMesh = new THREE.Mesh(tableGeo, tableMat);
-    tableMesh.position.y = -1.5;
+    tableMesh.position.y = -1.55;
     tableMesh.receiveShadow = true;
     scene.add(tableMesh);
 
     // ─────────────────────────────────────────────────────────────
-    // 6. BUILD MODE 1: COFFEE CUP & FLUID VORTEX
+    // 6. BUILD MODE 1: COFFEE CUP & STIRRING SPOON
     // ─────────────────────────────────────────────────────────────
     const coffeeGroup = new THREE.Group();
     coffeeGroupRef.current = coffeeGroup;
     scene.add(coffeeGroup);
 
-    // Ceramic Porcelain Mug Body
+    // Porcelain Mug Body
     const mugOuterGeo = new THREE.CylinderGeometry(1.85, 1.45, 2.6, 48, 1, false);
     const porcelainMat = new THREE.MeshPhysicalMaterial({
-      color: 0x1e222d,
-      roughness: 0.15,
+      color: 0x1d212c,
+      roughness: 0.14,
       metalness: 0.05,
-      clearcoat: 0.8,
-      clearcoatRoughness: 0.1,
+      clearcoat: 0.85,
+      clearcoatRoughness: 0.08,
     });
     const mugMesh = new THREE.Mesh(mugOuterGeo, porcelainMat);
     mugMesh.position.y = -0.15;
@@ -255,7 +305,7 @@ export default function BrouwersFixedPoint3DLab() {
     mugMesh.receiveShadow = true;
     coffeeGroup.add(mugMesh);
 
-    // Mug Rim Accent Ring (Golden Scholar Brass)
+    // Golden Rim Accent Ring
     const rimGeo = new THREE.TorusGeometry(1.86, 0.05, 16, 64);
     const rimMat = new THREE.MeshStandardMaterial({
       color: 0xe5a93c,
@@ -267,7 +317,7 @@ export default function BrouwersFixedPoint3DLab() {
     rimMesh.position.y = 1.15;
     coffeeGroup.add(rimMesh);
 
-    // Ceramic Handle (Smooth Ergonomic Loop)
+    // Ceramic Loop Handle
     const handleGeo = new THREE.TorusGeometry(0.9, 0.16, 16, 36, Math.PI * 0.95);
     const handleMesh = new THREE.Mesh(handleGeo, porcelainMat);
     handleMesh.position.set(1.8, -0.15, 0);
@@ -275,13 +325,39 @@ export default function BrouwersFixedPoint3DLab() {
     handleMesh.castShadow = true;
     coffeeGroup.add(handleMesh);
 
+    // Stainless Steel Stirring Spoon
+    const spoonGroup = new THREE.Group();
+    spoonRef.current = spoonGroup;
+
+    const spoonMat = new THREE.MeshStandardMaterial({
+      color: 0xe2e8f0,
+      metalness: 0.95,
+      roughness: 0.15,
+    });
+    const spoonHandleGeo = new THREE.CylinderGeometry(0.035, 0.045, 2.8, 16);
+    const spoonHandle = new THREE.Mesh(spoonHandleGeo, spoonMat);
+    spoonHandle.position.y = 1.4;
+    spoonGroup.add(spoonHandle);
+
+    const spoonHeadGeo = new THREE.SphereGeometry(0.24, 16, 16);
+    spoonHeadGeo.scale(1.0, 0.35, 1.4);
+    const spoonHead = new THREE.Mesh(spoonHeadGeo, spoonMat);
+    spoonHead.position.y = 0.08;
+    spoonHead.rotation.x = 0.3;
+    spoonGroup.add(spoonHead);
+
+    spoonGroup.position.set(0.7, 0.95, 0.5);
+    spoonGroup.rotation.z = -0.35;
+    spoonGroup.rotation.x = 0.2;
+    coffeeGroup.add(spoonGroup);
+
     // Coffee Liquid Interior Surface
     const liquidGeo = new THREE.PlaneGeometry(3.3, 3.3, 40, 40);
     const liquidMat = new THREE.MeshPhysicalMaterial({
-      color: 0x24140a,
-      roughness: 0.12,
-      metalness: 0.1,
-      transmission: 0.25,
+      color: 0x221309,
+      roughness: 0.1,
+      metalness: 0.08,
+      transmission: 0.22,
       ior: 1.34,
       clearcoat: 1.0,
     });
@@ -291,8 +367,8 @@ export default function BrouwersFixedPoint3DLab() {
     liquidSurfaceRef.current = liquidMesh;
     coffeeGroup.add(liquidMesh);
 
-    // Swirling Tracer Particles (Coffee Crema & Ground Flecks)
-    const particleCount = 450;
+    // Swirling Tracer Particles
+    const particleCount = 480;
     const tracerGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const radii = new Float32Array(particleCount);
@@ -300,9 +376,9 @@ export default function BrouwersFixedPoint3DLab() {
     const depths = new Float32Array(particleCount);
 
     for (let i = 0; i < particleCount; i++) {
-      const r = 0.1 + Math.sqrt(Math.random()) * 1.45;
+      const r = 0.12 + Math.sqrt(Math.random()) * 1.42;
       const theta = Math.random() * Math.PI * 2;
-      const d = (Math.random() - 0.5) * 0.15;
+      const d = (Math.random() - 0.5) * 0.12;
 
       radii[i] = r;
       angles[i] = theta;
@@ -316,7 +392,7 @@ export default function BrouwersFixedPoint3DLab() {
     tracerGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const tracerMat = new THREE.PointsMaterial({
       color: 0xfef08a,
-      size: 0.05,
+      size: 0.055,
       transparent: true,
       opacity: 0.85,
     });
@@ -324,12 +400,10 @@ export default function BrouwersFixedPoint3DLab() {
     tracerParticlesRef.current = { points: tracerPoints, radii, angles, depths };
     coffeeGroup.add(tracerPoints);
 
-    // Vector Flow Arrows (Instanced Velocity Flow Arrows)
+    // Vector Flow Arrows
     const vectorArrowGroup = new THREE.Group();
     const arrowCount = 28;
     const arrowHelpers = [];
-    const dir = new THREE.Vector3(1, 0, 0);
-    const origin = new THREE.Vector3(0, 0.88, 0);
 
     for (let i = 0; i < arrowCount; i++) {
       const r = 0.4 + (i / arrowCount) * 1.1;
@@ -341,17 +415,16 @@ export default function BrouwersFixedPoint3DLab() {
       const arrow = new THREE.ArrowHelper(tangent, new THREE.Vector3(px, 0.88, pz), 0.22, 0x38bdf8, 0.08, 0.05);
       arrow.line.material.transparent = true;
       arrow.line.material.opacity = 0.7;
-      arrowHelpers.push({ arrow, r, angle, baseTangent: tangent });
+      arrowHelpers.push({ arrow, r, angle });
       vectorArrowGroup.add(arrow);
     }
     vectorArrowsRef.current = arrowHelpers;
     coffeeGroup.add(vectorArrowGroup);
 
-    // Fixed Point Marker (Brouwer Invariant Beacon)
+    // Fixed Point Invariant Beacon
     const fixedBeaconGroup = new THREE.Group();
     fixedPointBeaconRef.current = fixedBeaconGroup;
 
-    // Outer Target Rings
     const ringGeo1 = new THREE.RingGeometry(0.12, 0.16, 32);
     const ringMat1 = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
     const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
@@ -362,17 +435,16 @@ export default function BrouwersFixedPoint3DLab() {
     const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xeab308, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
     const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
     ring2.rotation.x = Math.PI / 2;
+    pulseRingRef.current = ring2;
     fixedBeaconGroup.add(ring2);
 
-    // Vertical Reticle Needle
-    const needleGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.6, 16);
+    const needleGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.65, 16);
     const needleMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
     const needle = new THREE.Mesh(needleGeo, needleMat);
-    needle.position.y = 0.3;
+    needle.position.y = 0.32;
     fixedBeaconGroup.add(needle);
 
-    // Center Core Node (Zero-Displacement Molecule)
-    const coreGeo = new THREE.SphereGeometry(0.045, 16, 16);
+    const coreGeo = new THREE.SphereGeometry(0.05, 16, 16);
     const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const coreNode = new THREE.Mesh(coreGeo, coreMat);
     fixedBeaconGroup.add(coreNode);
@@ -386,15 +458,14 @@ export default function BrouwersFixedPoint3DLab() {
     const mapGroup = new THREE.Group();
     mapGroupRef.current = mapGroup;
     scene.add(mapGroup);
-    mapGroup.visible = false; // Initially hidden
+    mapGroup.visible = false;
 
-    // Bottom Reference Map (Flat Coordinate Grid)
+    // Bottom Reference Map (Flat Grid)
     const refMapGeo = new THREE.PlaneGeometry(3.6, 3.6, 24, 24);
     const refMapMat = new THREE.MeshStandardMaterial({
       color: 0x0f172a,
       roughness: 0.9,
       metalness: 0.1,
-      wireframe: false,
     });
     const refMapMesh = new THREE.Mesh(refMapGeo, refMapMat);
     refMapMesh.rotation.x = -Math.PI / 2;
@@ -402,12 +473,11 @@ export default function BrouwersFixedPoint3DLab() {
     refMapMesh.receiveShadow = true;
     mapGroup.add(refMapMesh);
 
-    // Reference Grid Lines
     const gridHelper = new THREE.GridHelper(3.6, 18, 0x38bdf8, 0x1e293b);
     gridHelper.position.y = -0.79;
     mapGroup.add(gridHelper);
 
-    // Top Crumpled Map (Deformed Topological Sheet)
+    // Top Crumpled Map (Wrinkled Topological Sheet)
     const crumpleGeo = new THREE.PlaneGeometry(3.4, 3.4, 48, 48);
     const crumpleMat = new THREE.MeshStandardMaterial({
       color: 0xd97706,
@@ -423,7 +493,7 @@ export default function BrouwersFixedPoint3DLab() {
     crumpledMeshRef.current = crumpledMesh;
     mapGroup.add(crumpledMesh);
 
-    // Laser Invariant Beam (Vertical Ray Penetrating Identical Coordinate)
+    // Vertical Laser Invariant Beam
     const laserGeo = new THREE.CylinderGeometry(0.018, 0.018, 1.45, 16);
     const laserMat = new THREE.MeshBasicMaterial({
       color: 0x38bdf8,
@@ -435,19 +505,24 @@ export default function BrouwersFixedPoint3DLab() {
     laserBeamRef.current = laserBeam;
     mapGroup.add(laserBeam);
 
-    // Reticle Targets for Map (Top and Bottom)
+    // Target Rings for Top and Bottom Maps
+    const mapTargetGroup = new THREE.Group();
+    mapTargetGroupRef.current = mapTargetGroup;
+
     const mapTargetGeo = new THREE.RingGeometry(0.08, 0.12, 24);
     const mapTargetMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
 
     const topTarget = new THREE.Mesh(mapTargetGeo, mapTargetMat);
     topTarget.rotation.x = Math.PI / 2;
     topTarget.position.set(0.25, 0.65, 0.15);
-    mapGroup.add(topTarget);
+    mapTargetGroup.add(topTarget);
 
     const bottomTarget = new THREE.Mesh(mapTargetGeo, mapTargetMat);
     bottomTarget.rotation.x = Math.PI / 2;
     bottomTarget.position.set(0.25, -0.78, 0.15);
-    mapGroup.add(bottomTarget);
+    mapTargetGroup.add(bottomTarget);
+
+    mapGroup.add(mapTargetGroup);
 
     // ─────────────────────────────────────────────────────────────
     // 8. ANIMATION RENDER LOOP
@@ -461,24 +536,61 @@ export default function BrouwersFixedPoint3DLab() {
 
       controls.update();
 
-      // Mode 1: Coffee Cup Dynamics
-      if (coffeeGroup.visible) {
-        const radPerSec = (stirSpeed / 60) * Math.PI * 2;
+      // Decrement animation timers
+      if (stirAnimTimeRef.current > 0) {
+        stirAnimTimeRef.current = Math.max(0, stirAnimTimeRef.current - delta);
+        if (stirAnimTimeRef.current === 0) setIsStirringActive(false);
+      }
+      if (crumpleAnimTimeRef.current > 0) {
+        crumpleAnimTimeRef.current = Math.max(0, crumpleAnimTimeRef.current - delta);
+        if (crumpleAnimTimeRef.current === 0) setIsCrumplingActive(false);
+      }
 
-        // Dynamic vortex offset
+      // ── MODE 1: COFFEE CUP FLUID DYNAMICS ──
+      if (coffeeGroup.visible) {
+        const isStirring = stirAnimTimeRef.current > 0;
+        const currentSpeed = isStirring ? stirSpeed * 1.5 : stirSpeed;
+        const radPerSec = (currentSpeed / 60) * Math.PI * 2;
+
         const vx = vortexEccentricityX;
         const vz = vortexEccentricityY;
-        const vortexDepth = (stirSpeed / 120) * 0.45;
+        const vortexDepth = (currentSpeed / 120) * 0.48;
+
+        // Animated Spoon Motion
+        if (spoonRef.current) {
+          if (isStirring) {
+            const spoonOrbitAngle = elapsed * 7.5;
+            const spoonOrbitRadius = 0.75 + 0.25 * Math.sin(elapsed * 3);
+            const sx = vx + Math.cos(spoonOrbitAngle) * spoonOrbitRadius;
+            const sz = vz + Math.sin(spoonOrbitAngle) * spoonOrbitRadius;
+            const sy = 0.8 + 0.12 * Math.sin(spoonOrbitAngle * 2);
+
+            spoonRef.current.position.set(sx, sy, sz);
+            spoonRef.current.rotation.z = -0.35 * Math.cos(spoonOrbitAngle);
+            spoonRef.current.rotation.x = 0.35 * Math.sin(spoonOrbitAngle);
+          } else {
+            // Resting angled posture inside cup
+            spoonRef.current.position.set(0.7, 0.95, 0.5);
+            spoonRef.current.rotation.z = -0.35;
+            spoonRef.current.rotation.x = 0.2;
+          }
+        }
 
         // Update Liquid Surface Vertex Depression
         if (liquidSurfaceRef.current) {
           const posAttr = liquidSurfaceRef.current.geometry.attributes.position;
+          const waveAmp = isStirring ? 0.06 : 0.015;
+
           for (let i = 0; i < posAttr.count; i++) {
             const x = posAttr.getX(i);
             const y = posAttr.getY(i);
             const distSq = (x - vx) ** 2 + (y - vz) ** 2;
-            const dip = -vortexDepth * Math.exp(-distSq / 0.8);
-            posAttr.setZ(i, dip);
+            const r = Math.sqrt(distSq);
+
+            const vortexDip = -vortexDepth * Math.exp(-distSq / 0.8);
+            const wave = Math.sin(r * 10 - elapsed * 8) * waveAmp * Math.exp(-r);
+
+            posAttr.setZ(i, vortexDip + wave);
           }
           posAttr.needsUpdate = true;
         }
@@ -489,15 +601,13 @@ export default function BrouwersFixedPoint3DLab() {
           const posAttr = points.geometry.attributes.position;
 
           for (let i = 0; i < radii.length; i++) {
-            // Speed decreases slightly near edge due to friction
             const r = radii[i];
-            const speedFactor = Math.max(0.2, 1.2 - r * 0.5);
+            const speedFactor = Math.max(0.2, 1.25 - r * 0.45);
             angles[i] += radPerSec * delta * speedFactor;
 
             const px = vx + Math.cos(angles[i]) * r;
             const pz = vz + Math.sin(angles[i]) * r;
 
-            // Restrict within cup inner radius (~1.65)
             const cupDist = Math.sqrt(px * px + pz * pz);
             let finalX = px;
             let finalZ = pz;
@@ -519,32 +629,24 @@ export default function BrouwersFixedPoint3DLab() {
           const beaconY = 0.86 - vortexDepth;
           fixedPointBeaconRef.current.position.set(vx, beaconY, vz);
 
-          // Pulse expansion of outer ring
-          const scale = 1 + Math.sin(elapsed * 4) * 0.15;
-          fixedPointBeaconRef.current.children[1].scale.set(scale, scale, 1);
+          const scale = 1 + Math.sin(elapsed * 5) * 0.18;
+          if (pulseRingRef.current) {
+            pulseRingRef.current.scale.set(scale, scale, 1);
+          }
         }
-
-        // Telemetry Update for Coffee Mode
-        setTelemetry({
-          fixedPointX: vx.toFixed(3),
-          fixedPointY: vz.toFixed(3),
-          fixedPointZ: (0.86 - vortexDepth).toFixed(3),
-          residualError: '0.00000000',
-          velocityAtPoint: '0.0000 mm/s',
-          domainStatus: 'Compact Convex K ⊂ ℝ³',
-          topologicalInvariant: 'f(x*) = x*',
-        });
       }
 
-      // Mode 2: Crumpled Map Dynamics
+      // ── MODE 2: CRUMPLED MAP DYNAMICS ──
       if (mapGroup.visible && crumpledMeshRef.current) {
-        const rotRad = (mapRotation * Math.PI) / 180;
+        const isCrumpling = crumpleAnimTimeRef.current > 0;
+        const animProgress = isCrumpling ? Math.sin((3.5 - crumpleAnimTimeRef.current) * 2) * 15 : 0;
+
+        const dynamicRot = mapRotation + animProgress;
+        const rotRad = (dynamicRot * Math.PI) / 180;
         const scaleFactor = compressionScale / 100;
-        const intensity = crumpleIntensity / 100;
+        const intensity = (crumpleIntensity + (isCrumpling ? 15 : 0)) / 100;
 
         const posAttr = crumpledMeshRef.current.geometry.attributes.position;
-        // Theoretical fixed coordinate for affine compression + rotation
-        // Contraction mapping theorem ensures unique fixed point
         const targetU = 0.25 * (1 - scaleFactor);
         const targetV = 0.15 * (1 - scaleFactor);
 
@@ -552,11 +654,10 @@ export default function BrouwersFixedPoint3DLab() {
           const u = posAttr.getX(i);
           const v = posAttr.getY(i);
 
-          // Complex multi-frequency crumpling wrinkles
           const wrinkle =
-            Math.sin(u * 5 + rotRad) * Math.cos(v * 6) * 0.25 * intensity +
-            Math.sin(u * 12) * Math.sin(v * 10) * 0.12 * intensity +
-            Math.cos((u + v) * 8 + elapsed * 0.5) * 0.08 * intensity;
+            Math.sin(u * 5 + rotRad) * Math.cos(v * 6) * 0.26 * intensity +
+            Math.sin(u * 12) * Math.sin(v * 10) * 0.13 * intensity +
+            Math.cos((u + v) * 8 + elapsed * 0.6) * 0.08 * intensity;
 
           posAttr.setZ(i, wrinkle);
         }
@@ -565,23 +666,54 @@ export default function BrouwersFixedPoint3DLab() {
         crumpledMeshRef.current.rotation.z = rotRad;
         crumpledMeshRef.current.scale.set(scaleFactor, scaleFactor, 1);
 
-        // Position of Invariant Point
         const fixedX = targetU;
         const fixedZ = targetV;
 
         if (laserBeamRef.current) {
           laserBeamRef.current.position.x = fixedX;
           laserBeamRef.current.position.z = fixedZ;
+          const laserPulse = 0.7 + Math.sin(elapsed * 6) * 0.25;
+          laserBeamRef.current.material.opacity = laserPulse;
         }
 
+        if (mapTargetGroupRef.current) {
+          mapTargetGroupRef.current.children[0].position.set(fixedX, 0.65, fixedZ);
+          mapTargetGroupRef.current.children[1].position.set(fixedX, -0.78, fixedZ);
+        }
+      }
+
+      // Update Telemetry Display
+      if (coffeeGroup.visible && !mapGroup.visible) {
         setTelemetry({
-          fixedPointX: fixedX.toFixed(3),
-          fixedPointY: fixedZ.toFixed(3),
+          fixedPointX: vortexEccentricityX.toFixed(3),
+          fixedPointY: vortexEccentricityY.toFixed(3),
+          fixedPointZ: (0.86 - (stirSpeed / 120) * 0.48).toFixed(3),
+          residualError: '0.00000000',
+          velocityAtPoint: '0.0000 mm/s',
+          domainStatus: 'Compact Convex K ⊂ ℝ³',
+          topologicalInvariant: 'f(x*) = x*',
+        });
+      } else if (!coffeeGroup.visible && mapGroup.visible) {
+        const scaleFactor = compressionScale / 100;
+        setTelemetry({
+          fixedPointX: (0.25 * (1 - scaleFactor)).toFixed(3),
+          fixedPointY: (0.15 * (1 - scaleFactor)).toFixed(3),
           fixedPointZ: (0.6).toFixed(3),
           residualError: '0.00000000',
           velocityAtPoint: '|f(x) - x| = 0',
           domainStatus: 'Contracted Disk D² ⊂ ℝ²',
           topologicalInvariant: 'x* = f(x*)',
+        });
+      } else {
+        // Dual Mode Telemetry
+        setTelemetry({
+          fixedPointX: 'Dual (Left/Right)',
+          fixedPointY: 'Simultaneous',
+          fixedPointZ: 'Topological Pair',
+          residualError: '< 10⁻⁸ Invariance',
+          velocityAtPoint: 'v = 0 & Δ(x,y)=0',
+          domainStatus: 'Both Compact Convex Sets',
+          topologicalInvariant: 'Continuity Enforces Invariance',
         });
       }
 
@@ -590,7 +722,6 @@ export default function BrouwersFixedPoint3DLab() {
 
     animate();
 
-    // 9. Resize Handling
     const handleResize = () => {
       if (!mount) return;
       camera.aspect = mount.clientWidth / mount.clientHeight;
@@ -610,17 +741,30 @@ export default function BrouwersFixedPoint3DLab() {
     };
   }, []);
 
-  // Mode Switcher Effect
+  // Mode Position & Camera Layout Effect
   useEffect(() => {
-    if (!coffeeGroupRef.current || !mapGroupRef.current) return;
+    if (!coffeeGroupRef.current || !mapGroupRef.current || !cameraRef.current || !controlsRef.current) return;
+
     if (activeMode === 'coffee') {
       coffeeGroupRef.current.visible = true;
+      coffeeGroupRef.current.position.set(0, 0, 0);
       mapGroupRef.current.visible = false;
-      if (cameraRef.current) cameraRef.current.position.set(0, 5.5, 6.8);
-    } else {
+      cameraRef.current.position.set(0, 5.5, 6.8);
+      controlsRef.current.target.set(0, 0.4, 0);
+    } else if (activeMode === 'map') {
       coffeeGroupRef.current.visible = false;
       mapGroupRef.current.visible = true;
-      if (cameraRef.current) cameraRef.current.position.set(0, 4.8, 5.8);
+      mapGroupRef.current.position.set(0, 0, 0);
+      cameraRef.current.position.set(0, 4.8, 5.8);
+      controlsRef.current.target.set(0, 0.2, 0);
+    } else if (activeMode === 'dual') {
+      // Both Experiments Side-by-Side!
+      coffeeGroupRef.current.visible = true;
+      coffeeGroupRef.current.position.set(-2.7, 0, 0);
+      mapGroupRef.current.visible = true;
+      mapGroupRef.current.position.set(2.7, 0, 0);
+      cameraRef.current.position.set(0, 6.2, 9.4);
+      controlsRef.current.target.set(0, 0.4, 0);
     }
   }, [activeMode]);
 
@@ -652,8 +796,9 @@ export default function BrouwersFixedPoint3DLab() {
             aria-selected={activeMode === 'coffee'}
           >
             <Icon name="coffee" size={14} />
-            <span>1. The Coffee Cup Stir</span>
+            <span>1. Coffee Cup Stir</span>
           </button>
+
           <button
             type="button"
             className={`${styles.modeBtn} ${activeMode === 'map' ? styles.modeBtnActive : ''}`}
@@ -666,7 +811,22 @@ export default function BrouwersFixedPoint3DLab() {
             aria-selected={activeMode === 'map'}
           >
             <Icon name="map" size={14} />
-            <span>2. The Crumpled Map Paradox</span>
+            <span>2. Crumpled Map</span>
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.modeBtn} ${activeMode === 'dual' ? styles.modeBtnActive : ''}`}
+            onClick={() => {
+              setActiveMode('dual');
+              audioEngine.init();
+              audioEngine.playChime(880, 0.3);
+            }}
+            role="tab"
+            aria-selected={activeMode === 'dual'}
+          >
+            <Icon name="columns" size={14} />
+            <span>3. Side-by-Side Dual View</span>
           </button>
         </div>
 
@@ -704,7 +864,7 @@ export default function BrouwersFixedPoint3DLab() {
             </span>
           </div>
           <div className={styles.hudMetric}>
-            <span className={styles.hudLabel}>Residual |f(x*) - x*|</span>
+            <span className={styles.hudLabel}>Residual Invariance</span>
             <span className={styles.hudValue}>{telemetry.residualError}</span>
           </div>
           <div className={styles.hudMetric}>
@@ -718,9 +878,8 @@ export default function BrouwersFixedPoint3DLab() {
         </div>
 
         <div className={styles.hudFormulaBox}>
-          <strong>Brouwer&apos;s Theorem:</strong> Any continuous mapping{' '}
-          <code>f: K → K</code> on compact convex set <code>K</code> possesses at least one point where{' '}
-          <code>f(x*) = x*</code>.
+          <strong>Brouwer&apos;s Invariance Theorem:</strong> Any continuous transformation{' '}
+          <code>f: K → K</code> on a compact convex domain <code>K</code> leaves at least one coordinate invariant: <code>f(x*) = x*</code>.
         </div>
       </div>
 
@@ -737,7 +896,7 @@ export default function BrouwersFixedPoint3DLab() {
 
       {/* Bottom Interactive Controls */}
       <div className={styles.bottomControls}>
-        {activeMode === 'coffee' ? (
+        {activeMode === 'coffee' && (
           <>
             <div className={styles.sliderGroup}>
               <div className={styles.sliderItem}>
@@ -758,7 +917,7 @@ export default function BrouwersFixedPoint3DLab() {
 
               <div className={styles.sliderItem}>
                 <div className={styles.sliderHeader}>
-                  <span>Spoon Vortex Eccentricity X</span>
+                  <span>Vortex Center X</span>
                   <span className={styles.sliderValue}>{vortexEccentricityX.toFixed(2)}</span>
                 </div>
                 <input
@@ -775,7 +934,7 @@ export default function BrouwersFixedPoint3DLab() {
 
               <div className={styles.sliderItem}>
                 <div className={styles.sliderHeader}>
-                  <span>Spoon Vortex Eccentricity Z</span>
+                  <span>Vortex Center Z</span>
                   <span className={styles.sliderValue}>{vortexEccentricityY.toFixed(2)}</span>
                 </div>
                 <input
@@ -807,11 +966,13 @@ export default function BrouwersFixedPoint3DLab() {
                 onClick={handleStirAction}
               >
                 <Icon name="refresh-cw" size={14} />
-                <span>Stir Fluid Grid</span>
+                <span>{isStirringActive ? 'Stirring Liquid...' : 'Stir Fluid Grid'}</span>
               </button>
             </div>
           </>
-        ) : (
+        )}
+
+        {activeMode === 'map' && (
           <>
             <div className={styles.sliderGroup}>
               <div className={styles.sliderItem}>
@@ -870,7 +1031,74 @@ export default function BrouwersFixedPoint3DLab() {
                 onClick={handleCrumpleAction}
               >
                 <Icon name="layers" size={14} />
-                <span>Crumple Coordinate Map</span>
+                <span>{isCrumplingActive ? 'Folding Sheet...' : 'Crumple Coordinate Map'}</span>
+              </button>
+            </div>
+          </>
+        )}
+
+        {activeMode === 'dual' && (
+          <>
+            <div className={styles.sliderGroup}>
+              <div className={styles.sliderItem}>
+                <div className={styles.sliderHeader}>
+                  <span>Coffee Stir Speed</span>
+                  <span className={styles.sliderValue}>{stirSpeed} RPM</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="120"
+                  value={stirSpeed}
+                  onChange={(e) => setStirSpeed(Number(e.target.value))}
+                  className={styles.rangeInput}
+                  aria-label="Dual Stir Speed"
+                />
+              </div>
+
+              <div className={styles.sliderItem}>
+                <div className={styles.sliderHeader}>
+                  <span>Paper Crumple Factor</span>
+                  <span className={styles.sliderValue}>{crumpleIntensity}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={crumpleIntensity}
+                  onChange={(e) => setCrumpleIntensity(Number(e.target.value))}
+                  className={styles.rangeInput}
+                  aria-label="Dual Crumple Factor"
+                />
+              </div>
+            </div>
+
+            <div className={styles.actionButtonGroup}>
+              <button
+                type="button"
+                className={styles.secondaryActionBtn}
+                onClick={handleStirAction}
+              >
+                <Icon name="coffee" size={14} />
+                <span>Stir Cup</span>
+              </button>
+
+              <button
+                type="button"
+                className={styles.secondaryActionBtn}
+                onClick={handleCrumpleAction}
+              >
+                <Icon name="map" size={14} />
+                <span>Crumple Map</span>
+              </button>
+
+              <button
+                type="button"
+                className={styles.bothActionBtn}
+                onClick={handleDualAction}
+              >
+                <Icon name="zap" size={14} />
+                <span>Simulate Both Simultaneously</span>
               </button>
             </div>
           </>
