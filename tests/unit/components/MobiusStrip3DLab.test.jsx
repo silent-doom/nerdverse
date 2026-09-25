@@ -25,6 +25,8 @@ describe('MobiusStrip3DLab Component', () => {
   beforeEach(() => {
     HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
       fillRect: vi.fn(),
+      strokeRect: vi.fn(),
+      setLineDash: vi.fn(),
       clearRect: vi.fn(),
       beginPath: vi.fn(),
       closePath: vi.fn(),

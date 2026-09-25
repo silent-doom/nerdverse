@@ -30,7 +30,7 @@ class MobiusAudioEngine {
   playStep() {
     if (this.isMuted || !this.ctx) return;
     const nowMs = performance.now();
-    if (nowMs - this.lastPlay < 80) return;
+    if (nowMs - this.lastPlay < 90) return;
     this.lastPlay = nowMs;
 
     try {
@@ -39,17 +39,17 @@ class MobiusAudioEngine {
       const gain = this.ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(520, now);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.03);
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.025);
 
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.04);
+      osc.stop(now + 0.035);
     } catch {
       // AudioContext policy suppression fallback
     }
@@ -66,7 +66,7 @@ class MobiusAudioEngine {
       osc.frequency.setValueAtTime(frequency, now);
       osc.frequency.exponentialRampToValueAtTime(frequency * 1.5, now + duration);
 
-      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.setValueAtTime(0.18, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
       osc.connect(gain);
@@ -87,17 +87,17 @@ class MobiusAudioEngine {
       const gain = this.ctx.createGain();
 
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(200, now + 0.06);
+      osc.frequency.setValueAtTime(750, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.05);
 
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.08);
+      osc.stop(now + 0.07);
     } catch {
       // Audio fallback
     }
@@ -107,93 +107,311 @@ class MobiusAudioEngine {
 const audioEngine = new MobiusAudioEngine();
 
 /**
- * Procedural Ant Probe Builder (Robotic explorer with sensor eye and ink tip)
+ * Anatomically authentic 3D Ant (Formicidae) Builder
+ * Includes:
+ * - Pear-shaped cranium with mandibles and compound black eyes
+ * - Long 2-segment elbowed antennae (scape + flagellum)
+ * - 3-segment thorax (pronotum, mesonotum, metanotum)
+ * - Pinched petiole waist with dorsal node scale
+ * - Segmented droplet gaster (abdomen)
+ * - 6 jointed biological legs with coxa, femur (elevated arch), tibia (downward), and tarsus
+ * - Fine technical drafting pen touching the surface
  */
-function createAntProbeMesh() {
+function createAuthenticAntMesh() {
   const antGroup = new THREE.Group();
 
-  // Materials
-  const chassisMat = new THREE.MeshStandardMaterial({
-    color: 0x1e293b,
-    metalness: 0.85,
+  // Anatomical Chitin Materials
+  const chitinMat = new THREE.MeshPhysicalMaterial({
+    color: 0x24140e, // Rich dark amber-brown ant chitin
+    roughness: 0.3,
+    metalness: 0.05,
+    clearcoat: 0.85,
+    clearcoatRoughness: 0.18,
+    sheen: 0.8,
+    sheenColor: 0x5a2d18,
+  });
+
+  const eyeMat = new THREE.MeshPhysicalMaterial({
+    color: 0x050505, // Black glossy compound eye
+    roughness: 0.05,
+    metalness: 0.1,
+    clearcoat: 1.0,
+  });
+
+  const penBrassMat = new THREE.MeshStandardMaterial({
+    color: 0xd4af37, // Polished brass drafting pen
+    metalness: 0.9,
     roughness: 0.2,
   });
 
-  const sensorMat = new THREE.MeshStandardMaterial({
-    color: 0x38bdf8,
-    emissive: 0x38bdf8,
-    emissiveIntensity: 1.5,
+  const penTipMat = new THREE.MeshBasicMaterial({
+    color: 0xdc2626, // Crimson ink dispenser tip
   });
 
-  const stylusMat = new THREE.MeshStandardMaterial({
-    color: 0xf59e0b,
-    metalness: 0.9,
-    roughness: 0.1,
-  });
-
-  // Thorax
-  const thoraxGeo = new THREE.SphereGeometry(0.18, 16, 16);
-  thoraxGeo.scale(1.2, 0.8, 0.9);
-  const thorax = new THREE.Mesh(thoraxGeo, chassisMat);
-  thorax.position.y = 0.16;
-  antGroup.add(thorax);
-
-  // Head
-  const headGeo = new THREE.SphereGeometry(0.12, 16, 16);
-  const head = new THREE.Mesh(headGeo, chassisMat);
-  head.position.set(0.24, 0.18, 0);
+  // 1. Head (Caput)
+  const headGeo = new THREE.SphereGeometry(0.13, 16, 16);
+  headGeo.scale(1.2, 0.88, 0.95);
+  const head = new THREE.Mesh(headGeo, chitinMat);
+  head.position.set(0.32, 0.13, 0);
   antGroup.add(head);
 
-  // Cyan Eye Sensor
-  const eyeGeo = new THREE.SphereGeometry(0.04, 12, 12);
-  const eyeR = new THREE.Mesh(eyeGeo, sensorMat);
-  eyeR.position.set(0.33, 0.21, 0.05);
-  const eyeL = new THREE.Mesh(eyeGeo, sensorMat);
-  eyeL.position.set(0.33, 0.21, -0.05);
+  // Compound Eyes (lateral on head)
+  const eyeGeo = new THREE.SphereGeometry(0.042, 12, 12);
+  eyeGeo.scale(1.1, 1.2, 0.75);
+  const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+  eyeR.position.set(0.36, 0.16, 0.075);
+  eyeR.rotation.y = 0.3;
+  const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+  eyeL.position.set(0.36, 0.16, -0.075);
+  eyeL.rotation.y = -0.3;
   antGroup.add(eyeR, eyeL);
 
-  // Abdomen
-  const abdomenGeo = new THREE.SphereGeometry(0.22, 16, 16);
-  abdomenGeo.scale(1.4, 0.9, 0.9);
-  const abdomen = new THREE.Mesh(abdomenGeo, chassisMat);
-  abdomen.position.set(-0.28, 0.2, 0);
-  antGroup.add(abdomen);
+  // Mandibles (curved pincer jaws)
+  const mandibleGeo = new THREE.ConeGeometry(0.022, 0.12, 8);
+  const mandibleR = new THREE.Mesh(mandibleGeo, chitinMat);
+  mandibleR.position.set(0.44, 0.08, 0.035);
+  mandibleR.rotation.set(0.2, 0.3, -Math.PI / 2 + 0.4);
 
-  // Ink Stylus Tip pointing down toward surface
-  const stylusGeo = new THREE.ConeGeometry(0.03, 0.14, 8);
-  stylusGeo.rotateZ(Math.PI);
-  const stylus = new THREE.Mesh(stylusGeo, stylusMat);
-  stylus.position.set(0, 0.06, 0);
-  antGroup.add(stylus);
+  const mandibleL = new THREE.Mesh(mandibleGeo, chitinMat);
+  mandibleL.position.set(0.44, 0.08, -0.035);
+  mandibleL.rotation.set(-0.2, -0.3, -Math.PI / 2 + 0.4);
+  antGroup.add(mandibleR, mandibleL);
 
-  // 6 Articulated Legs
-  const legPositions = [
-    [0.1, 0.14, 0.22],
-    [0.0, 0.14, 0.25],
-    [-0.1, 0.14, 0.22],
-    [0.1, 0.14, -0.22],
-    [0.0, 0.14, -0.25],
-    [-0.1, 0.14, -0.22],
-  ];
+  // Jointed Antennae (Scape + Flagellum with natural elbow bend)
+  [-1, 1].forEach((side) => {
+    const antennaGroup = new THREE.Group();
+    antennaGroup.position.set(0.38, 0.18, side * 0.04);
 
-  legPositions.forEach(([lx, ly, lz]) => {
-    const legGeo = new THREE.CylinderGeometry(0.015, 0.012, 0.22, 6);
-    const leg = new THREE.Mesh(legGeo, chassisMat);
-    leg.position.set(lx, ly * 0.6, lz * 0.7);
-    leg.rotation.x = lz > 0 ? 0.7 : -0.7;
-    leg.rotation.z = lx > 0 ? -0.2 : 0.2;
-    antGroup.add(leg);
+    // Scape (first segment, angling forward and up)
+    const scapeGeo = new THREE.CylinderGeometry(0.007, 0.006, 0.18, 6);
+    const scape = new THREE.Mesh(scapeGeo, chitinMat);
+    scape.position.set(0.06, 0.07, side * 0.03);
+    scape.rotation.set(side * 0.3, -0.2, -0.7);
+    antennaGroup.add(scape);
+
+    // Flagellum (elbow joint forward and curling down)
+    const flagellumGeo = new THREE.CylinderGeometry(0.006, 0.004, 0.22, 6);
+    const flagellum = new THREE.Mesh(flagellumGeo, chitinMat);
+    flagellum.position.set(0.18, 0.12, side * 0.07);
+    flagellum.rotation.set(side * 0.2, -0.4, 0.5);
+    antennaGroup.add(flagellum);
+
+    antGroup.add(antennaGroup);
   });
 
-  // Normal Vector Arrow
+  // 2. Thorax / Mesosoma (Segmented 3-part arch)
+  const pronotumGeo = new THREE.SphereGeometry(0.11, 14, 14);
+  pronotumGeo.scale(1.0, 0.85, 0.8);
+  const pronotum = new THREE.Mesh(pronotumGeo, chitinMat);
+  pronotum.position.set(0.16, 0.12, 0);
+
+  const mesonotumGeo = new THREE.SphereGeometry(0.13, 14, 14);
+  mesonotumGeo.scale(1.2, 0.95, 0.75);
+  const mesonotum = new THREE.Mesh(mesonotumGeo, chitinMat);
+  mesonotum.position.set(0.04, 0.13, 0);
+
+  const propodeumGeo = new THREE.SphereGeometry(0.11, 14, 14);
+  propodeumGeo.scale(1.0, 0.9, 0.75);
+  const propodeum = new THREE.Mesh(propodeumGeo, chitinMat);
+  propodeum.position.set(-0.08, 0.11, 0);
+
+  antGroup.add(pronotum, mesonotum, propodeum);
+
+  // 3. Petiole (The Narrow Pinched Waist Node — hallmark of an ant)
+  const petioleStemGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.08, 8);
+  petioleStemGeo.rotateZ(Math.PI / 2);
+  const petioleStem = new THREE.Mesh(petioleStemGeo, chitinMat);
+  petioleStem.position.set(-0.16, 0.1, 0);
+
+  const petioleNodeGeo = new THREE.SphereGeometry(0.045, 10, 10);
+  petioleNodeGeo.scale(0.7, 1.3, 0.8);
+  const petioleNode = new THREE.Mesh(petioleNodeGeo, chitinMat);
+  petioleNode.position.set(-0.16, 0.14, 0);
+  antGroup.add(petioleStem, petioleNode);
+
+  // 4. Gaster / Abdomen (Large segmented bulb tilted slightly downwards)
+  const gasterGroup = new THREE.Group();
+  gasterGroup.position.set(-0.2, 0.1, 0);
+
+  const gasterBase = new THREE.Mesh(new THREE.SphereGeometry(0.15, 14, 14), chitinMat);
+  gasterBase.position.set(-0.08, 0.02, 0);
+  gasterBase.scale.set(1.0, 0.9, 0.85);
+
+  const gasterMain = new THREE.Mesh(new THREE.SphereGeometry(0.19, 16, 16), chitinMat);
+  gasterMain.position.set(-0.19, 0.02, 0);
+  gasterMain.scale.set(1.2, 0.95, 0.9);
+
+  const gasterTip = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.2, 14), chitinMat);
+  gasterTip.position.set(-0.35, -0.01, 0);
+  gasterTip.rotation.z = Math.PI / 2 + 0.2;
+
+  gasterGroup.add(gasterBase, gasterMain, gasterTip);
+  antGroup.add(gasterGroup);
+
+  // 5. Technical Drafting Pen (Mouth/mandibles precision ink stylus)
+  const penGroup = new THREE.Group();
+  penGroup.position.set(0.44, 0.08, 0);
+  penGroup.rotation.z = -Math.PI / 4;
+
+  const penBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.24, 8), penBrassMat);
+  penBarrel.position.y = 0.1;
+  const penNib = new THREE.Mesh(new THREE.ConeGeometry(0.018, 0.08, 8), penBrassMat);
+  penNib.rotation.z = Math.PI;
+  penNib.position.y = -0.04;
+  const penTip = new THREE.Mesh(new THREE.SphereGeometry(0.008, 8, 8), penTipMat);
+  penTip.position.y = -0.08;
+
+  penGroup.add(penBarrel, penNib, penTip);
+  antGroup.add(penGroup);
+
+  // 6. Jointed Biological Legs with realistic insect posture
+  // Leg definitions: [coxaX, coxaY, coxaZ, femurAngleZ, tibiaAngleZ, lengthScale]
+  const legSpecs = [
+    // Front Legs (Prothoracic): angled forward-outward
+    { origin: [0.16, 0.07, 0.08], angles: [0.6, 0.5, -0.9], sign: 1, id: 'L1' },
+    { origin: [0.16, 0.07, -0.08], angles: [-0.6, 0.5, -0.9], sign: -1, id: 'R1' },
+    // Middle Legs (Mesothoracic): arched outward-perpendicular
+    { origin: [0.04, 0.07, 0.09], angles: [1.0, 0.1, -1.2], sign: 1, id: 'L2' },
+    { origin: [0.04, 0.07, -0.09], angles: [-1.0, 0.1, -1.2], sign: -1, id: 'R2' },
+    // Hind Legs (Metathoracic): longest, swept backward
+    { origin: [-0.06, 0.07, 0.08], angles: [1.2, -0.5, -1.4], sign: 1, id: 'L3' },
+    { origin: [-0.06, 0.07, -0.08], angles: [-1.2, -0.5, -1.4], sign: -1, id: 'R3' },
+  ];
+
+  const legMeshes = [];
+
+  legSpecs.forEach((spec) => {
+    const legContainer = new THREE.Group();
+    legContainer.position.set(...spec.origin);
+    legContainer.name = `leg_${spec.id}`;
+
+    // Coxa / Trochanter base
+    const coxa = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.014, 0.06, 6), chitinMat);
+    coxa.rotation.x = spec.sign * 0.6;
+    legContainer.add(coxa);
+
+    // Femur (High inverted V arch upward)
+    const femurLen = 0.22;
+    const femur = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.011, femurLen, 6), chitinMat);
+    femur.position.set(spec.angles[1] * 0.08, 0.1, spec.sign * 0.1);
+    femur.rotation.set(spec.sign * 0.8, 0, spec.angles[1] * 0.5);
+    legContainer.add(femur);
+
+    // Knee Joint sphere
+    const knee = new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 8), chitinMat);
+    knee.position.set(spec.angles[1] * 0.14, 0.2, spec.sign * 0.2);
+    legContainer.add(knee);
+
+    // Tibia (Long slender segment angling down to ribbon surface)
+    const tibiaLen = 0.26;
+    const tibia = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.007, tibiaLen, 6), chitinMat);
+    tibia.position.set(spec.angles[1] * 0.17, 0.09, spec.sign * 0.26);
+    tibia.rotation.set(spec.sign * -0.4, 0, spec.angles[2] * 0.4);
+    legContainer.add(tibia);
+
+    // Tarsus / Foot claw
+    const tarsus = new THREE.Mesh(new THREE.ConeGeometry(0.007, 0.06, 6), chitinMat);
+    tarsus.position.set(spec.angles[1] * 0.19, -0.02, spec.sign * 0.3);
+    tarsus.rotation.set(spec.sign * -0.2, 0, 0);
+    legContainer.add(tarsus);
+
+    antGroup.add(legContainer);
+    legMeshes.push(legContainer);
+  });
+
+  // Normal Vector Arrow (clean technical vector extending from ant thorax)
   const arrowDir = new THREE.Vector3(0, 1, 0);
-  const arrowOrigin = new THREE.Vector3(0, 0.35, 0);
-  const normalArrow = new THREE.ArrowHelper(arrowDir, arrowOrigin, 0.65, 0x38bdf8, 0.18, 0.1);
+  const arrowOrigin = new THREE.Vector3(0, 0.28, 0);
+  const normalArrow = new THREE.ArrowHelper(arrowDir, arrowOrigin, 0.75, 0x38bdf8, 0.16, 0.08);
   normalArrow.name = 'normalArrow';
   antGroup.add(normalArrow);
 
-  antGroup.scale.set(0.85, 0.85, 0.85);
+  antGroup.scale.set(0.9, 0.9, 0.9);
+  antGroup.userData = { legMeshes };
   return antGroup;
+}
+
+/**
+ * Creates high-resolution archival paper texture with millimeter grid & dashed centerline
+ */
+function createCardstockTexture(theme = 'parchment') {
+  if (typeof document === 'undefined') return null;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  const isParchment = theme === 'parchment';
+
+  // Base background
+  ctx.fillStyle = isParchment ? '#f4f0e6' : '#141b2b';
+  ctx.fillRect(0, 0, 1024, 128);
+
+  // Subtle paper grain
+  ctx.fillStyle = isParchment ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.02)';
+  for (let i = 0; i < 4000; i++) {
+    const rx = Math.random() * 1024;
+    const ry = Math.random() * 128;
+    ctx.fillRect(rx, ry, 1.5, 1.5);
+  }
+
+  // Edge margin guidelines
+  ctx.strokeStyle = isParchment ? 'rgba(100, 116, 139, 0.35)' : 'rgba(56, 189, 248, 0.3)';
+  ctx.lineWidth = 1;
+  if (typeof ctx.strokeRect === 'function') {
+    ctx.strokeRect(0, 12, 1024, 104);
+  }
+
+  // Millimeter coordinate tick marks
+  for (let x = 0; x < 1024; x += 16) {
+    const isMajor = x % 64 === 0;
+    const tickH = isMajor ? 12 : 6;
+    ctx.strokeStyle = isParchment
+      ? isMajor
+        ? 'rgba(71, 85, 105, 0.5)'
+        : 'rgba(148, 163, 184, 0.3)'
+      : isMajor
+      ? 'rgba(56, 189, 248, 0.5)'
+      : 'rgba(56, 189, 248, 0.2)';
+    if (typeof ctx.beginPath === 'function') {
+      ctx.beginPath();
+      ctx.moveTo(x, 12);
+      ctx.lineTo(x, 12 + tickH);
+      ctx.moveTo(x, 116);
+      ctx.lineTo(x, 116 - tickH);
+      ctx.stroke();
+    }
+
+    if (isMajor && x % 128 === 0 && typeof ctx.fillText === 'function') {
+      ctx.fillStyle = isParchment ? '#64748b' : '#38bdf8';
+      ctx.font = '9px monospace';
+      ctx.fillText(`${x / 16}π`, x + 3, 24);
+    }
+  }
+
+  // Centerline dashed guide for Ant path
+  ctx.strokeStyle = isParchment ? 'rgba(220, 38, 38, 0.3)' : 'rgba(239, 68, 68, 0.3)';
+  if (typeof ctx.setLineDash === 'function') {
+    ctx.setLineDash([8, 8]);
+  }
+  ctx.lineWidth = 1.5;
+  if (typeof ctx.beginPath === 'function') {
+    ctx.beginPath();
+    ctx.moveTo(0, 64);
+    ctx.lineTo(1024, 64);
+    ctx.stroke();
+  }
+  if (typeof ctx.setLineDash === 'function') {
+    ctx.setLineDash([]);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.repeat.set(4, 1);
+  return texture;
 }
 
 export default function MobiusStrip3DLab() {
@@ -202,20 +420,23 @@ export default function MobiusStrip3DLab() {
   // Mode: 'ant' (Traversal & Ink) | 'scissors' (Cutting Paradox) | 'topology' (Manifold Parameters)
   const [activeMode, setActiveMode] = useState('ant');
 
+  // Surface Material Theme: 'parchment' (Archival Cardstock) | 'titanium' (Matte Slate)
+  const [surfaceTheme, setSurfaceTheme] = useState('parchment');
+
   // Mode 1: Ant Traversal State
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const [traversalU, setTraversalU] = useState(0.0); // 0 to 4*PI (two full circuits)
+  const [traversalU, setTraversalU] = useState(0.0); // 0 to 4*PI
   const [showNormalVector, setShowNormalVector] = useState(true);
   const [cameraFollowAnt, setCameraFollowAnt] = useState(false);
 
   // Mode 2: Scissors Paradox State
-  const [cutType, setCutType] = useState('midline'); // 'midline' (1/2) | 'offset' (1/3)
-  const [cutProgress, setCutProgress] = useState(0.0); // 0.0 to 1.0 cut circuit
-  const [separationProgress, setSeparationProgress] = useState(0.0); // 0.0 to 1.0 unfold/separate
+  const [cutType, setCutType] = useState('midline'); // 'midline' | 'offset'
+  const [cutProgress, setCutProgress] = useState(0.0);
+  const [separationProgress, setSeparationProgress] = useState(0.0);
 
   // Mode 3: Topology Parameters
-  const [halfTwists, setHalfTwists] = useState(1); // 0=cylinder, 1=mobius, 2=full twist, 3=trefoil
+  const [halfTwists, setHalfTwists] = useState(1);
   const [ribbonRadius, setRibbonRadius] = useState(3.4);
   const [ribbonWidth, setRibbonWidth] = useState(1.4);
   const [isWireframe, setIsWireframe] = useState(false);
@@ -226,7 +447,7 @@ export default function MobiusStrip3DLab() {
   const [autoRotate, setAutoRotate] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
 
-  // Three.js References
+  // Three.js Scene References
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
   const cameraRef = useRef(null);
@@ -245,34 +466,22 @@ export default function MobiusStrip3DLab() {
     audioEngine.isMuted = !soundEnabled;
   }, [soundEnabled]);
 
-  // Compute Telemetry Values based on traversalU
+  // Telemetry Calculations
   const telemetry = useMemo(() => {
     const k = activeMode === 'topology' ? halfTwists : 1;
     const R = ribbonRadius;
-    const w = ribbonWidth;
     const u = traversalU;
 
-    // Normal calculation at centerline v=0
-    // r(u, 0) = (R cos u, R sin u, 0)
-    // tu = (-R sin u, R cos u, 0)
-    // tv = (cos(ku/2) cos u, cos(ku/2) sin u, sin(ku/2))
-    // tu x tv = (R sin(ku/2) cos u, R sin(ku/2) sin u, -R cos(ku/2))
-    // Normalized n = (sin(ku/2) cos u, sin(ku/2) sin u, -cos(ku/2))
     const halfU = (k * u) / 2;
     const nx = Math.sin(halfU) * Math.cos(u);
     const ny = Math.sin(halfU) * Math.sin(u);
     const nz = -Math.cos(halfU);
 
-    // Cumulative orientation angle
     const twistAngleDeg = ((u / 2) * (180 / Math.PI)) % 360;
-
-    // Distance traveled (approximate 2*pi*R per loop)
     const arcLengthTraveled = u * R;
-    const totalCircumference = 2 * Math.PI * R;
     const loopNumber = u < 2 * Math.PI ? 1 : 2;
     const isApparentSideA = loopNumber === 1;
 
-    // Topological Invariants
     const isEvenTwist = k % 2 === 0;
     const sidesCount = isEvenTwist ? 2 : 1;
     const boundaryCount = isEvenTwist ? 2 : 1;
@@ -291,9 +500,9 @@ export default function MobiusStrip3DLab() {
       sidesCount,
       boundaryCount,
       orientable,
-      eulerChar: 0, // chi = 0
+      eulerChar: 0,
     };
-  }, [traversalU, halfTwists, ribbonRadius, ribbonWidth, activeMode]);
+  }, [traversalU, halfTwists, ribbonRadius, activeMode]);
 
   // Handle Play/Pause
   const handleTogglePlay = useCallback(() => {
@@ -308,11 +517,10 @@ export default function MobiusStrip3DLab() {
     if (audioEngine) audioEngine.playStep();
   }, []);
 
-  // Update Three.js Surface Geometry
+  // Rebuild Möbius Strip Mesh with Photorealistic Studio Textures
   const rebuildStripMesh = useCallback(() => {
     if (!sceneRef.current) return;
 
-    // Remove existing meshes
     if (stripMeshRef.current) {
       sceneRef.current.remove(stripMeshRef.current);
       stripMeshRef.current.geometry.dispose();
@@ -330,6 +538,8 @@ export default function MobiusStrip3DLab() {
     const R = ribbonRadius;
     const w = ribbonWidth;
     const k = activeMode === 'topology' ? halfTwists : 1;
+    const isParchment = surfaceTheme === 'parchment';
+    const cardTexture = createCardstockTexture(surfaceTheme);
 
     // Mode 2: Scissors Paradox Meshes
     if (activeMode === 'scissors') {
@@ -337,27 +547,26 @@ export default function MobiusStrip3DLab() {
       const cutAngleLimit = cutProgress * 2 * Math.PI;
 
       if (cutType === 'midline') {
-        // Midline Cut: Splitting v into [-w/2, -gap] and [gap, w/2]
         const gap = 0.03 + separationProgress * 0.35;
-        const unfoldStretch = separationProgress * 1.5;
+        const unfoldStretch = separationProgress * 1.6;
 
-        // Sub-strip 1: left half
+        // Sub-strip 1: Slate Blue Cardstock
         const geoLeft = buildParametricBandGeometry(R, -w / 2, -gap, k, cutAngleLimit, unfoldStretch, 1);
-        const matLeft = new THREE.MeshStandardMaterial({
-          color: 0x38bdf8,
-          metalness: 0.6,
-          roughness: 0.3,
+        const matLeft = new THREE.MeshPhysicalMaterial({
+          color: 0x3b82f6,
+          roughness: 0.45,
+          metalness: 0.1,
           side: THREE.DoubleSide,
           wireframe: isWireframe,
         });
         const meshLeft = new THREE.Mesh(geoLeft, matLeft);
 
-        // Sub-strip 2: right half
+        // Sub-strip 2: Warm Amber Cardstock
         const geoRight = buildParametricBandGeometry(R, gap, w / 2, k, cutAngleLimit, -unfoldStretch, -1);
-        const matRight = new THREE.MeshStandardMaterial({
-          color: 0xec4899,
-          metalness: 0.6,
-          roughness: 0.3,
+        const matRight = new THREE.MeshPhysicalMaterial({
+          color: 0xf59e0b,
+          roughness: 0.45,
+          metalness: 0.1,
           side: THREE.DoubleSide,
           wireframe: isWireframe,
         });
@@ -365,25 +574,26 @@ export default function MobiusStrip3DLab() {
 
         group.add(meshLeft, meshRight);
       } else {
-        // 1/3 Offset Cut: One strip width [ -w/2, -w/6 ], other [ -w/6 + gap, w/2 ]
         const gap = 0.04 + separationProgress * 0.4;
-        const interlinkOffset = separationProgress * 0.8;
+        const interlinkOffset = separationProgress * 0.9;
 
+        // Thin loop: Warm Brass / Amber
         const geoThin = buildParametricBandGeometry(R, -w / 2, -w / 6, k, cutAngleLimit, interlinkOffset, 1);
-        const matThin = new THREE.MeshStandardMaterial({
-          color: 0xf59e0b,
-          metalness: 0.7,
-          roughness: 0.25,
+        const matThin = new THREE.MeshPhysicalMaterial({
+          color: 0xeab308,
+          roughness: 0.4,
+          metalness: 0.2,
           side: THREE.DoubleSide,
           wireframe: isWireframe,
         });
         const meshThin = new THREE.Mesh(geoThin, matThin);
 
+        // Thick double loop: Architectural Sage
         const geoThick = buildParametricBandGeometry(R, -w / 6 + gap, w / 2, k, cutAngleLimit, -interlinkOffset, -1);
-        const matThick = new THREE.MeshStandardMaterial({
+        const matThick = new THREE.MeshPhysicalMaterial({
           color: 0x10b981,
-          metalness: 0.7,
-          roughness: 0.25,
+          roughness: 0.4,
+          metalness: 0.2,
           side: THREE.DoubleSide,
           wireframe: isWireframe,
         });
@@ -397,21 +607,21 @@ export default function MobiusStrip3DLab() {
       return;
     }
 
-    // Default & Ant & Topology Modes: Canonical Single Surface
-    const uSegments = 140;
-    const vSegments = 20;
+    // Default & Ant & Topology Modes: Studio Cardstock Ribbon
+    const uSegments = 160;
+    const vSegments = 24;
     const positions = [];
     const normals = [];
-    const colors = [];
+    const uvs = [];
     const indices = [];
-
-    const colorOuter = new THREE.Color(0x38bdf8); // Cyan
-    const colorInner = new THREE.Color(0x818cf8); // Indigo/Purple
 
     for (let i = 0; i <= uSegments; i++) {
       const u = (i / uSegments) * 2 * Math.PI;
+      const uCoord = i / uSegments;
+
       for (let j = 0; j <= vSegments; j++) {
         const v = -w / 2 + (j / vSegments) * w;
+        const vCoord = j / vSegments;
 
         const halfU = (k * u) / 2;
         const cosHalfU = Math.cos(halfU);
@@ -424,16 +634,12 @@ export default function MobiusStrip3DLab() {
         const z = v * sinHalfU;
         positions.push(x, y, z);
 
-        // Exact normal vector
         const nx = sinHalfU * cosU;
         const ny = sinHalfU * sinU;
         const nz = -cosHalfU;
         normals.push(nx, ny, nz);
 
-        // Subtle gradient coloring along twist
-        const t = (Math.sin(halfU) + 1) / 2;
-        const vertexColor = colorOuter.clone().lerp(colorInner, t);
-        colors.push(vertexColor.r, vertexColor.g, vertexColor.b);
+        uvs.push(uCoord, vCoord);
       }
     }
 
@@ -451,18 +657,23 @@ export default function MobiusStrip3DLab() {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     geometry.setIndex(indices);
 
-    const material = new THREE.MeshStandardMaterial({
-      vertexColors: true,
-      metalness: 0.55,
-      roughness: 0.35,
+    const material = new THREE.MeshPhysicalMaterial({
+      map: cardTexture,
+      color: isParchment ? 0xf4f0e6 : 0x1e293b,
+      roughness: isParchment ? 0.55 : 0.35,
+      metalness: isParchment ? 0.05 : 0.3,
+      clearcoat: isParchment ? 0.1 : 0.4,
+      clearcoatRoughness: 0.3,
       side: THREE.DoubleSide,
       wireframe: isWireframe,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     stripMeshRef.current = mesh;
     sceneRef.current.add(mesh);
 
@@ -472,7 +683,7 @@ export default function MobiusStrip3DLab() {
       const stepU = 10;
       for (let i = 0; i < uSegments; i += stepU) {
         const u = (i / uSegments) * 2 * Math.PI;
-        for (let j = 0; j <= vSegments; j += 10) {
+        for (let j = 0; j <= vSegments; j += 8) {
           const v = -w / 2 + (j / vSegments) * w;
           const halfU = (k * u) / 2;
           const x = (R + v * Math.cos(halfU)) * Math.cos(u);
@@ -488,8 +699,8 @@ export default function MobiusStrip3DLab() {
             new THREE.Vector3(x, y, z),
             0.35,
             0x38bdf8,
-            0.1,
-            0.05
+            0.08,
+            0.04
           );
           normalGroup.add(arrow);
         }
@@ -507,6 +718,7 @@ export default function MobiusStrip3DLab() {
     cutType,
     cutProgress,
     separationProgress,
+    surfaceTheme,
   ]);
 
   // Helper: Build parametric band for cut segments
@@ -560,7 +772,7 @@ export default function MobiusStrip3DLab() {
     return geo;
   }
 
-  // Build / Update Glowing Red Ink Trail
+  // Build / Update Realistic Red Fountain-Pen Ink Trail
   const updateInkTrailMesh = useCallback(() => {
     if (!sceneRef.current) return;
 
@@ -573,8 +785,8 @@ export default function MobiusStrip3DLab() {
     if (activeMode !== 'ant' || traversalU <= 0.02) return;
 
     const R = ribbonRadius;
-    const k = 1; // Canonical Möbius
-    const pointsCount = Math.max(10, Math.floor((traversalU / (4 * Math.PI)) * 320));
+    const k = 1;
+    const pointsCount = Math.max(10, Math.floor((traversalU / (4 * Math.PI)) * 360));
     const points = [];
 
     for (let i = 0; i <= pointsCount; i++) {
@@ -585,12 +797,12 @@ export default function MobiusStrip3DLab() {
       const cosU = Math.cos(u);
       const sinU = Math.sin(u);
 
-      // Normal vector to elevate ink slightly off surface
       const nx = sinHalfU * cosU;
       const ny = sinHalfU * sinU;
       const nz = -cosHalfU;
 
-      const elevation = 0.025;
+      // Rest ink exactly on paper surface with microscopic offset to eliminate z-fighting
+      const elevation = 0.015;
       const x = R * cosU + nx * elevation;
       const y = R * sinU + ny * elevation;
       const z = nz * elevation;
@@ -599,9 +811,11 @@ export default function MobiusStrip3DLab() {
     }
 
     const curve = new THREE.CatmullRomCurve3(points);
-    const tubeGeo = new THREE.TubeGeometry(curve, pointsCount, 0.025, 8, false);
-    const tubeMat = new THREE.MeshBasicMaterial({
-      color: 0xef4444, // Glowing Red Ink
+    const tubeGeo = new THREE.TubeGeometry(curve, pointsCount, 0.022, 8, false);
+    const tubeMat = new THREE.MeshStandardMaterial({
+      color: 0xb91c1c, // Deep fountain pen crimson ink
+      roughness: 0.2,
+      metalness: 0.1,
     });
 
     const inkMesh = new THREE.Mesh(tubeGeo, tubeMat);
@@ -609,7 +823,7 @@ export default function MobiusStrip3DLab() {
     sceneRef.current.add(inkMesh);
   }, [traversalU, ribbonRadius, activeMode]);
 
-  // Position Ant Probe along Surface
+  // Position Ant Probe along Surface and animate leg gait
   const updateAntPosition = useCallback(() => {
     if (!antMeshRef.current) return;
 
@@ -629,26 +843,41 @@ export default function MobiusStrip3DLab() {
     const cosU = Math.cos(u);
     const sinU = Math.sin(u);
 
-    // Position at centerline v=0
+    // Centerline position
     const x = R * cosU;
     const y = R * sinU;
     const z = 0;
 
     antMeshRef.current.position.set(x, y, z);
 
-    // Tangent along u: tu = (-R sin u, R cos u, 0)
+    // Tangent along u
     const tu = new THREE.Vector3(-Math.sin(u), Math.cos(u), 0).normalize();
 
-    // Normal n = (sin(u/2) cos u, sin(u/2) sin u, -cos(u/2))
+    // Normal n
     const n = new THREE.Vector3(sinHalfU * cosU, sinHalfU * sinU, -cosHalfU).normalize();
 
     // Binormal tv = n x tu
     const tv = new THREE.Vector3().crossVectors(n, tu).normalize();
 
-    // Orientation Matrix: X=tv, Y=n, Z=tu
+    // Orientation Basis: X=tv, Y=n, Z=tu
     const rotMatrix = new THREE.Matrix4();
     rotMatrix.makeBasis(tv, n, tu);
     antMeshRef.current.setRotationFromMatrix(rotMatrix);
+
+    // Alternate Tripod Insect Leg Gait
+    const legMeshes = antMeshRef.current.userData?.legMeshes || [];
+    if (legMeshes.length === 6) {
+      const gaitPhase = u * 12; // Frequency of walking cycle
+      const swingL1 = Math.sin(gaitPhase) * 0.12;
+      const swingR1 = Math.sin(gaitPhase + Math.PI) * 0.12;
+
+      legMeshes[0].rotation.z = swingL1;
+      legMeshes[1].rotation.z = swingR1;
+      legMeshes[2].rotation.z = swingR1;
+      legMeshes[3].rotation.z = swingL1;
+      legMeshes[4].rotation.z = swingL1;
+      legMeshes[5].rotation.z = swingR1;
+    }
 
     // Toggle normal vector arrow visibility
     const arrow = antMeshRef.current.getObjectByName('normalArrow');
@@ -658,14 +887,14 @@ export default function MobiusStrip3DLab() {
 
     // Camera follow ant
     if (cameraFollowAnt && cameraRef.current && controlsRef.current) {
-      const camOffset = n.clone().multiplyScalar(2.5).add(tu.clone().multiplyScalar(-3.0));
+      const camOffset = n.clone().multiplyScalar(2.6).add(tu.clone().multiplyScalar(-3.2));
       cameraRef.current.position.copy(antMeshRef.current.position).add(camOffset);
       controlsRef.current.target.copy(antMeshRef.current.position);
       controlsRef.current.update();
     }
   }, [traversalU, ribbonRadius, activeMode, showNormalVector, cameraFollowAnt]);
 
-  // Setup Three.js WebGL Scene
+  // Setup Three.js WebGL Scene with Studio Lighting & Pedestal
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
@@ -676,14 +905,17 @@ export default function MobiusStrip3DLab() {
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.set(0, -7.5, 6.0);
+    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+    camera.position.set(0, -8.0, 6.2);
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
     rendererRef.current = renderer;
     container.appendChild(renderer.domElement);
 
@@ -694,36 +926,77 @@ export default function MobiusStrip3DLab() {
     controls.minDistance = 2.5;
     controlsRef.current = controls;
 
-    // Ambient and Directional Lighting
-    const ambientLight = new THREE.AmbientLight(0x1e293b, 1.4);
+    // ── Neutral Photographic Studio Lighting ──
+    // Ambient fill (neutral slate, no colored tints)
+    const ambientLight = new THREE.AmbientLight(0xf1f5f9, 0.85);
     scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 1.8);
-    dirLight1.position.set(8, 12, 10);
-    scene.add(dirLight1);
+    // Key Light: Warm studio softbox (3800K)
+    const keyLight = new THREE.DirectionalLight(0xfff5ea, 2.0);
+    keyLight.position.set(10, 15, 12);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.width = 1024;
+    keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.camera.near = 2;
+    keyLight.shadow.camera.far = 30;
+    scene.add(keyLight);
 
-    const dirLight2 = new THREE.DirectionalLight(0xec4899, 1.0);
-    dirLight2.position.set(-8, -10, -8);
-    scene.add(dirLight2);
+    // Fill Light: Cool diffused studio fill (5500K)
+    const fillLight = new THREE.DirectionalLight(0xe0e7ff, 0.9);
+    fillLight.position.set(-10, 8, -8);
+    scene.add(fillLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 0.8, 15);
-    pointLight.position.set(0, 0, 4);
-    scene.add(pointLight);
+    // Rim / Back Light: Crisp neutral white to carve edge silhouette of half-twist
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    rimLight.position.set(0, 12, -12);
+    scene.add(rimLight);
 
-    // Subtle Celestial Starfield
-    const starGeo = new THREE.BufferGeometry();
-    const starCount = 300;
-    const starPos = [];
-    for (let i = 0; i < starCount; i++) {
-      starPos.push((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40, (Math.random() - 0.5) * 30);
-    }
-    starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-    const starMat = new THREE.PointsMaterial({ color: 0x475569, size: 0.08 });
-    const starfield = new THREE.Points(starGeo, starMat);
-    scene.add(starfield);
+    // Soft upward bounce from lab floor
+    const bounceLight = new THREE.DirectionalLight(0x94a3b8, 0.4);
+    bounceLight.position.set(0, -10, 0);
+    scene.add(bounceLight);
+
+    // ── Studio Measurement Turntable / Ground Pedestal ──
+    const pedestalGroup = new THREE.Group();
+    pedestalGroup.position.y = -2.8;
+
+    // Turntable Disk
+    const turntableGeo = new THREE.CylinderGeometry(5.2, 5.4, 0.15, 64);
+    const turntableMat = new THREE.MeshStandardMaterial({
+      color: 0x0f1422,
+      roughness: 0.6,
+      metalness: 0.3,
+    });
+    const turntable = new THREE.Mesh(turntableGeo, turntableMat);
+    turntable.receiveShadow = true;
+    pedestalGroup.add(turntable);
+
+    // Concentric Metric Calibration Rings on Pedestal
+    [1.5, 2.5, 3.5, 4.5].forEach((radius) => {
+      const ringGeo = new THREE.RingGeometry(radius - 0.015, radius + 0.015, 64);
+      ringGeo.rotateX(-Math.PI / 2);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x334155,
+        side: THREE.DoubleSide,
+      });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.position.y = 0.08;
+      pedestalGroup.add(ring);
+    });
+
+    // Soft Contact Shadow Plane directly beneath the ribbon
+    const shadowGeo = new THREE.PlaneGeometry(10, 10);
+    shadowGeo.rotateX(-Math.PI / 2);
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.35 });
+    const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
+    shadowPlane.position.y = 0.085;
+    shadowPlane.receiveShadow = true;
+    pedestalGroup.add(shadowPlane);
+
+    scene.add(pedestalGroup);
 
     // Ant Explorer Probe
-    const ant = createAntProbeMesh();
+    const ant = createAuthenticAntMesh();
     antMeshRef.current = ant;
     scene.add(ant);
 
@@ -772,23 +1045,22 @@ export default function MobiusStrip3DLab() {
 
       if (controlsRef.current) {
         controlsRef.current.autoRotate = autoRotate;
-        controlsRef.current.autoRotateSpeed = 1.2;
+        controlsRef.current.autoRotateSpeed = 1.0;
         controlsRef.current.update();
       }
 
       // Mode 1: Ant Walking Logic
       if (activeMode === 'ant' && isPlaying) {
         setTraversalU((prevU) => {
-          const step = delta * playbackSpeed * 0.8;
+          const step = delta * playbackSpeed * 0.75;
           let nextU = prevU + step;
 
-          // Sound trigger for steps
           audioEngine.playStep();
 
           // Milestone 1: Reaching 2*PI (50% progress, upside down on Side B)
           if (prevU < 2 * Math.PI && nextU >= 2 * Math.PI) {
             if (!circuitMilestoneRef.current.halfCompleted) {
-              audioEngine.playChime(440, 0.3); // Chime for inverted arrival
+              audioEngine.playChime(440, 0.3);
               circuitMilestoneRef.current.halfCompleted = true;
             }
           }
@@ -798,7 +1070,7 @@ export default function MobiusStrip3DLab() {
             nextU = 4 * Math.PI;
             setIsPlaying(false);
             if (!circuitMilestoneRef.current.fullCompleted) {
-              audioEngine.playChime(880, 0.45); // High triumph chime
+              audioEngine.playChime(880, 0.45);
               circuitMilestoneRef.current.fullCompleted = true;
             }
           }
@@ -807,7 +1079,6 @@ export default function MobiusStrip3DLab() {
         });
       }
 
-      // Render Scene
       if (rendererRef.current && sceneRef.current && cameraRef.current) {
         rendererRef.current.render(sceneRef.current, cameraRef.current);
       }
@@ -856,6 +1127,24 @@ export default function MobiusStrip3DLab() {
           <Icon name="sliders" size={15} />
           <span>Topological Manifold Sandbox</span>
         </button>
+
+        {/* Surface Material Theme Toggle */}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
+          <button
+            className={`${styles.pillBtn} ${surfaceTheme === 'parchment' ? styles.pillBtnActive : ''}`}
+            onClick={() => setSurfaceTheme('parchment')}
+            title="Archival Cardstock Paper"
+          >
+            Parchment
+          </button>
+          <button
+            className={`${styles.pillBtn} ${surfaceTheme === 'titanium' ? styles.pillBtnActive : ''}`}
+            onClick={() => setSurfaceTheme('titanium')}
+            title="Matte Titanium Slate"
+          >
+            Titanium
+          </button>
+        </div>
       </div>
 
       {/* ── Main 3D Canvas Viewport ── */}
@@ -868,7 +1157,7 @@ export default function MobiusStrip3DLab() {
               <span>Listing &amp; Möbius (1858) · Non-Orientable Manifold</span>
             </div>
             <h2 className={styles.headerTitle}>Möbius Strip Interactive Laboratory</h2>
-            <p className={styles.subtitle || styles.headerSubtitle}>
+            <p className={styles.headerSubtitle}>
               Empirical 3D simulation of one-sided topology, normal vector inversion, and cutting paradoxes.
             </p>
           </div>
